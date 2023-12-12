@@ -28,9 +28,9 @@ jobs:
       - name: Build All DocC 🛠
         run: |
           swift package resolve;
-          xcodebuild docbuild -scheme FSAppHealthChecks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS';
+          xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS';
           $(xcrun --find docc) process-archive \
-            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/FSAppHealthChecks.doccarchive \
+            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/fs-app-health-checks.doccarchive \
             --output-path docs \
             --hosting-base-path dxprotocol;
           echo "<script>window.location.href += \"/documentation/fs-app-health-checks\"</script>" > docs/index.html;
