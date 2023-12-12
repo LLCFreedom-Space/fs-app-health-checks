@@ -9,13 +9,13 @@ let package = Package(
         .macOS(.v13),
         .iOS(.v16),
         .watchOS(.v9),
-        .tvOS(.v16),
+        .tvOS(.v16)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "AppHealthChecks",
-            targets: ["AppHealthChecks"]),
+            targets: ["AppHealthChecks"])
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -24,6 +24,6 @@ let package = Package(
             name: "AppHealthChecks"),
         .testTarget(
             name: "AppHealthChecksTests",
-            dependencies: ["AppHealthChecks"]),
+            dependencies: ["AppHealthChecks"])
     ]
 )
