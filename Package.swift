@@ -4,20 +4,20 @@
 import PackageDescription
 
 let package = Package(
-    name: "FSAppHealthChecks",
+    name: "fs-app-health-checks",
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "FSAppHealthChecks",
-            targets: ["FSAppHealthChecks"]),
+            name: "AppHealthChecks",
+            targets: ["AppHealthChecks"]),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "FSAppHealthChecks"),
+            name: "AppHealthChecks"),
         .testTarget(
-            name: "FSAppHealthChecksTests",
-            dependencies: ["FSAppHealthChecks"]),
+            name: "AppHealthChecksTests",
+            dependencies: ["AppHealthChecks"]),
     ]
 )

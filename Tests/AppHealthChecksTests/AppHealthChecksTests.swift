@@ -1,7 +1,7 @@
 import XCTest
-@testable import FSAppHealthChecks
+@testable import AppHealthChecks
 
-final class FSAppHealthChecksTests: XCTestCase {
+final class AppHealthChecksTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest
