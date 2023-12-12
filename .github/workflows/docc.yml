@@ -32,7 +32,7 @@ jobs:
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/FSAppHealthChecks.doccarchive \
             --output-path docs \
-            --hosting-base-path FSAppHealthChecks;
+            --hosting-base-path fs-app-health-checks;
           echo "<script>window.location.href += \"/documentation/fs-app-health-checks\"</script>" > docs/index.html;
 
       - name: Upload artifact 📜
