@@ -32,8 +32,8 @@ jobs:
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/AppHealthChecks.doccarchive \
             --output-path docs \
-            --hosting-base-path fs-app-health-checks;
-          echo "<script>window.location.href += \"/documentation/fs-app-health-checks\"</script>" > docs/index.html;
+            --hosting-base-path app-health-checks;
+          echo "<script>window.location.href += \"/documentation/app-health-checks\"</script>" > docs/index.html;
 
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v1
