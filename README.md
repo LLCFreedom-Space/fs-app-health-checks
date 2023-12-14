@@ -11,6 +11,17 @@
 
 This repository offers a wide collection of health checks features for widely used services and platforms.
 
+## Health Checks Library for Swift
+
+The Health Checks Library for Swift is a simple and easy-to-use way to implement health checks for your server-side Swift applications. It is designed specifically for the Vapor framework and also conforms to the RFC [Health Check Response Format for HTTP APIs](https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-06#section-4.6-1).
+
+Features
+
+* A set of pre-defined health checks that cover common server-side functionality, such as database connectivity, HTTP connectivity, and memory usage.
+* The ability to create custom health checks to monitor your application's specific needs.
+* A simple API that makes it easy to implement health checks in your Vapor application.
+* Conforms to the RFC [Health Check Response Format for HTTP APIs](https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-06#section-4.6-1).
+
 ## Installation
 
 App Health Checks is available with Swift Package Manager.
