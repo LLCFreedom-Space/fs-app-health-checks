@@ -9,6 +9,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# Allow one concurrent deployment
+concurrency:
+  group: "testing"
+  cancel-in-progress: true
+
 jobs:
   build:
 
