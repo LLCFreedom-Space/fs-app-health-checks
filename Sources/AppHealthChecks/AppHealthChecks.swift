@@ -3,5 +3,4 @@
 
 /// AppHealthChecks library
 struct AppHealthChecks {
-
 }
