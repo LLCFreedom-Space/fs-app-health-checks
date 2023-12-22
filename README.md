@@ -7,6 +7,7 @@
 ![example workflow](https://github.com/LLCFreedom-Space/fs-app-health-checks/actions/workflows/docc.yml/badge.svg?branch=main)
 ![example workflow](https://github.com/LLCFreedom-Space/fs-app-health-checks/actions/workflows/lint.yml/badge.svg?branch=main)
 ![example workflow](https://github.com/LLCFreedom-Space/fs-app-health-checks/actions/workflows/test.yml/badge.svg?branch=main)
+![example workflow](https://github.com/LLCFreedom-Space/fs-app-health-checks/actions/workflows/codeql.yml/badge.svg?branch=main)
 [![codecov](https://codecov.io/github/LLCFreedom-Space/fs-app-health-checks/graph/badge.svg?token=2EUIA4OGS9)](https://codecov.io/github/LLCFreedom-Space/fs-app-health-checks)
 
 This repository offers a wide collection of health checks features for widely used services and platforms.
