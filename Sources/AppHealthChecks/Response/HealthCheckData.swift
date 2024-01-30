@@ -11,8 +11,7 @@ import Vapor
 
 /// The `checks` object MAY have a number of unique keys, one for each logical downstream dependency or sub-component.
 /// Since each sub-component may be backed by several nodes with varying health statuses, these keys point to arrays of objects.
-/// In case of a single-node sub-component (or if presence of nodes is not relevant), a single-element array SHOULD be used as the value, for consistency.
-/// The key identifying an element in the object SHOULD be a unique string within the details section. 
+/// The key identifying an element in the object SHOULD be a unique string within the details section.
 /// It MAY have two parts: `{componentName}:{measurementName}`, in which case the meaning of the parts SHOULD be as follows:
 public struct HealthCheckData: Content {
     /// Is a unique identifier of an instance of a specific sub-component/dependency of a service.
