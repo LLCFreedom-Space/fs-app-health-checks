@@ -9,7 +9,7 @@
 
 import Vapor
 
-/// SHOULD be present if componentName is present. It's a type of the component and could be one of:
+/// Human-readable type for the component.
 public enum ComponentType: String, Content, CaseIterable {
     case component
     case datastore

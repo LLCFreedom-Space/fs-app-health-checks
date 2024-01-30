@@ -1,5 +1,5 @@
 //
-//  HealthCheckData.swift
+//  HealthCheckItem.swift
 //
 //
 //  Created by Mykola Buhaiov on 29.01.2024.
@@ -13,7 +13,7 @@ import Vapor
 /// Since each sub-component may be backed by several nodes with varying health statuses, these keys point to arrays of objects.
 /// The key identifying an element in the object SHOULD be a unique string within the details section.
 /// It MAY have two parts: `{componentName}:{measurementName}`, in which case the meaning of the parts SHOULD be as follows:
-public struct HealthCheckData: Content {
+public struct HealthCheckItem: Content {
     /// Is a unique identifier of an instance of a specific sub-component/dependency of a service.
     /// Multiple objects with the same componentID MAY appear in the details, if they are from different nodes
     /// Example: `43119325-63f5-4e14-9175-84e0e296c527`

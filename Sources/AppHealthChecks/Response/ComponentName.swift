@@ -9,7 +9,7 @@
 
 import Vapor
 
-/// Human-readable name for the component. MUST not contain a colon, in the name, since colon is used as a separator.
+/// Human-readable name for the component
 public enum ComponentName: String, Content, CaseIterable {
     case cpu
     case memory
