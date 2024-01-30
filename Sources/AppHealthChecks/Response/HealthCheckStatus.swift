@@ -9,13 +9,13 @@
 
 import Vapor
 
-/// Indicates whether the service status is acceptable or not. API publishers SHOULD use following values for the field:
+/// Indicates whether the service status is acceptable or not
 public enum HealthCheckStatus: String {
-    /// Unhealthy (acceptable aliases: `error` to support Node's Terminus and `down` for Java's SpringBoot)
+    /// Unhealthy
     case fail
     /// Healthy, with some concerns
     case warm
-    /// Healthy (acceptable aliases: `ok` to support Node's Terminus and `up` for Java's SpringBoot)
+    /// Healthy, without concerns
     case pass
 }
 
