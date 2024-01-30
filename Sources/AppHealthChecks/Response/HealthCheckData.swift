@@ -15,32 +15,45 @@ import Vapor
 /// The key identifying an element in the object SHOULD be a unique string within the details section. 
 /// It MAY have two parts: `{componentName}:{measurementName}`, in which case the meaning of the parts SHOULD be as follows:
 public struct HealthCheckData: Content {
-    ///Is a unique identifier of an instance of a specific sub-component/dependency of a service.
-    ///Multiple objects with the same componentID MAY appear in the details, if they are from different nodes
+    /// Is a unique identifier of an instance of a specific sub-component/dependency of a service.
+    /// Multiple objects with the same componentID MAY appear in the details, if they are from different nodes
+    /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
     public var componentId: String?
+  
     /// SHOULD be present if componentName is present. It's a type of the component and could be one of:
+    /// Example: `component`
     public var componentType: ComponentType?
+    
     /// Could be any valid JSON value, such as: string, number, object, array or literal
+    /// Example: `100`
     public var observedValue: Double?
-    /// SHOULD be present if observedValue is present. 
-    /// Clarifies the unit of measurement in which observedUnit is reported, e.g. for a time-based value it is important to know whether the time is reported in seconds, minutes, hours or something else.
-    /// To make sure unit is denoted by a well-understood name or an abbreviation, it SHOULD be one of:
+    
+    /// SHOULD be present if observedValue is present.
+    /// Time-based value it is important to know whether the time is reported in seconds, minutes, hours or something else.
+    /// Example: `ms`
     public var observedUnit: String?
-    /// Has the exact same meaning as the top-level "output" element, but for the sub-component/downstream dependency represented by the details object
+    
+    /// Has the exact same meaning as the top-level `output` element, but for the sub-component/downstream dependency represented by the details object
     public var status: HealthCheckStatus?
-    /// Is a JSON array containing URI Templates as defined by [RFC6570]. This field SHOULD be omitted if the `status` field is present and has value equal to "pass".
-    /// A typical API has many URI endpoints. Most of the time we are interested in the overall health of the API, without diving into details.
-    /// That said, sometimes operational and resilience middleware needs to know more details about the health of the API (which is why `checks` property provides details).
-    /// In such cases, we often need to indicate which particular endpoints are affected by a particular check's troubles vs. other endpoints that may be fine
+    
+    /// Is a JSON array containing URI Templates as defined by [RFC6570]. This field SHOULD be omitted if the `status` field is present and has value equal to `pass`.
+    /// Example: `pass`
     public var affectedEndpoints: [String]?
+    
     /// Is the date-time, in ISO8601 format, at which the reading of the observedValue was recorded.
     /// This assumes that the value can be cached and the reading typically doesn't happen in real time, for performance and scalability purposes
+    /// Example: `2024-01-17T03:36:48Z`
     public var time: String?
+    
     /// Has the exact same meaning as the top-level `output` element, but for the sub-component/downstream dependency represented by the details object.
-    ///  As is the case for the top-level element, this field SHOULD be omitted for "pass" state of a downstream dependency
+    /// As is the case for the top-level element, this field SHOULD be omitted for `pass` state of a downstream dependency
     public var output: String?
+    
     /// Has the exact same meaning as the top-level `output` element, but for the sub-component/downstream dependency represented by the details object
+    /// Example: `["about": "http://api.example.com/about/authz"]`
     public var links: [String: String]?
+    
     /// Number of node
+    /// Example: `1`
     public var node: Int?
 }

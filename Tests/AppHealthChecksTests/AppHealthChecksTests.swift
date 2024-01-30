@@ -12,7 +12,9 @@ import XCTest
 @testable import AppHealthChecks
 
 final class AppHealthChecksTests: XCTestCase {
+    //  swiftlint:disable implicitly_unwrapped_optional
     var app: Application!
+    //  swiftlint:enable implicitly_unwrapped_optional
 
     override func setUpWithError() throws {
         app = Application(.testing)
