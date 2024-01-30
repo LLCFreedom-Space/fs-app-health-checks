@@ -10,7 +10,6 @@
 import Vapor
 
 /// Name of the measurement type (a data point type) that the status is reported for.
-/// MUST not contain a colon, in the name, since colon is used as a separator. The observation's name can be one of:
 public enum MeasurementType: String, Content, CaseIterable {
     case utilization
     case responseTime
