@@ -30,7 +30,7 @@ public struct HealthCheck: Content {
     
     /// Is an object that provides detailed health statuses of additional downstream systems and endpoints which can affect the overall health of the main API.
     /// Please refer to the `The Checks Object` section for more information
-    public var checks: [String: [HealthCheckData]]?
+    public var checks: [String: [HealthCheckItem]]?
     
     /// Is an object containing link relations and URIs [RFC3986] for external links that MAY contain more information about the health of the endpoint.
     public var links: [String: String]?

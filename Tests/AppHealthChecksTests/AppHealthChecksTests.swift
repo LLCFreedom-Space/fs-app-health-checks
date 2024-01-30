@@ -25,12 +25,12 @@ final class AppHealthChecksTests: XCTestCase {
     }
 
     func testGetMajorVersion() throws {
-        let version = AppHealthChecks().getMajorVersion(from: "1.0.0")
+        let version = AppHealthChecks().getPublicVersion(from: "1.0.0")
         XCTAssertEqual(version, 1)
     }
 
     func testGetMajorVersionForDefaultVersion() throws {
-        let version = AppHealthChecks().getMajorVersion(from: "1-0-0")
+        let version = AppHealthChecks().getPublicVersion(from: "1-0-0")
         XCTAssertEqual(version, 0)
     }
 }
