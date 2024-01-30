@@ -28,4 +28,9 @@ final class AppHealthChecksTests: XCTestCase {
         let version = AppHealthChecks().getMajorVersion(from: "1.0.0")
         XCTAssertEqual(version, 1)
     }
+
+    func testGetMajorVersionForDefaultVersion() throws {
+        let version = AppHealthChecks().getMajorVersion(from: "1-0-0")
+        XCTAssertEqual(version, 0)
+    }
 }

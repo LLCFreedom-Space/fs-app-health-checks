@@ -7,6 +7,7 @@
 
 import Vapor
 
+/// Service that provides app health check functionality
 public struct AppHealthChecks {
     private let logger = Logger(label: "AppHealthChecks")
 
