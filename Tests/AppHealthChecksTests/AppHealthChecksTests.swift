@@ -1,4 +1,4 @@
-// FS Dependency Injection
+// FS App Health Checks
 // Copyright (C) 2024  FREEDOM SPACE, LLC
 
 //
@@ -42,17 +42,17 @@ final class AppHealthChecksTests: XCTestCase {
         app.shutdown()
     }
 
-    func testGetMajorVersion() throws {
+    func testGetMajorVersion() {
         let version = AppHealthChecks().getPublicVersion(from: releaseId)
         XCTAssertEqual(version, 1)
     }
 
-    func testGetMajorVersionForDefaultVersion() throws {
+    func testGetMajorVersionForDefaultVersion() {
         let version = AppHealthChecks().getPublicVersion(from: "1-0-0")
         XCTAssertEqual(version, 0)
     }
 
-    func testGetHealth() throws {
+    func testGetHealth() {
         app.serviceId = serviceId
         app.releaseId = releaseId
         let response = AppHealthChecks().getHealth(from: app)

@@ -1,4 +1,4 @@
-// FS Dependency Injection
+// FS App Health Checks
 // Copyright (C) 2024  FREEDOM SPACE, LLC
 
 //
@@ -36,7 +36,7 @@ extension Application {
     public var serviceId: UUID {
         get {
             guard let serviceId = storage[ServiceIdKey.self] else {
-                fatalError("ServiceId not setup for application")
+                preconditionError("ServiceId not setup for application")
             }
             return serviceId
         }
@@ -53,7 +53,7 @@ extension Application {
     public var releaseId: String {
         get {
             guard let releaseId = storage[ReleaseIdKey.self] else {
-                fatalError("ReleaseId not setup for application")
+                preconditionError("ReleaseId not setup for application")
             }
             return releaseId
         }
