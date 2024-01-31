@@ -25,7 +25,7 @@
 import Vapor
 
 /// Human-readable name for the component
-public enum ComponentName: String, Content, CaseIterable {
+public enum ComponentName: String {
     case cpu
     case memory
     case redis
@@ -35,3 +35,7 @@ public enum ComponentName: String, Content, CaseIterable {
     case consul
     case grpc
 }
+
+extension ComponentName: Content {}
+
+extension ComponentName: CaseIterable {}
