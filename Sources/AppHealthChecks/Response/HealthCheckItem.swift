@@ -42,10 +42,10 @@ public struct HealthCheckItem: Content {
     /// Example: `ms`
     public var observedUnit: String?
     
-    /// Has the exact same meaning as the top-level `output` element, but for the sub-component/downstream dependency represented by the details object
+    /// It's a status of the health check
     public var status: HealthCheckStatus?
     
-    /// Is a JSON array containing URI Templates as defined by [RFC6570]. This field SHOULD be omitted if the `status` field is present and has value equal to `pass`.
+    /// Array of affected endpoints
     /// Example: `http://example.com/pass/endpoints`
     public var affectedEndpoints: [String]?
     
@@ -57,7 +57,7 @@ public struct HealthCheckItem: Content {
     /// Example: `"Redis database not exist"`
     public var output: String?
     
-    /// Has the exact same meaning as the top-level `output` element, but for the sub-component/downstream dependency represented by the details object
+    /// Dictionary of links for show more information about health check item
     /// Example: `["about": "http://api.example.com/about/authz"]`
     public var links: [String: String]?
     

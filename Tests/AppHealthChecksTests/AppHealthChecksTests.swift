@@ -27,19 +27,15 @@ import XCTest
 @testable import AppHealthChecks
 
 final class AppHealthChecksTests: XCTestCase {
-    //  swiftlint:disable implicitly_unwrapped_optional
-    var app: Application!
-    //  swiftlint:enable implicitly_unwrapped_optional
+    let app = Application(.testing)
 
     let serviceId = UUID()
     let releaseId = "1.0.0"
 
-    override func setUpWithError() throws {
-        app = Application(.testing)
-    }
+    override func setUpWithError() throws {}
 
     override func tearDown() {
-        app.shutdown()
+        do { app.shutdown() }
     }
 
     func testGetMajorVersion() {
