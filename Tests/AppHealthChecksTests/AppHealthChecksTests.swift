@@ -32,23 +32,20 @@ final class AppHealthChecksTests: XCTestCase {
     let serviceId = UUID()
     let releaseId = "1.0.0"
 
-    override func setUpWithError() throws {}
-
-    override func tearDown() {
-        do { app.shutdown() }
-    }
-
     func testGetMajorVersion() {
+        defer { app.shutdown() }
         let version = AppHealthChecks().getPublicVersion(from: releaseId)
         XCTAssertEqual(version, 1)
     }
 
     func testGetMajorVersionForDefaultVersion() {
+        defer { app.shutdown() }
         let version = AppHealthChecks().getPublicVersion(from: "1-0-0")
         XCTAssertEqual(version, 0)
     }
 
     func testGetHealth() {
+        defer { app.shutdown() }
         app.serviceId = serviceId
         app.releaseId = releaseId
         let response = AppHealthChecks().getHealth(from: app)
