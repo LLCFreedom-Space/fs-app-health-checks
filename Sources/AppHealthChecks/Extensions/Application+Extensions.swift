@@ -36,7 +36,7 @@ extension Application {
     public var serviceId: UUID {
         get {
             guard let serviceId = storage[ServiceIdKey.self] else {
-                preconditionError("ServiceId not setup for application")
+                preconditionFailure("ServiceId not setup for application")
             }
             return serviceId
         }
@@ -53,7 +53,7 @@ extension Application {
     public var releaseId: String {
         get {
             guard let releaseId = storage[ReleaseIdKey.self] else {
-                preconditionError("ReleaseId not setup for application")
+                preconditionFailure("ReleaseId not setup for application")
             }
             return releaseId
         }
