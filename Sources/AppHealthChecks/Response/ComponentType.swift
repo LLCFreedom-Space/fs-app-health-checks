@@ -25,8 +25,12 @@
 import Vapor
 
 /// Human-readable type for the component.
-public enum ComponentType: String, Content, CaseIterable {
+public enum ComponentType: String {
     case component
     case datastore
     case system
 }
+
+extension ComponentType: Content {}
+
+extension ComponentType: CaseIterable {}

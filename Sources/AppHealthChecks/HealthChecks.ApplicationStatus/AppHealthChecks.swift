@@ -28,7 +28,6 @@ import Vapor
 public struct AppHealthChecks {
     private let logger = Logger(label: "AppHealthChecks")
 
-
     /// Get app major version
     /// - Parameter serverVersion: `String`
     /// - Returns: `Int`
@@ -41,41 +40,15 @@ public struct AppHealthChecks {
         return version
     }
     
-    /// Get application health
-    /// - Parameter appInformation: `AppInformationDTO`
+    /// Get health for application
+    /// - Parameter app: `Application`
     /// - Returns: `HealthCheck`
-    public func getApplicationHealth(from appInformation: AppInformationDTO) -> HealthCheck {
+    public func getHealth(from app: Application) -> HealthCheck {
         let healthCheck = HealthCheck(
-            status: appInformation.status,
-            version: appInformation.version,
-            releaseId: appInformation.releaseId,
-            notes: appInformation.notes,
-            output: appInformation.output,
-            checks: appInformation.checks,
-            links: appInformation.links,
-            serviceId: appInformation.serviceId,
-            description: appInformation.description
+            version: self.getPublicVersion(from: app.releaseId),
+            releaseId: app.releaseId,
+            serviceId: app.serviceId
         )
         return healthCheck
     }
-}
-
-public struct AppInformationDTO: Content {
-    public var status: HealthCheckStatus?
-
-    public var version: Int?
-
-    public var releaseId: String?
-
-    public var notes: [String]?
-
-    public var output: String?
-
-    public var checks: [String: [HealthCheckItem]]?
-
-    public var links: [String: String]?
-
-    public var serviceId: UUID?
-
-    public var description: String?
 }

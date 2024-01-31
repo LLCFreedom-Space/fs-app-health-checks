@@ -25,9 +25,13 @@
 import Vapor
 
 /// Name of the measurement type (a data point type) that the status is reported for
-public enum MeasurementType: String, Content, CaseIterable {
+public enum MeasurementType: String {
     case utilization
     case responseTime
     case connections
     case uptime
 }
+
+extension MeasurementType: Content {}
+
+extension MeasurementType: CaseIterable {}

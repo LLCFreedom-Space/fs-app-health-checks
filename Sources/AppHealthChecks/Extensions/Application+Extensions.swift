@@ -19,9 +19,44 @@
 //  Application+Extensions.swift
 //
 //
-//  Created by Mykola Buhaiov on 30.01.2024.
+//  Created by Mykola Buhaiov on 31.01.2024.
 //
 
 import Vapor
 
-extension Application { }
+/// Extension for core type representing a Vapor application.
+extension Application {
+    /// A `ServiceIdKey` conform to StorageKey protocol
+    private struct ServiceIdKey: StorageKey {
+        /// Less verbose typealias for `UUID`.
+        typealias Value = UUID
+    }
+    
+    /// Setup `serviceId` in application storage
+    public var serviceId: UUID {
+        get {
+            guard let serviceId = storage[ServiceIdKey.self] else {
+                fatalError("ServerId not setup for application")
+            }
+            return serviceId
+        }
+        set { storage[ServiceIdKey.self] = newValue }
+    }
+
+    /// A `ReleaseIdKey` conform to StorageKey protocol
+    private struct ReleaseIdKey: StorageKey {
+        /// Less verbose typealias for `String`.
+        typealias Value = String
+    }
+
+    /// Setup `releaseId` in application storage
+    public var releaseId: String {
+        get {
+            guard let releaseId = storage[ReleaseIdKey.self] else {
+                fatalError("ReleaseId not setup for application")
+            }
+            return releaseId
+        }
+        set { storage[ReleaseIdKey.self] = newValue }
+    }
+}

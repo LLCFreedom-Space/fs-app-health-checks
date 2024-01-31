@@ -31,6 +31,9 @@ final class AppHealthChecksTests: XCTestCase {
     var app: Application!
     //  swiftlint:enable implicitly_unwrapped_optional
 
+    let serviceId = UUID()
+    let releaseId = "1.0.0"
+
     override func setUpWithError() throws {
         app = Application(.testing)
     }
@@ -40,12 +43,21 @@ final class AppHealthChecksTests: XCTestCase {
     }
 
     func testGetMajorVersion() throws {
-        let version = AppHealthChecks().getPublicVersion(from: "1.0.0")
+        let version = AppHealthChecks().getPublicVersion(from: releaseId)
         XCTAssertEqual(version, 1)
     }
 
     func testGetMajorVersionForDefaultVersion() throws {
         let version = AppHealthChecks().getPublicVersion(from: "1-0-0")
         XCTAssertEqual(version, 0)
+    }
+
+    func testGetHealth() throws {
+        app.serviceId = serviceId
+        app.releaseId = releaseId
+        let response = AppHealthChecks().getHealth(from: app)
+        XCTAssertEqual(response.version, 1)
+        XCTAssertEqual(response.releaseId, releaseId)
+        XCTAssertEqual(response.serviceId, serviceId)
     }
 }

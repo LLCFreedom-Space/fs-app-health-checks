@@ -31,7 +31,7 @@ public struct HealthCheckItem: Content {
     public var componentId: String?
   
     /// It's a type of the component
-    /// Example: `component`
+    /// Example: one of the enumeration:`component` or `datastore` or `system`
     public var componentType: ComponentType?
     
     /// Could be any valid JSON value, such as: `string`, `number`, object, array or literal
@@ -53,7 +53,8 @@ public struct HealthCheckItem: Content {
     /// Example: `2024-01-17T03:36:48Z`
     public var time: String?
     
-    /// As is the case for the top-level element, this field SHOULD be omitted for `pass` state of a downstream dependency
+    /// Raw error output, in case of `fail` or `warn` states
+    /// Example: `"Redis database not exist"`
     public var output: String?
     
     /// Has the exact same meaning as the top-level `output` element, but for the sub-component/downstream dependency represented by the details object
