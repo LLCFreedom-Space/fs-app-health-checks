@@ -26,18 +26,12 @@ import Vapor
 
 /// Service that provides app health check functionality
 public struct AppHealthChecks {
-    private let logger = Logger(label: "AppHealthChecks")
-
     /// Get app major version
     /// - Parameter serverVersion: `String`
     /// - Returns: `Int`
-    public func getPublicVersion(from version: String?) -> Int {
+    public func getPublicVersion(from version: String?) -> Int? {
         let components = version?.components(separatedBy: ".")
-        guard let version = Int(components?.first ?? "0") else {
-            logger.error("In version: \(String(describing: version)) not found first index")
-            return 0
-        }
-        return version
+        return Int(components?.first ?? "0")
     }
     
     /// Get health for application
