@@ -29,9 +29,9 @@ public struct AppHealthChecks {
     /// Get app major version
     /// - Parameter serverVersion: `String`
     /// - Returns: `Int`
-    public func getPublicVersion(from version: String?) -> Int? {
+    public func getPublicVersion(from version: String?) -> String? {
         let components = version?.components(separatedBy: ".")
-        return Int(components?.first ?? "0")
+        return components?.first
     }
     
     /// Get health for application

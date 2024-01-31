@@ -34,7 +34,7 @@ final class AppHealthChecksTests: XCTestCase {
         let app = Application(.testing)
         defer { app.shutdown() }
         let version = AppHealthChecks().getPublicVersion(from: releaseId)
-        XCTAssertEqual(version, 1)
+        XCTAssertEqual(version, "1")
     }
 
     func testGetHealth() {
@@ -43,7 +43,7 @@ final class AppHealthChecksTests: XCTestCase {
         app.serviceId = serviceId
         app.releaseId = releaseId
         let response = AppHealthChecks().getHealth(from: app)
-        XCTAssertEqual(response.version, 1)
+        XCTAssertEqual(response.version, "1")
         XCTAssertEqual(response.releaseId, releaseId)
         XCTAssertEqual(response.serviceId, serviceId)
     }

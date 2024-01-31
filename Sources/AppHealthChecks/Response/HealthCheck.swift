@@ -32,7 +32,7 @@ public struct HealthCheck: Content {
 
     /// Public version of the service
     /// Example: `1`
-    public var version: Int?
+    public var version: String?
     
     /// Release id of the service
     /// Example: `1.0.0`
