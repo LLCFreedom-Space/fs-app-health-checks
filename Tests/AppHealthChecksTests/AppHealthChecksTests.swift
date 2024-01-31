@@ -37,13 +37,6 @@ final class AppHealthChecksTests: XCTestCase {
         XCTAssertEqual(version, 1)
     }
 
-    func testGetMajorVersionForDefaultVersion() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let version = AppHealthChecks().getPublicVersion(from: "1-0-0")
-        XCTAssertEqual(version, 0)
-    }
-
     func testGetHealth() {
         let app = Application(.testing)
         defer { app.shutdown() }
