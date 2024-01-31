@@ -46,7 +46,7 @@ public struct HealthCheck: Content {
     /// Example: `"Redis database not exist"`
     public var output: String?
     
-    /// Is an object that provides detailed health statuses of additional downstream systems and endpoints which can affect the overall health of the main API.
+    /// Dictionary of array that provides all health check item
     public var checks: [String: [HealthCheckItem]]?
 
     /// Dictionary of links for show more information
