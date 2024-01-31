@@ -36,7 +36,7 @@ extension Application {
     public var serviceId: UUID {
         get {
             guard let serviceId = storage[ServiceIdKey.self] else {
-                fatalError("ServerId not setup for application")
+                fatalError("ServiceId not setup for application")
             }
             return serviceId
         }
