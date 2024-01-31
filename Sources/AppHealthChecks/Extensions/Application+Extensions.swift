@@ -33,13 +33,8 @@ extension Application {
     }
     
     /// Setup `serviceId` in application storage
-    public var serviceId: UUID {
-        get {
-            guard let serviceId = storage[ServiceIdKey.self] else {
-                preconditionFailure("ServiceId not setup for application")
-            }
-            return serviceId
-        }
+    public var serviceId: UUID? {
+        get { storage[ServiceIdKey.self] }
         set { storage[ServiceIdKey.self] = newValue }
     }
 
@@ -50,13 +45,8 @@ extension Application {
     }
 
     /// Setup `releaseId` in application storage
-    public var releaseId: String {
-        get {
-            guard let releaseId = storage[ReleaseIdKey.self] else {
-                preconditionFailure("ReleaseId not setup for application")
-            }
-            return releaseId
-        }
+    public var releaseId: String? {
+        get { storage[ReleaseIdKey.self] }
         set { storage[ReleaseIdKey.self] = newValue }
     }
 }
