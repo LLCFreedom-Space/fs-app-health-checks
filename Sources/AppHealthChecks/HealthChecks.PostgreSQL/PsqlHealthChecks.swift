@@ -38,6 +38,7 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     ///   - username: `String`
     ///   - password: `String`
     ///   - database: `String`
+    ///   - tls: optional `PostgresConnection.Configuration.TLS`
     /// - Returns: `HealthCheckItem`
     public func checkConnection(
         hostname: String,

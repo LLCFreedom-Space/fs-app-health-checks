@@ -34,6 +34,7 @@ public protocol PsqlHealthChecksProtocol {
     ///   - username: `String`
     ///   - password: `String`
     ///   - database: `String`
+    ///   - tls: optional `PostgresConnection.Configuration.TLS`
     /// - Returns: `HealthCheckItem`
     func checkConnection(
         hostname: String,
