@@ -26,9 +26,13 @@ import Vapor
 
 /// Name of the measurement type (a data point type) that the status is reported for
 public enum MeasurementType: String {
+    /// An act or instance of making practical or profitable use of something
     case utilization
+    /// The time lag between an electronic input and the output signal which depends upon the value of passive components used
     case responseTime
+    /// The state of being connected
     case connections
+    /// Uptime is a measure of system reliability, expressed as the percentage of time a machine
     case uptime
 }
 

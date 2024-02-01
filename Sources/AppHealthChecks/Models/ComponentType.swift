@@ -26,8 +26,11 @@ import Vapor
 
 /// Human-readable type for the component.
 public enum ComponentType: String {
+    /// A part that combines with other parts to form something bigger
     case component
+    /// A datastore is a repository for storing, managing and distributing data sets on an enterprise level
     case datastore
+    /// A set of connected things or devices that operate together
     case system
 }
 

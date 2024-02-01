@@ -48,7 +48,7 @@ final class PsqlHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let url = "postgres://username:password@hostname:port/database?tlsmode=mode"
-        let result = try await app.psqlHealthChecks?.checkConnection(url: url)
+        let result = try await app.psqlHealthChecks?.checkConnection(by: url)
         XCTAssertEqual(result, PsqlHealthChecksMock.healthCheckItem)
     }
 }

@@ -48,5 +48,5 @@ public protocol PsqlHealthChecksProtocol {
     /// Get psql health using url connection
     /// - Parameter url: `String`
     /// - Returns: `HealthCheckItem`
-    func checkConnection(url: String) async throws -> HealthCheckItem
+    func checkConnection(by url: String) async throws -> HealthCheckItem
 }

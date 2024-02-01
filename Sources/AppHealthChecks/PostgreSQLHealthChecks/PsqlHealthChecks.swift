@@ -68,9 +68,9 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
             componentType: .datastore,
             observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
-            status: connectionDescription.isEmpty ? .pass : .fail,
+            status: connectionDescription.contains("ERROR:") ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.isEmpty ? connectionDescription : nil,
+            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -80,7 +80,7 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     /// Get psql health using url connection
     /// - Parameter url: `String`
     /// - Returns: `HealthCheckItem`
-    public func checkConnection(url: String) async throws -> HealthCheckItem {
+    public func checkConnection(by url: String) async throws -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
         try app.databases.use(.postgres(url: url), as: .psql)
         let connectionDescription = await checkConnection()
@@ -89,9 +89,9 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
             componentType: .datastore,
             observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
-            status: connectionDescription.isEmpty ? .pass : .fail,
+            status: connectionDescription.contains("ERROR:") ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.isEmpty ? connectionDescription : nil,
+            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -103,9 +103,9 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     private func checkConnection() async -> String {
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
         let row = rows?.first?.makeRandomAccess()
-        guard (row?[data: "version"].string) != nil else {
-            return "No connect to Postgres database. Response: \(String(describing: row))"
+        guard let result = (row?[data: "version"].string) else {
+            return "ERROR: No connect to Postgres database. Response: \(String(describing: row))"
         }
-        return ""
+        return result
     }
 }
