@@ -33,7 +33,7 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
         observedUnit: "s",
         status: .pass,
         affectedEndpoints: nil,
-        time: Date().ISO8601Format(),
+        time: Date().formatted(.iso8601),
         output: "Ok",
         links: nil,
         node: nil
