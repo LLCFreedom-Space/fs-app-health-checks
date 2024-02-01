@@ -61,3 +61,22 @@ public struct HealthCheck: Content {
     /// Example: `"This service use for get application health"`
     public var description: String?
 }
+
+extension HealthCheck: Equatable {
+    /// Check for equal model
+    /// - Parameters:
+    ///   - lhs: `HealthCheck`
+    ///   - rhs: `HealthCheck`
+    /// - Returns: `Bool`
+    public static func == (lhs: HealthCheck, rhs: HealthCheck) -> Bool {
+        return lhs.status == rhs.status &&
+        lhs.version == rhs.version &&
+        lhs.releaseId == rhs.releaseId &&
+        lhs.notes == rhs.notes &&
+        lhs.output == rhs.output &&
+        lhs.checks == rhs.checks &&
+        lhs.links == rhs.links &&
+        lhs.serviceId == rhs.serviceId &&
+        lhs.description == rhs.description
+    }
+}

@@ -49,4 +49,16 @@ extension Application {
         get { storage[ReleaseIdKey.self] }
         set { storage[ReleaseIdKey.self] = newValue }
     }
+
+    /// A `PsqlHealthChecksKey` conform to StorageKey protocol
+    public struct PsqlHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `PsqlHealthChecksProtocol`.
+        public typealias Value = PsqlHealthChecksProtocol
+    }
+
+    /// Setup `psqlHealthChecks` in application storage
+    public var psqlHealthChecks: PsqlHealthChecksProtocol? {
+        get { storage[PsqlHealthChecksKey.self] }
+        set { storage[PsqlHealthChecksKey.self] = newValue }
+    }
 }
