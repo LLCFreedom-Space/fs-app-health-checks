@@ -62,11 +62,10 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
             as: .psql
         )
         let connectionDescription = await checkConnection()
-        let observedValue = Date().timeIntervalSinceReferenceDate - dateNow
         let connection = HealthCheckItem(
             componentId: UUID().uuidString,
             componentType: .datastore,
-            observedValue: observedValue,
+            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
             status: connectionDescription.isEmpty ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
@@ -84,11 +83,10 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
         let dateNow = Date().timeIntervalSinceReferenceDate
         try app.databases.use(.postgres(url: url), as: .psql)
         let connectionDescription = await checkConnection()
-        let observedValue = Date().timeIntervalSinceReferenceDate - dateNow
         let connection = HealthCheckItem(
             componentId: UUID().uuidString,
             componentType: .datastore,
-            observedValue: observedValue,
+            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
             status: connectionDescription.isEmpty ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
