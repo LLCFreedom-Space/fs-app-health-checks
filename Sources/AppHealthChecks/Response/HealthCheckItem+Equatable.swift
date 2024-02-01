@@ -1,5 +1,5 @@
 //
-//  HealthCheckItem+Extensions.swift
+//  HealthCheckItem+Equatable.swift
 //  
 //
 //  Created by Mykola Buhaiov on 01.02.2024.
