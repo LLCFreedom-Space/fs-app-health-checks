@@ -61,16 +61,16 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
             ),
             as: .psql
         )
-        let (statusCode, connectionDescription) = await checkConnection()
+        let connectionDescription = await checkConnection()
         let observedValue = Date().timeIntervalSinceReferenceDate - dateNow
         let connection = HealthCheckItem(
             componentId: UUID().uuidString,
             componentType: .datastore,
             observedValue: observedValue,
             observedUnit: "s",
-            status: statusCode == .ok ? .pass : .fail,
+            status: connectionDescription.isEmpty ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription,
+            output: !connectionDescription.isEmpty ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -83,16 +83,16 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     public func checkConnection(url: String) async throws -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
         try app.databases.use(.postgres(url: url), as: .psql)
-        let (statusCode, connectionDescription) = await checkConnection()
+        let connectionDescription = await checkConnection()
         let observedValue = Date().timeIntervalSinceReferenceDate - dateNow
         let connection = HealthCheckItem(
             componentId: UUID().uuidString,
             componentType: .datastore,
             observedValue: observedValue,
             observedUnit: "s",
-            status: statusCode == .ok ? .pass : .fail,
+            status: connectionDescription.isEmpty ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription,
+            output: !connectionDescription.isEmpty ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -100,19 +100,13 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     }
     
     /// Check health psql connection
-    /// - Returns: `HTTPResponseStatus`, `String`
-    private func checkConnection() async -> (HTTPStatus, String) {
-        var connectionDescription = String()
-        var statusCode = HTTPResponseStatus.badRequest
+    /// - Returns: `String`
+    private func checkConnection() async -> String {
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
         let row = rows?.first?.makeRandomAccess()
-        if (row?[data: "version"].string) != nil {
-            connectionDescription = "Ok"
-            statusCode = .ok
-        } else {
-            app.logger.error("No connect to Postgres database. Response: \(String(describing: row))")
-            connectionDescription = "No connect to Postgres database."
+        guard (row?[data: "version"].string) != nil else {
+            return "No connect to Postgres database. Response: \(String(describing: row))"
         }
-        return (statusCode, connectionDescription)
+        return ""
     }
 }
