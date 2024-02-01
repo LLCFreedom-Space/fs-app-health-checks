@@ -26,7 +26,6 @@ import Vapor
 @testable import AppHealthChecks
 
 public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
-
     static let healthCheckItem = HealthCheckItem(
         componentId: UUID().uuidString,
         componentType: .datastore,
