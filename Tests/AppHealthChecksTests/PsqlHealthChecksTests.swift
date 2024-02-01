@@ -41,7 +41,6 @@ final class PsqlHealthChecksTests: XCTestCase {
         )
         XCTAssertEqual(result?.0, ("\(ComponentName.postgresql):\(MeasurementType.connections)"))
         XCTAssertEqual(result?.1, PsqlHealthChecksMock.healthCheckItem)
-        print(result)
     }
 
     func testGetHealthUsingUrl() async throws {
