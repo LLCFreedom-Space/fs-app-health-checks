@@ -26,6 +26,7 @@ import Vapor
 @testable import AppHealthChecks
 
 public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
+
     static let healthCheckItem = HealthCheckItem(
         componentId: UUID().uuidString,
         componentType: .datastore,
@@ -33,7 +34,7 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
         observedUnit: "s",
         status: .pass,
         affectedEndpoints: nil,
-        time: Date().formatted(.iso8601),
+        time: globalDateFormat.string(from: Date()),
         output: "Ok",
         links: nil,
         node: nil
@@ -51,5 +52,11 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
 
     public func getHealth(url: String) async -> (String, HealthCheckItem) {
         return ("\(ComponentName.postgresql):\(MeasurementType.connections)", PsqlHealthChecksMock.healthCheckItem)
+    }
+
+   static var globalDateFormat: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+        return formatter
     }
 }
