@@ -94,7 +94,7 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
             observedValue: observedValue,
             observedUnit: "s",
             status: statusCode == .ok ? .pass : .fail,
-            time: Date().description,
+            time: app.dateTimeISOFormat.string(from: Date()),
             output: statusConnect,
             links: nil,
             node: nil

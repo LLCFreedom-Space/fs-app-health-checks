@@ -34,7 +34,7 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
         observedUnit: "s",
         status: .pass,
         affectedEndpoints: nil,
-        time: globalDateFormat.string(from: Date()),
+        time: "2024-02-01T11:11:59.364+02:00",
         output: "Ok",
         links: nil,
         node: nil
@@ -52,11 +52,5 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
 
     public func getHealth(url: String) async -> (String, HealthCheckItem) {
         return ("\(ComponentName.postgresql):\(MeasurementType.connections)", PsqlHealthChecksMock.healthCheckItem)
-    }
-
-   static var globalDateFormat: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-        return formatter
     }
 }

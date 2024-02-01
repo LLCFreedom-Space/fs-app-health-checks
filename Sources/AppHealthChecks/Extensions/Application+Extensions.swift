@@ -62,3 +62,13 @@ extension Application {
         set { storage[PsqlHealthChecksKey.self] = newValue }
     }
 }
+
+extension Application {
+    /// Variable of date conform to DateFormatter protocol. ISO 8601
+    /// Example: `2024-02-01T11:11:59.364+02:00`
+    var dateTimeISOFormat: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+        return formatter
+    }
+}
