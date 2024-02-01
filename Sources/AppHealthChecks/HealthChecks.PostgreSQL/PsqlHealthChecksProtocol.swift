@@ -26,7 +26,6 @@ import Vapor
 
 /// Groups func for get psql health check
 public protocol PsqlHealthChecksProtocol {
-    
     /// Get psql health using authorize parameters
     /// - Parameters:
     ///   - hostname: `String`

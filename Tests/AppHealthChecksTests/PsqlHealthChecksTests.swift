@@ -27,13 +27,14 @@ import XCTest
 @testable import AppHealthChecks
 
 final class PsqlHealthChecksTests: XCTestCase {
+    let defaultPort = 5432
     func testGetHealthUsingParameters() async {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let result = await app.psqlHealthChecks?.getHealth(
             hostname: "localhost",
-            port: 5432,
+            port: defaultPort,
             username: "test",
             password: "password",
             database: "test"
