@@ -23,6 +23,7 @@
 //
 
 import Vapor
+import FluentPostgresDriver
 
 /// Groups func for get psql health check
 public protocol PsqlHealthChecksProtocol {
@@ -33,17 +34,18 @@ public protocol PsqlHealthChecksProtocol {
     ///   - username: `String`
     ///   - password: `String`
     ///   - database: `String`
-    /// - Returns: `String`, `HealthCheckItem`
-    func getHealth(
+    /// - Returns: `HealthCheckItem`
+    func checkConnection(
         hostname: String,
         port: Int,
         username: String,
         password: String,
-        database: String
-    ) async -> (String, HealthCheckItem)
+        database: String,
+        tls: PostgresConnection.Configuration.TLS?
+    ) async -> HealthCheckItem
     
     /// Get psql health using url connection
     /// - Parameter url: `String`
-    /// - Returns: `String`, `HealthCheckItem`
-    func getHealth(url: String) async throws -> (String, HealthCheckItem)
+    /// - Returns: `HealthCheckItem`
+    func checkConnection(url: String) async throws -> HealthCheckItem
 }

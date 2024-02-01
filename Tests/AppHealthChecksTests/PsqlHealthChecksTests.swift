@@ -32,15 +32,15 @@ final class PsqlHealthChecksTests: XCTestCase {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlHealthChecks = PsqlHealthChecksMock()
-        let result = await app.psqlHealthChecks?.getHealth(
+        let result = await app.psqlHealthChecks?.checkConnection(
             hostname: "localhost",
             port: defaultPort,
             username: "test",
             password: "password",
-            database: "test"
+            database: "test",
+            tls: nil
         )
-        XCTAssertEqual(result?.0, ("\(ComponentName.postgresql):\(MeasurementType.connections)"))
-        XCTAssertEqual(result?.1, PsqlHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(result, PsqlHealthChecksMock.healthCheckItem)
     }
 
     func testGetHealthUsingUrl() async throws {
@@ -48,8 +48,7 @@ final class PsqlHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let url = "postgres://username:password@hostname:port/database?tlsmode=mode"
-        let result = try await app.psqlHealthChecks?.getHealth(url: url)
-        XCTAssertEqual(result?.0, ("\(ComponentName.postgresql):\(MeasurementType.connections)"))
-        XCTAssertEqual(result?.1, PsqlHealthChecksMock.healthCheckItem)
+        let result = try await app.psqlHealthChecks?.checkConnection(url: url)
+        XCTAssertEqual(result, PsqlHealthChecksMock.healthCheckItem)
     }
 }

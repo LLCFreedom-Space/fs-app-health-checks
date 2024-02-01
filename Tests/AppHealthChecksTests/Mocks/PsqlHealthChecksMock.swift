@@ -23,6 +23,7 @@
 //
 
 import Vapor
+import FluentPostgresDriver
 @testable import AppHealthChecks
 
 public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
@@ -39,17 +40,18 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
         node: nil
     )
 
-    public func getHealth(
+    public func checkConnection(
         hostname: String,
         port: Int,
         username: String,
         password: String,
-        database: String
-    ) async -> (String, HealthCheckItem) {
-        return ("\(ComponentName.postgresql):\(MeasurementType.connections)", PsqlHealthChecksMock.healthCheckItem)
+        database: String,
+        tls: PostgresConnection.Configuration.TLS?
+    ) async -> HealthCheckItem {
+        return PsqlHealthChecksMock.healthCheckItem
     }
 
-    public func getHealth(url: String) async -> (String, HealthCheckItem) {
-        return ("\(ComponentName.postgresql):\(MeasurementType.connections)", PsqlHealthChecksMock.healthCheckItem)
+    public func checkConnection(url: String) async -> HealthCheckItem {
+        return PsqlHealthChecksMock.healthCheckItem
     }
 }

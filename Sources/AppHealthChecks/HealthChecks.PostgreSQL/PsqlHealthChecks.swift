@@ -38,14 +38,16 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     ///   - username: `String`
     ///   - password: `String`
     ///   - database: `String`
-    /// - Returns: `String`, `HealthCheckItem`
-    public func getHealth(
+    /// - Returns: `HealthCheckItem`
+    public func checkConnection(
         hostname: String,
         port: Int,
         username: String,
         password: String,
-        database: String
-    ) async -> (String, HealthCheckItem) {
+        database: String,
+        tls: PostgresConnection.Configuration.TLS?
+    ) async -> HealthCheckItem {
+        let dateNow = Date().timeIntervalSinceReferenceDate
         app.databases.use(
             .postgres(
                 configuration: .init(
@@ -54,39 +56,12 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
                     username: username,
                     password: password,
                     database: database,
-                    tls: .disable
+                    tls: tls ?? .disable
                 )
             ),
             as: .psql
         )
-        let connectionItem = await checkConnection()
-        return ("\(ComponentName.postgresql):\(MeasurementType.connections)", connectionItem)
-    }
-
-    /// Get psql health using url connection
-    /// - Parameter url: `String`
-    /// - Returns: `String`, `HealthCheckItem`
-    public func getHealth(url: String) async throws -> (String, HealthCheckItem) {
-        try app.databases.use(.postgres(url: url), as: .psql)
-        let connectionItem = await checkConnection()
-        return ("\(ComponentName.postgresql):\(MeasurementType.connections)", connectionItem)
-    }
-    
-    /// Check health psql connection
-    /// - Returns: `String`, `HealthCheckItem`
-    private func checkConnection() async -> HealthCheckItem {
-        var statusConnect = String()
-        let dateNow = Date().timeIntervalSinceReferenceDate
-        var statusCode = HTTPResponseStatus.badRequest
-        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
-        let row = rows?.first?.makeRandomAccess()
-        if (row?[data: "version"].string) != nil {
-            statusConnect = "Ok"
-            statusCode = .ok
-        } else {
-            app.logger.error("No connect to Postgres database. Response: \(String(describing: row))")
-            statusConnect = "No connect to Postgres database."
-        }
+        let (statusCode, connectionDescription) = await checkConnection()
         let observedValue = Date().timeIntervalSinceReferenceDate - dateNow
         let connection = HealthCheckItem(
             componentId: UUID().uuidString,
@@ -95,10 +70,49 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
             observedUnit: "s",
             status: statusCode == .ok ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: statusConnect,
+            output: connectionDescription,
             links: nil,
             node: nil
         )
         return connection
+    }
+
+    /// Get psql health using url connection
+    /// - Parameter url: `String`
+    /// - Returns: `HealthCheckItem`
+    public func checkConnection(url: String) async throws -> HealthCheckItem {
+        let dateNow = Date().timeIntervalSinceReferenceDate
+        try app.databases.use(.postgres(url: url), as: .psql)
+        let (statusCode, connectionDescription) = await checkConnection()
+        let observedValue = Date().timeIntervalSinceReferenceDate - dateNow
+        let connection = HealthCheckItem(
+            componentId: UUID().uuidString,
+            componentType: .datastore,
+            observedValue: observedValue,
+            observedUnit: "s",
+            status: statusCode == .ok ? .pass : .fail,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: connectionDescription,
+            links: nil,
+            node: nil
+        )
+        return connection
+    }
+    
+    /// Check health psql connection
+    /// - Returns: `HTTPResponseStatus`, `String`
+    private func checkConnection() async -> (HTTPStatus, String) {
+        var connectionDescription = String()
+        var statusCode = HTTPResponseStatus.badRequest
+        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
+        let row = rows?.first?.makeRandomAccess()
+        if (row?[data: "version"].string) != nil {
+            connectionDescription = "Ok"
+            statusCode = .ok
+        } else {
+            app.logger.error("No connect to Postgres database. Response: \(String(describing: row))")
+            connectionDescription = "No connect to Postgres database."
+        }
+        return (statusCode, connectionDescription)
     }
 }
