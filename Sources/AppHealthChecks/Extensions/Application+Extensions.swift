@@ -65,10 +65,10 @@ extension Application {
 
 extension Application {
     /// Variable of date conform to DateFormatter protocol. ISO 8601 with date time format
-    /// Example: `2024-02-01T11:11:59.364+02:00`
+    /// Example: `2024-02-01T11:11:59.364`
     public var dateTimeISOFormat: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
         return formatter
     }
 }
