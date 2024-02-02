@@ -56,7 +56,7 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
         return PsqlHealthChecksMock.healthCheckItem
     }
 
-    public func checkConnection() async -> String {
+    public func getVersion() async -> String {
         "Ok"
     }
 }

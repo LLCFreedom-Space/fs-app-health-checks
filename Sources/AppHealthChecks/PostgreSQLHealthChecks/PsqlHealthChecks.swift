@@ -62,7 +62,7 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
             ),
             as: .psql
         )
-        let connectionDescription = await checkConnection()
+        let connectionDescription = await getVersion()
         let connection = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
@@ -83,7 +83,7 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     public func checkConnection(by url: String) async throws -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
         try app.databases.use(.postgres(url: url), as: .psql)
-        let connectionDescription = await checkConnection()
+        let connectionDescription = await getVersion()
         let connection = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
@@ -100,7 +100,7 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     
     /// Check health psql connection
     /// - Returns: `String`
-    public func checkConnection() async -> String {
+    public func getVersion() async -> String {
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
         let row = rows?.first?.makeRandomAccess()
         guard let result = (row?[data: "version"].string) else {

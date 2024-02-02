@@ -72,12 +72,12 @@ final class PsqlHealthChecksTests: XCTestCase {
         XCTAssertEqual(result?.node, PsqlHealthChecksMock.healthCheckItem.node)
     }
 
-    func testCheckConnection() async throws {
+    func testGetVersion() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         let dateFormat = app.dateTimeISOFormat
         app.psqlHealthChecks = PsqlHealthChecksMock()
-        let result = await app.psqlHealthChecks?.checkConnection()
+        let result = await app.psqlHealthChecks?.getVersion()
         XCTAssertEqual(result, "Ok")
     }
 }

@@ -52,5 +52,5 @@ public protocol PsqlHealthChecksProtocol {
     
     /// Check health psql connection
     /// - Returns: `String`
-    func checkConnection() async -> String
+    func getVersion() async -> String
 }
