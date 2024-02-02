@@ -50,6 +50,18 @@ extension Application {
         set { storage[ReleaseIdKey.self] = newValue }
     }
 
+    /// A `psqlIdKey` conform to StorageKey protocol
+    private struct PsqlIdKey: StorageKey {
+        /// Less verbose typealias for `String`.
+        typealias Value = String
+    }
+
+    /// Setup `psqlIdKey` in application storage
+    public var psqlId: String? {
+        get { storage[PsqlIdKey.self] }
+        set { storage[PsqlIdKey.self] = newValue }
+    }
+
     /// A `PsqlHealthChecksKey` conform to StorageKey protocol
     public struct PsqlHealthChecksKey: StorageKey {
         /// Less verbose typealias for `PsqlHealthChecksProtocol`.

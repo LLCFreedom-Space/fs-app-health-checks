@@ -27,8 +27,9 @@ import FluentPostgresDriver
 @testable import AppHealthChecks
 
 public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
+    static let psqlId = UUID().uuidString
     static let healthCheckItem = HealthCheckItem(
-        componentId: UUID().uuidString,
+        componentId: psqlId,
         componentType: .datastore,
         observedValue: 1,
         observedUnit: "s",
@@ -53,5 +54,9 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
 
     public func checkConnection(by url: String) async -> HealthCheckItem {
         return PsqlHealthChecksMock.healthCheckItem
+    }
+
+    public func checkConnection() async -> String {
+        "Ok"
     }
 }

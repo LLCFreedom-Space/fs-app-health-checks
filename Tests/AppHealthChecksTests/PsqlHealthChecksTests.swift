@@ -40,15 +40,41 @@ final class PsqlHealthChecksTests: XCTestCase {
             database: "test",
             tls: nil
         )
-        XCTAssertEqual(result, PsqlHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(result?.componentId, PsqlHealthChecksMock.healthCheckItem.componentId)
+        XCTAssertEqual(result?.componentType, PsqlHealthChecksMock.healthCheckItem.componentType)
+        XCTAssertEqual(result?.observedValue, PsqlHealthChecksMock.healthCheckItem.observedValue)
+        XCTAssertEqual(result?.observedUnit, PsqlHealthChecksMock.healthCheckItem.observedUnit)
+        XCTAssertEqual(result?.status, PsqlHealthChecksMock.healthCheckItem.status)
+        XCTAssertEqual(result?.affectedEndpoints, PsqlHealthChecksMock.healthCheckItem.affectedEndpoints)
+        XCTAssertEqual(result?.time, PsqlHealthChecksMock.healthCheckItem.time)
+        XCTAssertEqual(result?.output, PsqlHealthChecksMock.healthCheckItem.output)
+        XCTAssertEqual(result?.links, PsqlHealthChecksMock.healthCheckItem.links)
+        XCTAssertEqual(result?.node, PsqlHealthChecksMock.healthCheckItem.node)
     }
 
-    func testGetHealthUsingUrl() async throws {
+    func testGetHealthByUrl() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let url = "postgres://username:password@hostname:port/database?tlsmode=mode"
         let result = try await app.psqlHealthChecks?.checkConnection(by: url)
-        XCTAssertEqual(result, PsqlHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(result?.componentId, PsqlHealthChecksMock.healthCheckItem.componentId)
+        XCTAssertEqual(result?.componentType, PsqlHealthChecksMock.healthCheckItem.componentType)
+        XCTAssertEqual(result?.observedValue, PsqlHealthChecksMock.healthCheckItem.observedValue)
+        XCTAssertEqual(result?.observedUnit, PsqlHealthChecksMock.healthCheckItem.observedUnit)
+        XCTAssertEqual(result?.status, PsqlHealthChecksMock.healthCheckItem.status)
+        XCTAssertEqual(result?.affectedEndpoints, PsqlHealthChecksMock.healthCheckItem.affectedEndpoints)
+        XCTAssertEqual(result?.time, PsqlHealthChecksMock.healthCheckItem.time)
+        XCTAssertEqual(result?.output, PsqlHealthChecksMock.healthCheckItem.output)
+        XCTAssertEqual(result?.links, PsqlHealthChecksMock.healthCheckItem.links)
+        XCTAssertEqual(result?.node, PsqlHealthChecksMock.healthCheckItem.node)
+    }
+
+    func testCheckConnection() async throws {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        app.psqlHealthChecks = PsqlHealthChecksMock()
+        let result = await app.psqlHealthChecks?.checkConnection()
+        XCTAssertEqual(result, "Ok")
     }
 }
