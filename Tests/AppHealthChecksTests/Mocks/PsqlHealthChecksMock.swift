@@ -27,7 +27,7 @@ import FluentPostgresDriver
 @testable import AppHealthChecks
 
 public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
-    static let psqlId = UUID().uuidString
+    static let psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     static let healthCheckItem = HealthCheckItem(
         componentId: psqlId,
         componentType: .datastore,

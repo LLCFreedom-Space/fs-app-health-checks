@@ -31,6 +31,7 @@ final class PsqlHealthChecksTests: XCTestCase {
     func testGetHealthUsingParameters() async {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.psqlId = PsqlHealthChecksMock.psqlId
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let result = await app.psqlHealthChecks?.checkConnection(
             hostname: "localhost",
@@ -55,10 +56,11 @@ final class PsqlHealthChecksTests: XCTestCase {
     func testGetHealthByUrl() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.psqlId = PsqlHealthChecksMock.psqlId
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let url = "postgres://username:password@hostname:port/database?tlsmode=mode"
         let result = try await app.psqlHealthChecks?.checkConnection(by: url)
-        XCTAssertEqual(result?.componentId, PsqlHealthChecksMock.healthCheckItem.componentId)
+        XCTAssertEqual(result?.componentId, app.psqlId)
         XCTAssertEqual(result?.componentType, PsqlHealthChecksMock.healthCheckItem.componentType)
         XCTAssertEqual(result?.observedValue, PsqlHealthChecksMock.healthCheckItem.observedValue)
         XCTAssertEqual(result?.observedUnit, PsqlHealthChecksMock.healthCheckItem.observedUnit)
@@ -73,6 +75,7 @@ final class PsqlHealthChecksTests: XCTestCase {
     func testCheckConnection() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
+        let dateFormat = app.dateTimeISOFormat
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let result = await app.psqlHealthChecks?.checkConnection()
         XCTAssertEqual(result, "Ok")
