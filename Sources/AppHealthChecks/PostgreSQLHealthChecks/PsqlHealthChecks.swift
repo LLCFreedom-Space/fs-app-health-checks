@@ -33,11 +33,6 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     
     public let url: String
 
-    init(app: Application, url: String) {
-        self.app = app
-        self.url = url
-    }
-
     /// Get psql health using url connection
     /// - Parameter url: `String`
     /// - Returns: `HealthCheckItem`
