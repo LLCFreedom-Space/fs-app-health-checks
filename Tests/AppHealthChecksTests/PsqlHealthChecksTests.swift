@@ -33,7 +33,7 @@ final class PsqlHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.psqlId = PsqlHealthChecksMock.psqlId
         app.psqlHealthChecks = PsqlHealthChecksMock()
-        let result = await app.psqlHealthChecks?.checkConnection()
+        let result = await app.psqlHealthChecks?.check()
         XCTAssertEqual(result?.componentId, PsqlHealthChecksMock.healthCheckItem.componentId)
         XCTAssertEqual(result?.componentType, PsqlHealthChecksMock.healthCheckItem.componentType)
         XCTAssertEqual(result?.observedValue, PsqlHealthChecksMock.healthCheckItem.observedValue)

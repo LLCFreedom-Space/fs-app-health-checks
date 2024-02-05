@@ -41,7 +41,7 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     /// Get psql health using url connection
     /// - Parameter url: `String`
     /// - Returns: `HealthCheckItem`
-    public func checkConnection() async -> HealthCheckItem {
+    public func check() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
         try? app.databases.use(.postgres(url: self.url), as: .psql)
         let connectionDescription = await getVersion()
