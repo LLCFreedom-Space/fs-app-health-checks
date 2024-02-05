@@ -40,19 +40,8 @@ public struct PsqlHealthChecksMock: PsqlHealthChecksProtocol {
         links: nil,
         node: nil
     )
-
-    public func checkConnection(
-        hostname: String,
-        port: Int,
-        username: String,
-        password: String,
-        database: String,
-        tls: PostgresConnection.Configuration.TLS?
-    ) async -> HealthCheckItem {
-        return PsqlHealthChecksMock.healthCheckItem
-    }
-
-    public func checkConnection(by url: String) async -> HealthCheckItem {
+    
+    public func checkConnection() async -> HealthCheckItem {
         return PsqlHealthChecksMock.healthCheckItem
     }
 

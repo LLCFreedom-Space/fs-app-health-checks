@@ -27,28 +27,10 @@ import FluentPostgresDriver
 
 /// Groups func for get psql health check
 public protocol PsqlHealthChecksProtocol {
-    /// Get psql health using authorize parameters
-    /// - Parameters:
-    ///   - hostname: `String`
-    ///   - port: `Int`
-    ///   - username: `String`
-    ///   - password: `String`
-    ///   - database: `String`
-    ///   - tls: optional `PostgresConnection.Configuration.TLS`
-    /// - Returns: `HealthCheckItem`
-    func checkConnection(
-        hostname: String,
-        port: Int,
-        username: String,
-        password: String,
-        database: String,
-        tls: PostgresConnection.Configuration.TLS?
-    ) async -> HealthCheckItem
-    
     /// Get psql health using url connection
     /// - Parameter url: `String`
     /// - Returns: `HealthCheckItem`
-    func checkConnection(by url: String) async throws -> HealthCheckItem
+    func checkConnection() async -> HealthCheckItem
     
     /// Check health psql connection
     /// - Returns: `String`

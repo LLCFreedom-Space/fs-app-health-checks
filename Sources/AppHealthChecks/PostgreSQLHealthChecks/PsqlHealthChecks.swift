@@ -31,58 +31,19 @@ public struct PsqlHealthChecks: PsqlHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
     
-    /// Get psql health using authorize parameters
-    /// - Parameters:
-    ///   - hostname: `String`
-    ///   - port: `Int`
-    ///   - username: `String`
-    ///   - password: `String`
-    ///   - database: `String`
-    ///   - tls: optional `PostgresConnection.Configuration.TLS`
-    /// - Returns: `HealthCheckItem`
-    public func checkConnection(
-        hostname: String,
-        port: Int,
-        username: String,
-        password: String,
-        database: String,
-        tls: PostgresConnection.Configuration.TLS?
-    ) async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
-        app.databases.use(
-            .postgres(
-                configuration: .init(
-                    hostname: hostname,
-                    port: port,
-                    username: username,
-                    password: password,
-                    database: database,
-                    tls: tls ?? .disable
-                )
-            ),
-            as: .psql
-        )
-        let connectionDescription = await getVersion()
-        let connection = HealthCheckItem(
-            componentId: app.psqlId,
-            componentType: .datastore,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
-            status: connectionDescription.contains("ERROR:") ? .fail : .pass,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
-            links: nil,
-            node: nil
-        )
-        return connection
+    public let url: String
+
+    init(app: Application, url: String) {
+        self.app = app
+        self.url = url
     }
 
     /// Get psql health using url connection
     /// - Parameter url: `String`
     /// - Returns: `HealthCheckItem`
-    public func checkConnection(by url: String) async throws -> HealthCheckItem {
+    public func checkConnection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
-        try app.databases.use(.postgres(url: url), as: .psql)
+        try? app.databases.use(.postgres(url: self.url), as: .psql)
         let connectionDescription = await getVersion()
         let connection = HealthCheckItem(
             componentId: app.psqlId,
