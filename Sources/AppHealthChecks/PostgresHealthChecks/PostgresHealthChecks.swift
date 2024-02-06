@@ -27,7 +27,7 @@ import Fluent
 import FluentPostgresDriver
 
 /// Service that provides psql health check functionality
-public struct PostgresHealthChecks: PostgresHealthChecksProtocol{
+public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
     
@@ -41,9 +41,9 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol{
             componentType: .datastore,
             observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
-            status: !versionDescription.contains("ERROR:") ? .pass : .fail,
+            status: versionDescription.contains("PostgreSQL") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: versionDescription.contains("ERROR:") ? versionDescription : nil,
+            output: !versionDescription.contains("PostgreSQL") ? versionDescription : nil,
             links: nil,
             node: nil
         )
@@ -60,9 +60,9 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol{
             componentType: .datastore,
             observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
-            status: !versionDescription.contains("ERROR:") ? .pass : .fail,
+            status: versionDescription.contains("PostgreSQL") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: versionDescription.contains("ERROR:") ? versionDescription : nil,
+            output: !versionDescription.contains("PostgreSQL") ? versionDescription : nil,
             links: nil,
             node: nil
         )
