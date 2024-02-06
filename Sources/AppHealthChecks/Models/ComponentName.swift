@@ -26,13 +26,21 @@ import Vapor
 
 /// Human-readable name for the component
 public enum ComponentName: String {
+    /// The Central Processing Unit (CPU) is the primary component of a computer that acts as its "control center."
     case cpu
+    /// Memory, also known as random access memory (RAM), is a PC component that stores data while the computer runs
     case memory
+    /// Redis is an open-source in-memory storage, used as a distributed, in-memory key–value database
     case redis
+    /// PostgreSQL also known as Postgres, is a free and open-source relational database management system (RDBMS) emphasizing extensibility
     case postgresql
+    /// MongoDB is a source-available, cross-platform, document-oriented database program.
     case mongo
+    /// Distributed messaging system between server applications in real time
     case kafka
+    /// Consul is a service networking solution to automate network configurations, discover services, and enable secure connectivity across any cloud or runtime.
     case consul
+    /// gRPC is a modern open source high performance Remote Procedure Call (RPC) framework that can run in any environment.
     case grpc
 }
 

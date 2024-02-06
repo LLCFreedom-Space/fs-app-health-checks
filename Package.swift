@@ -16,7 +16,11 @@ let package = Package(
     ],
     dependencies: [
         // 💧 A server-side Swift web framework.
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0")
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+        // 🖋 Swift ORM (queries, models, and relations) for NoSQL and SQL databases.
+        .package(url: "https://github.com/vapor/fluent.git", from: "4.1.0"),
+        // 🐘 Swift ORM (queries, models, relations, etc) built on PostgreSQL.
+        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.1.1")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -24,7 +28,9 @@ let package = Package(
         .target(
             name: "AppHealthChecks",
             dependencies: [
-                .product(name: "Vapor", package: "vapor")
+                .product(name: "Vapor", package: "vapor"),
+                .product(name: "Fluent", package: "fluent"),
+                .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver")
             ]
         ),
         .testTarget(

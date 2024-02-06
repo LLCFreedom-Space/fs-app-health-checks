@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MeasurementType.swift
+//  ComponentType.swift
 //
 //
 //  Created by Mykola Buhaiov on 29.01.2024.
@@ -24,14 +24,16 @@
 
 import Vapor
 
-/// Name of the measurement type (a data point type) that the status is reported for
-public enum MeasurementType: String {
-    case utilization
-    case responseTime
-    case connections
-    case uptime
+/// Human-readable type for the component.
+public enum ComponentType: String {
+    /// A part that combines with other parts to form something bigger
+    case component
+    /// A datastore is a repository for storing, managing and distributing data sets on an enterprise level
+    case datastore
+    /// A set of connected things or devices that operate together
+    case system
 }
 
-extension MeasurementType: Content {}
+extension ComponentType: Content {}
 
-extension MeasurementType: CaseIterable {}
+extension ComponentType: CaseIterable {}

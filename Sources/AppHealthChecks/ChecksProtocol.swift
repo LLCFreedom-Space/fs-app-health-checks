@@ -16,21 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ComponentType.swift
+//  ChecksProtocol.swift
 //
 //
-//  Created by Mykola Buhaiov on 29.01.2024.
+//  Created by Mykola Buhaiov on 06.02.2024.
 //
 
 import Vapor
 
-/// Human-readable type for the component.
-public enum ComponentType: String {
-    case component
-    case datastore
-    case system
+/// Groups func for get health check
+public protocol ChecksProtocol {
+    /// Check with setup options
+    /// - Parameter options: array of `MeasurementType`
+    /// - Returns: dictionary `[String: HealthCheckItem]`
+    func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem]
 }
-
-extension ComponentType: Content {}
-
-extension ComponentType: CaseIterable {}

@@ -31,7 +31,7 @@ extension Application {
         /// Less verbose typealias for `UUID`.
         typealias Value = UUID
     }
-    
+
     /// Setup `serviceId` in application storage
     public var serviceId: UUID? {
         get { storage[ServiceIdKey.self] }
@@ -48,5 +48,41 @@ extension Application {
     public var releaseId: String? {
         get { storage[ReleaseIdKey.self] }
         set { storage[ReleaseIdKey.self] = newValue }
+    }
+
+    /// A `psqlIdKey` conform to StorageKey protocol
+    private struct PsqlIdKey: StorageKey {
+        /// Less verbose typealias for `String`.
+        typealias Value = String
+    }
+
+    /// Setup `psqlIdKey` in application storage
+    public var psqlId: String? {
+        get { storage[PsqlIdKey.self] }
+        set { storage[PsqlIdKey.self] = newValue }
+    }
+}
+
+extension Application {
+    /// A `PostgresHealthChecksKey` conform to StorageKey protocol
+    public struct PostgresHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `PostgresHealthChecksProtocol`.
+        public typealias Value = PostgresHealthChecksProtocol
+    }
+
+    /// Setup `psqlHealthChecks` in application storage
+    public var psqlHealthChecks: PostgresHealthChecksProtocol? {
+        get { storage[PostgresHealthChecksKey.self] }
+        set { storage[PostgresHealthChecksKey.self] = newValue }
+    }
+}
+
+extension Application {
+    /// Variable of date conform to DateFormatter protocol. ISO 8601 with date time format
+    /// Example: `2024-02-01T11:11:59.364`
+    public var dateTimeISOFormat: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = Constants.dateFormat
+        return formatter
     }
 }
