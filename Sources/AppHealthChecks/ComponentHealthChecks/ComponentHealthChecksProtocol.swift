@@ -27,8 +27,8 @@ import FluentPostgresDriver
 
 /// Groups func for get health check
 public protocol ComponentHealthChecksProtocol {
-    /// Get psql health using url connection
-    /// - Parameter url: `String`
-    /// - Returns: `HealthCheckItem`
+    /// Check health for components
+    /// - Parameter components: array `ComponentName`
+    /// - Returns: `[String: [HealthCheckItem]]`
     func checkHealth(for components: [ComponentName]) async -> [String: [HealthCheckItem]] 
 }
