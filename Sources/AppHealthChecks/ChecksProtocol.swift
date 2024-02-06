@@ -16,21 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PsqlHealthChecksProtocol.swift
+//  ChecksProtocol.swift
 //
 //
-//  Created by Mykola Buhaiov on 31.01.2024.
+//  Created by Mykola Buhaiov on 06.02.2024.
 //
 
 import Vapor
 
-/// Groups func for get psql health check
-public protocol PsqlHealthChecksProtocol {
-    /// Get  Postgresql version
-    /// - Returns: `HealthCheckItem`
-    func getVersion() async -> HealthCheckItem
-
-    /// Get response time from postgresql
-    /// - Returns: `HealthCheckItem`
-    func getResponseTime() async -> HealthCheckItem
+/// Groups func for get health check
+public protocol ChecksProtocol {
+    /// Check with setup options
+    /// - Parameter options: array of `MeasurementType`
+    /// - Returns: dictionary `[String: HealthCheckItem]`
+    func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem]
 }

@@ -26,8 +26,9 @@ import Vapor
 import FluentPostgresDriver
 @testable import AppHealthChecks
 
-public struct PostgresHealthChecksMock: PostgresChecksProtocol {
+public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
     static let psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+    static let version = "database version - 15"
     static let healthCheckItem = HealthCheckItem(
         componentId: psqlId,
         componentType: .datastore,
@@ -41,12 +42,16 @@ public struct PostgresHealthChecksMock: PostgresChecksProtocol {
         node: nil
     )
 
-    public func getVersion() async -> HealthCheckItem {
+    public func connection() async -> HealthCheckItem {
         PostgresHealthChecksMock.healthCheckItem
     }
 
     public func getResponseTime() async -> HealthCheckItem {
         PostgresHealthChecksMock.healthCheckItem
+    }
+
+    public func getVersion() async -> String {
+        PostgresHealthChecksMock.version
     }
 
     public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {

@@ -16,25 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PostgresChecksProtocol.swift
+//  Constants.swift
 //
 //
-//  Created by Mykola Buhaiov on 31.01.2024.
+//  Created by Mykola Buhaiov on 06.02.2024.
 //
 
 import Vapor
 
-/// Groups func for get psql health check
-public protocol PostgresChecksProtocol {
-    /// Get  Postgresql version
-    /// - Returns: `HealthCheckItem`
-    func connection() async -> HealthCheckItem
-
-    /// Get response time from postgresql
-    /// - Returns: `HealthCheckItem`
-    func getResponseTime() async -> HealthCheckItem
-    
-    /// Get version from postgresql
-    /// - Returns: `String`
-    func getVersion() async -> String
+/// Constants
+public enum Constants {
+   static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
 }

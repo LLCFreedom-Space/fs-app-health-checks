@@ -27,28 +27,23 @@ import Fluent
 import FluentPostgresDriver
 
 /// Service that provides psql health check functionality
-public struct PostgresHealthChecks: PostgresChecksProtocol{
+public struct PostgresHealthChecks: PostgresHealthChecksProtocol{
     /// Instance of app as `Application`
     public let app: Application
     
     /// Get  postgresql version
     /// - Returns: `HealthCheckItem`
-    public func getVersion() async -> HealthCheckItem {
+    public func connection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
-        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
-        let row = rows?.first?.makeRandomAccess()
-        var connectionDescription = "ERROR: No connect to Postgres database"
-        if let result = (row?[data: "version"].string) {
-            connectionDescription = result
-        }
+        let versionDescription = await getVersion()
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
             observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
-            status: connectionDescription.contains("ERROR:") ? .fail : .pass,
+            status: !versionDescription.contains("ERROR:") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
+            output: versionDescription.contains("ERROR:") ? versionDescription : nil,
             links: nil,
             node: nil
         )
@@ -59,21 +54,34 @@ public struct PostgresHealthChecks: PostgresChecksProtocol{
     /// - Returns: `HealthCheckItem`
     public func getResponseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
+        let versionDescription = await getVersion()
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
             observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
-            status: .pass,
+            status: !versionDescription.contains("ERROR:") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: "",
+            output: versionDescription.contains("ERROR:") ? versionDescription : nil,
             links: nil,
             node: nil
         )
         return result
     }
-    
-    /// Check health for array of measurement type
+
+    /// Get version from postgresql
+    /// - Returns: `String`
+    public func getVersion() async -> String {
+        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
+        let row = rows?.first?.makeRandomAccess()
+        var connectionDescription = "ERROR: No connect to Postgres database"
+        if let result = (row?[data: "version"].string) {
+            connectionDescription = result
+        }
+        return connectionDescription
+    }
+
+    /// Check with setup options
     /// - Parameter options: array of `MeasurementType`
     /// - Returns: dictionary `[String: HealthCheckItem]`
     public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
@@ -84,7 +92,7 @@ public struct PostgresHealthChecks: PostgresChecksProtocol{
             case .responseTime:
                 result["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = await getResponseTime()
             case .connections:
-                result["\(ComponentName.postgresql):\(MeasurementType.connections)"] = await getVersion()
+                result["\(ComponentName.postgresql):\(MeasurementType.connections)"] = await connection()
             default:
                 break
             }

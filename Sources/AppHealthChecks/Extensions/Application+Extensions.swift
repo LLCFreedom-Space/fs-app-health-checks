@@ -66,12 +66,12 @@ extension Application {
 extension Application {
     /// A `PostgresHealthChecksKey` conform to StorageKey protocol
     public struct PostgresHealthChecksKey: StorageKey {
-        /// Less verbose typealias for `PostgresChecksProtocol`.
-        public typealias Value = PostgresChecksProtocol
+        /// Less verbose typealias for `PostgresHealthChecksProtocol`.
+        public typealias Value = PostgresHealthChecksProtocol
     }
 
     /// Setup `psqlHealthChecks` in application storage
-    public var psqlHealthChecks: PostgresChecksProtocol? {
+    public var psqlHealthChecks: PostgresHealthChecksProtocol? {
         get { storage[PostgresHealthChecksKey.self] }
         set { storage[PostgresHealthChecksKey.self] = newValue }
     }
@@ -82,7 +82,7 @@ extension Application {
     /// Example: `2024-02-01T11:11:59.364`
     public var dateTimeISOFormat: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        formatter.dateFormat = Constants.dateFormat
         return formatter
     }
 }
