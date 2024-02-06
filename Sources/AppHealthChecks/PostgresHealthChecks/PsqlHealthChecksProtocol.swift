@@ -16,19 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ComponentHealthChecksProtocol.swift
+//  PsqlHealthChecksProtocol.swift
 //
 //
-//  Created by Mykola Buhaiov on 06.02.2024.
+//  Created by Mykola Buhaiov on 31.01.2024.
 //
 
 import Vapor
-import FluentPostgresDriver
 
-/// Groups func for get health check
-public protocol ComponentHealthChecksProtocol {
-    /// Check health for components
-    /// - Parameter components: array `ComponentName`
-    /// - Returns: `[String: [HealthCheckItem]]`
-    func checkHealth(for components: [ComponentName]) async -> [String: [HealthCheckItem]] 
+/// Groups func for get psql health check
+public protocol PsqlHealthChecksProtocol {
+    /// Get  Postgresql version
+    /// - Returns: `HealthCheckItem`
+    func getVersion() async -> HealthCheckItem
+
+    /// Get response time from postgresql
+    /// - Returns: `HealthCheckItem`
+    func getResponseTime() async -> HealthCheckItem
 }

@@ -30,6 +30,7 @@ final class PostgresHealthChecksTests: XCTestCase {
     func testGetVersion() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.psqlId = UUID().uuidString
         app.psqlHealthChecks = PostgresHealthChecksMock()
         let result = await app.psqlHealthChecks?.getVersion()
         XCTAssertEqual(result?.componentId, PostgresHealthChecksMock.healthCheckItem.componentId)
@@ -60,5 +61,35 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(result?.output, PostgresHealthChecksMock.healthCheckItem.output)
         XCTAssertEqual(result?.links, PostgresHealthChecksMock.healthCheckItem.links)
         XCTAssertEqual(result?.node, PostgresHealthChecksMock.healthCheckItem.node)
+    }
+
+    func testCheckHealth() async throws {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        app.psqlId = UUID().uuidString
+        app.psqlHealthChecks = PostgresHealthChecksMock()
+        let result = await app.psqlHealthChecks?.checkHealth(for: [MeasurementType.responseTime, MeasurementType.connections])
+        let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
+        XCTAssertEqual(psqlConnections?.componentId, PostgresHealthChecksMock.healthCheckItem.componentId)
+        XCTAssertEqual(psqlConnections?.componentType, PostgresHealthChecksMock.healthCheckItem.componentType)
+        XCTAssertEqual(psqlConnections?.observedValue, PostgresHealthChecksMock.healthCheckItem.observedValue)
+        XCTAssertEqual(psqlConnections?.observedUnit, PostgresHealthChecksMock.healthCheckItem.observedUnit)
+        XCTAssertEqual(psqlConnections?.status, PostgresHealthChecksMock.healthCheckItem.status)
+        XCTAssertEqual(psqlConnections?.affectedEndpoints, PostgresHealthChecksMock.healthCheckItem.affectedEndpoints)
+        XCTAssertEqual(psqlConnections?.time, PostgresHealthChecksMock.healthCheckItem.time)
+        XCTAssertEqual(psqlConnections?.output, PostgresHealthChecksMock.healthCheckItem.output)
+        XCTAssertEqual(psqlConnections?.links, PostgresHealthChecksMock.healthCheckItem.links)
+        XCTAssertEqual(psqlConnections?.node, PostgresHealthChecksMock.healthCheckItem.node)
+        let psqlResponseTimes = result?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
+        XCTAssertEqual(psqlResponseTimes?.componentId, PostgresHealthChecksMock.healthCheckItem.componentId)
+        XCTAssertEqual(psqlResponseTimes?.componentType, PostgresHealthChecksMock.healthCheckItem.componentType)
+        XCTAssertEqual(psqlResponseTimes?.observedValue, PostgresHealthChecksMock.healthCheckItem.observedValue)
+        XCTAssertEqual(psqlResponseTimes?.observedUnit, PostgresHealthChecksMock.healthCheckItem.observedUnit)
+        XCTAssertEqual(psqlResponseTimes?.status, PostgresHealthChecksMock.healthCheckItem.status)
+        XCTAssertEqual(psqlResponseTimes?.affectedEndpoints, PostgresHealthChecksMock.healthCheckItem.affectedEndpoints)
+        XCTAssertEqual(psqlResponseTimes?.time, PostgresHealthChecksMock.healthCheckItem.time)
+        XCTAssertEqual(psqlResponseTimes?.output, PostgresHealthChecksMock.healthCheckItem.output)
+        XCTAssertEqual(psqlResponseTimes?.links, PostgresHealthChecksMock.healthCheckItem.links)
+        XCTAssertEqual(psqlResponseTimes?.node, PostgresHealthChecksMock.healthCheckItem.node)
     }
 }

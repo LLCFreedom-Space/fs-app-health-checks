@@ -27,7 +27,7 @@ import Fluent
 import FluentPostgresDriver
 
 /// Service that provides psql health check functionality
-public struct PostgresHealthChecks: PostgresChecksProtocol {
+public struct PostgresHealthChecks: PostgresChecksProtocol{
     /// Instance of app as `Application`
     public let app: Application
     
@@ -70,6 +70,25 @@ public struct PostgresHealthChecks: PostgresChecksProtocol {
             links: nil,
             node: nil
         )
+        return result
+    }
+    
+    /// Check health for array of measurement type
+    /// - Parameter options: array of `MeasurementType`
+    /// - Returns: dictionary `[String: HealthCheckItem]`
+    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+        var result = ["": HealthCheckItem()]
+        let measurementTypes = Array(Set(options))
+        for type in measurementTypes {
+            switch type {
+            case .responseTime:
+                result["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = await getResponseTime()
+            case .connections:
+                result["\(ComponentName.postgresql):\(MeasurementType.connections)"] = await getVersion()
+            default:
+                break
+            }
+        }
         return result
     }
 }

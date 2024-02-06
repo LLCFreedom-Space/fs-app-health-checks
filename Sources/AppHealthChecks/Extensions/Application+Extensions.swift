@@ -75,18 +75,6 @@ extension Application {
         get { storage[PostgresHealthChecksKey.self] }
         set { storage[PostgresHealthChecksKey.self] = newValue }
     }
-
-    /// A `ComponentHealthChecksKey` conform to StorageKey protocol
-    public struct ComponentHealthChecksKey: StorageKey {
-        /// Less verbose typealias for `ComponentHealthChecksProtocol`.
-        public typealias Value = ComponentHealthChecksProtocol
-    }
-
-    /// Setup `componentHealthChecks` in application storage
-    public var componentHealthChecks: ComponentHealthChecksProtocol? {
-        get { storage[ComponentHealthChecksKey.self] }
-        set { storage[ComponentHealthChecksKey.self] = newValue }
-    }
 }
 
 extension Application {

@@ -48,4 +48,12 @@ public struct PostgresHealthChecksMock: PostgresChecksProtocol {
     public func getResponseTime() async -> HealthCheckItem {
         PostgresHealthChecksMock.healthCheckItem
     }
+
+    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+        let result = [
+            "\(ComponentName.postgresql):\(MeasurementType.responseTime)": PostgresHealthChecksMock.healthCheckItem,
+            "\(ComponentName.postgresql):\(MeasurementType.connections)": PostgresHealthChecksMock.healthCheckItem
+        ]
+        return result
+    }
 }
