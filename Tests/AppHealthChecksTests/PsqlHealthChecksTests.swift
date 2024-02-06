@@ -33,7 +33,8 @@ final class PsqlHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.psqlId = PsqlHealthChecksMock.psqlId
         app.psqlHealthChecks = PsqlHealthChecksMock()
-        let result = await app.psqlHealthChecks?.check()
+        let response = await app.psqlHealthChecks?.checkHealth(options: [.responseTime])
+        let result = response?["postgresql:\(MeasurementType.responseTime)"]
         XCTAssertEqual(result?.componentId, PsqlHealthChecksMock.healthCheckItem.componentId)
         XCTAssertEqual(result?.componentType, PsqlHealthChecksMock.healthCheckItem.componentType)
         XCTAssertEqual(result?.observedValue, PsqlHealthChecksMock.healthCheckItem.observedValue)
@@ -52,6 +53,33 @@ final class PsqlHealthChecksTests: XCTestCase {
         let dateFormat = app.dateTimeISOFormat
         app.psqlHealthChecks = PsqlHealthChecksMock()
         let result = await app.psqlHealthChecks?.getVersion()
-        XCTAssertEqual(result, "Ok")
+        XCTAssertEqual(result?.componentId, PsqlHealthChecksMock.healthCheckItem.componentId)
+        XCTAssertEqual(result?.componentType, PsqlHealthChecksMock.healthCheckItem.componentType)
+        XCTAssertEqual(result?.observedValue, PsqlHealthChecksMock.healthCheckItem.observedValue)
+        XCTAssertEqual(result?.observedUnit, PsqlHealthChecksMock.healthCheckItem.observedUnit)
+        XCTAssertEqual(result?.status, PsqlHealthChecksMock.healthCheckItem.status)
+        XCTAssertEqual(result?.affectedEndpoints, PsqlHealthChecksMock.healthCheckItem.affectedEndpoints)
+        XCTAssertEqual(result?.time, PsqlHealthChecksMock.healthCheckItem.time)
+        XCTAssertEqual(result?.output, PsqlHealthChecksMock.healthCheckItem.output)
+        XCTAssertEqual(result?.links, PsqlHealthChecksMock.healthCheckItem.links)
+        XCTAssertEqual(result?.node, PsqlHealthChecksMock.healthCheckItem.node)
+    }
+
+    func testGetResponseTime() async throws {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        let dateFormat = app.dateTimeISOFormat
+        app.psqlHealthChecks = PsqlHealthChecksMock()
+        let result = await app.psqlHealthChecks?.getResponseTime()
+        XCTAssertEqual(result?.componentId, PsqlHealthChecksMock.healthCheckItem.componentId)
+        XCTAssertEqual(result?.componentType, PsqlHealthChecksMock.healthCheckItem.componentType)
+        XCTAssertEqual(result?.observedValue, PsqlHealthChecksMock.healthCheckItem.observedValue)
+        XCTAssertEqual(result?.observedUnit, PsqlHealthChecksMock.healthCheckItem.observedUnit)
+        XCTAssertEqual(result?.status, PsqlHealthChecksMock.healthCheckItem.status)
+        XCTAssertEqual(result?.affectedEndpoints, PsqlHealthChecksMock.healthCheckItem.affectedEndpoints)
+        XCTAssertEqual(result?.time, PsqlHealthChecksMock.healthCheckItem.time)
+        XCTAssertEqual(result?.output, PsqlHealthChecksMock.healthCheckItem.output)
+        XCTAssertEqual(result?.links, PsqlHealthChecksMock.healthCheckItem.links)
+        XCTAssertEqual(result?.node, PsqlHealthChecksMock.healthCheckItem.node)
     }
 }

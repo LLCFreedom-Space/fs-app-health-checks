@@ -64,12 +64,12 @@ extension Application {
 
     /// A `PsqlHealthChecksKey` conform to StorageKey protocol
     public struct PsqlHealthChecksKey: StorageKey {
-        /// Less verbose typealias for `PsqlHealthChecksProtocol`.
-        public typealias Value = PsqlHealthChecksProtocol
+        /// Less verbose typealias for `PostgresChecksProtocol`.
+        public typealias Value = PostgresChecksProtocol
     }
 
     /// Setup `psqlHealthChecks` in application storage
-    public var psqlHealthChecks: PsqlHealthChecksProtocol? {
+    public var psqlHealthChecks: PostgresChecksProtocol? {
         get { storage[PsqlHealthChecksKey.self] }
         set { storage[PsqlHealthChecksKey.self] = newValue }
     }
