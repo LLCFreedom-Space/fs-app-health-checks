@@ -44,8 +44,16 @@ public struct ComponentHealthChecksMock: ComponentHealthChecksProtocol {
         for component in components {
             switch component {
             case .postgresql:
-                result["postgresql:\(MeasurementType.connections)"]?.append(ComponentHealthChecksMock.healthCheckItem)
-                result["postgresql:\(MeasurementType.responseTime)"]?.append(ComponentHealthChecksMock.healthCheckItem)
+                if var key = result["postgresql:\(MeasurementType.connections)"] {
+                    key.append(ComponentHealthChecksMock.healthCheckItem)
+                } else {
+                    result["postgresql:\(MeasurementType.connections)"] = [ComponentHealthChecksMock.healthCheckItem]
+                }
+                if var key = result["postgresql:\(MeasurementType.responseTime)"] {
+                    key.append(ComponentHealthChecksMock.healthCheckItem)
+                } else {
+                    result["postgresql:\(MeasurementType.responseTime)"] = [ComponentHealthChecksMock.healthCheckItem]
+                }
             default:
                 break
             }

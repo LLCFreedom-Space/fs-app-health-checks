@@ -38,10 +38,18 @@ public struct ComponentHealthChecks: ComponentHealthChecksProtocol {
             switch component {
             case .postgresql:
                 if let response = await app.psqlHealthChecks?.getVersion() {
-                    result["postgresql:\(MeasurementType.connections)"]?.append(response)
+                    if var key = result["postgresql:\(MeasurementType.connections)"] {
+                        key.append(response)
+                    } else {
+                        result["postgresql:\(MeasurementType.connections)"] = [response]
+                    }
                 }
                 if let response = await app.psqlHealthChecks?.getResponseTime() {
-                    result["postgresql:\(MeasurementType.responseTime)"]?.append(response)
+                    if var key = result["postgresql:\(MeasurementType.responseTime)"] {
+                        key.append(response)
+                    } else {
+                        result["postgresql:\(MeasurementType.responseTime)"] = [response]
+                    }
                 }
             default:
                 break
