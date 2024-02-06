@@ -31,7 +31,7 @@ extension Application {
         /// Less verbose typealias for `UUID`.
         typealias Value = UUID
     }
-    
+
     /// Setup `serviceId` in application storage
     public var serviceId: UUID? {
         get { storage[ServiceIdKey.self] }
@@ -61,17 +61,31 @@ extension Application {
         get { storage[PsqlIdKey.self] }
         set { storage[PsqlIdKey.self] = newValue }
     }
+}
 
-    /// A `PsqlHealthChecksKey` conform to StorageKey protocol
-    public struct PsqlHealthChecksKey: StorageKey {
+extension Application {
+    /// A `PostgresHealthChecksKey` conform to StorageKey protocol
+    public struct PostgresHealthChecksKey: StorageKey {
         /// Less verbose typealias for `PostgresChecksProtocol`.
         public typealias Value = PostgresChecksProtocol
     }
 
     /// Setup `psqlHealthChecks` in application storage
     public var psqlHealthChecks: PostgresChecksProtocol? {
-        get { storage[PsqlHealthChecksKey.self] }
-        set { storage[PsqlHealthChecksKey.self] = newValue }
+        get { storage[PostgresHealthChecksKey.self] }
+        set { storage[PostgresHealthChecksKey.self] = newValue }
+    }
+
+    /// A `ComponentHealthChecksKey` conform to StorageKey protocol
+    public struct ComponentHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `ComponentHealthChecksProtocol`.
+        public typealias Value = ComponentHealthChecksProtocol
+    }
+
+    /// Setup `componentHealthChecks` in application storage
+    public var componentHealthChecks: ComponentHealthChecksProtocol? {
+        get { storage[ComponentHealthChecksKey.self] }
+        set { storage[ComponentHealthChecksKey.self] = newValue }
     }
 }
 

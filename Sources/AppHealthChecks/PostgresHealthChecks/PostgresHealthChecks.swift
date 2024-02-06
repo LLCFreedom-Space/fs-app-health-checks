@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PostgresqlHealthCheck.swift
+//  PostgresHealthChecks.swift
 //
 //
 //  Created by Mykola Buhaiov on 31.01.2024.
@@ -27,31 +27,9 @@ import Fluent
 import FluentPostgresDriver
 
 /// Service that provides psql health check functionality
-public struct PostgresqlHealthCheck: PostgresChecksProtocol {
+public struct PostgresHealthChecks: PostgresChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
-
-    /// Get psql health using url connection
-    /// - Parameter url: `String`
-    /// - Returns: `HealthCheckItem`
-    public func checkHealth(options: Set<MeasurementType>) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
-        for option in options {
-            switch option {
-            case .connections:
-                let response = await getVersion()
-                result["postgresql:\(MeasurementType.connections)"] = response
-            case .utilization:
-                break
-            case .responseTime:
-                let response = await getResponseTime()
-                result["postgresql:\(MeasurementType.responseTime)"] = response
-            case .uptime:
-                break
-            }
-        }
-        return result
-    }
     
     /// Get  postgresql version
     /// - Returns: `HealthCheckItem`

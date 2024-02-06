@@ -16,17 +16,16 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PsqlHealthChecksMock.swift
+//  ComponentHealthChecksMock.swift
 //
 //
-//  Created by Mykola Buhaiov on 31.01.2024.
+//  Created by Mykola Buhaiov on 06.02.2024.
 //
 
 import Vapor
-import FluentPostgresDriver
 @testable import AppHealthChecks
 
-public struct PsqlHealthChecksMock: PostgresChecksProtocol {
+public struct ComponentHealthChecksMock: ComponentHealthChecksProtocol {
     static let psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     static let healthCheckItem = HealthCheckItem(
         componentId: psqlId,
@@ -40,25 +39,17 @@ public struct PsqlHealthChecksMock: PostgresChecksProtocol {
         links: nil,
         node: nil
     )
-
-    public func check() async -> HealthCheckItem {
-        return PsqlHealthChecksMock.healthCheckItem
-    }
-
-    public func getVersion() async -> String {
-        "Ok"
-    }
-
-    public func checkHealth(options: Set<MeasurementType>) async -> [String: HealthCheckItem] {
-       ["postgresql:\(MeasurementType.responseTime)": PsqlHealthChecksMock.healthCheckItem]
-    }
-
-    public func getVersion() async -> HealthCheckItem {
-        PsqlHealthChecksMock.healthCheckItem
-    }
-
-    public func getResponseTime() async -> HealthCheckItem {
-        PsqlHealthChecksMock.healthCheckItem
+    public func checkHealth(for components: [ComponentName]) async -> [String : [HealthCheckItem]] {
+        var result = ["": [HealthCheckItem()]]
+        for component in components {
+            switch component {
+            case .postgresql:
+                result["postgresql:\(MeasurementType.connections)"]?.append(ComponentHealthChecksMock.healthCheckItem)
+                result["postgresql:\(MeasurementType.responseTime)"]?.append(ComponentHealthChecksMock.healthCheckItem)
+            default:
+                break
+            }
+        }
+        return result
     }
 }
-

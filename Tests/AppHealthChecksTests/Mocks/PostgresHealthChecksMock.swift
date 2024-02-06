@@ -16,27 +16,36 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PostgresChecksProtocol.swift
-//  
+//  PostgresHealthChecksMock.swift
+//
 //
 //  Created by Mykola Buhaiov on 31.01.2024.
 //
 
 import Vapor
 import FluentPostgresDriver
+@testable import AppHealthChecks
 
-/// Groups func for get psql health check
-public protocol PostgresChecksProtocol {
-    /// Get psql health using url connection
-    /// - Parameter url: `String`
-    /// - Returns: `HealthCheckItem`
-    func checkHealth(options: Set<MeasurementType>) async -> [String: HealthCheckItem]
+public struct PostgresHealthChecksMock: PostgresChecksProtocol {
+    static let psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+    static let healthCheckItem = HealthCheckItem(
+        componentId: psqlId,
+        componentType: .datastore,
+        observedValue: 1,
+        observedUnit: "s",
+        status: .pass,
+        affectedEndpoints: nil,
+        time: "2024-02-01T11:11:59.364",
+        output: "Ok",
+        links: nil,
+        node: nil
+    )
 
-    /// Get  Postgresql version
-    /// - Returns: `HealthCheckItem`
-    func getVersion() async -> HealthCheckItem
+    public func getVersion() async -> HealthCheckItem {
+        PostgresHealthChecksMock.healthCheckItem
+    }
 
-    /// Get response time from postgresql
-    /// - Returns: `HealthCheckItem`
-    func getResponseTime() async -> HealthCheckItem
+    public func getResponseTime() async -> HealthCheckItem {
+        PostgresHealthChecksMock.healthCheckItem
+    }
 }
