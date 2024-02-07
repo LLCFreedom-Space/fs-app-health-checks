@@ -33,7 +33,7 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testConnection() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.consulId = UUID().uuidString
+        app.consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
         app.consulHealthChecks = ConsulHealthChecksMock()
         let result = await app.consulHealthChecks?.connection(by: url, and: path)
         XCTAssertEqual(result, ConsulHealthChecksMock.healthCheckItem)
@@ -42,6 +42,7 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testGetResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
         app.consulHealthChecks = ConsulHealthChecksMock()
         let result = await app.consulHealthChecks?.getResponseTime(by: url, and: path)
         XCTAssertEqual(result, ConsulHealthChecksMock.healthCheckItem)
@@ -50,6 +51,7 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testCheckHealth() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
         app.consulHealthChecks = ConsulHealthChecksMock()
         let result = await app.consulHealthChecks?.checkHealth(by: url, and: path, for: [MeasurementType.responseTime, MeasurementType.connections])
         let psqlConnections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]

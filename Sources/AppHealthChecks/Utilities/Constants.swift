@@ -27,6 +27,4 @@ import Vapor
 /// Constants
 public enum Constants {
    static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-
-    static let consulStatusPath = "/v1/status/leader"
 }
