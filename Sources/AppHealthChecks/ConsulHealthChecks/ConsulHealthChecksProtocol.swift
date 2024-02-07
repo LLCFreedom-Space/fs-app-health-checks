@@ -16,17 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  Constants.swift
+//  ConsulHealthChecksProtocol.swift
 //
 //
-//  Created by Mykola Buhaiov on 06.02.2024.
+//  Created by Mykola Buhaiov on 07.02.2024.
 //
 
 import Vapor
 
-/// Constants
-public enum Constants {
-   static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-
-    static let consulStatusPath = "/v1/status/leader"
-}
+/// Groups func for get consul health check
+public protocol ConsulHealthChecksProtocol: ConsulChecksProtocol {}

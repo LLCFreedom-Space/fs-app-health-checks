@@ -61,6 +61,18 @@ extension Application {
         get { storage[PsqlIdKey.self] }
         set { storage[PsqlIdKey.self] = newValue }
     }
+
+    /// A `consulIdKey` conform to StorageKey protocol
+    private struct ConsulIdKey: StorageKey {
+        /// Less verbose typealias for `String`.
+        typealias Value = String
+    }
+
+    /// Setup `consulIdKey` in application storage
+    public var consulId: String? {
+        get { storage[ConsulIdKey.self] }
+        set { storage[ConsulIdKey.self] = newValue }
+    }
 }
 
 extension Application {
@@ -74,6 +86,18 @@ extension Application {
     public var psqlHealthChecks: PostgresHealthChecksProtocol? {
         get { storage[PostgresHealthChecksKey.self] }
         set { storage[PostgresHealthChecksKey.self] = newValue }
+    }
+
+    /// A `ConsulHealthChecksKey` conform to StorageKey protocol
+    public struct ConsulHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `ConsulHealthChecksProtocol`.
+        public typealias Value = ConsulHealthChecksProtocol
+    }
+
+    /// Setup `consulHealthChecks` in application storage
+    public var consulHealthChecks: ConsulHealthChecksProtocol? {
+        get { storage[ConsulHealthChecksKey.self] }
+        set { storage[ConsulHealthChecksKey.self] = newValue }
     }
 }
 
