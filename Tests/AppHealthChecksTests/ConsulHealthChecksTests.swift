@@ -49,15 +49,17 @@ final class ConsulHealthChecksTests: XCTestCase {
     }
 
     func testCheckHealth() async throws {
+        let consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+        app.consulId = consulId
         app.consulHealthChecks = ConsulHealthChecksMock()
         let result = await app.consulHealthChecks?.checkHealth(by: url, and: path, for: [MeasurementType.responseTime, MeasurementType.connections])
-        let psqlConnections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
-        XCTAssertEqual(psqlConnections, ConsulHealthChecksMock.healthCheckItem)
-        let psqlResponseTimes = result?["\(ComponentName.consul):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(psqlResponseTimes, ConsulHealthChecksMock.healthCheckItem)
+        let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
+        XCTAssertEqual(connections, ConsulHealthChecksMock.healthCheckItem)
+        let responseTimes = result?["\(ComponentName.consul):\(MeasurementType.responseTime)"]
+        XCTAssertEqual(responseTimes, ConsulHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(app.consulId, consulId)
     }
 
     func testGetStatus() async throws {

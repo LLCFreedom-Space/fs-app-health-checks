@@ -52,7 +52,7 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
         HTTPResponseStatus.ok
     }
 
-    public func checkHealth(by url: String, and path: String, for options: [MeasurementType]) async -> [String : HealthCheckItem] {
+    public func checkHealth(by url: String, and path: String, for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem,
             "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
