@@ -52,6 +52,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     }
 
     /// Get response time from consul
+    /// - Parameters:
     ///   - url: `String` on which the application is running. Example - `http://127.0.0.1:8500`, `https://xmpl-consul.example.com`
     ///   - path: `String` the way to get a status for Consul. Example - `/v1/status/leader`
     /// - Returns: `HealthCheckItem`
