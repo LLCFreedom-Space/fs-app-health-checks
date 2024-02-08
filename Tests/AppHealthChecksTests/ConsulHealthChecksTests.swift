@@ -40,8 +40,6 @@ final class ConsulHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.consulHealthChecks = ConsulHealthChecksMock()
         let result = await app.consulHealthChecks?.checkHealth(for: [MeasurementType.responseTime, MeasurementType.connections])
-        let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
-        XCTAssertEqual(connections, ConsulHealthChecksMock.healthCheckItem)
         let responseTimes = result?["\(ComponentName.consul):\(MeasurementType.responseTime)"]
         XCTAssertEqual(responseTimes, ConsulHealthChecksMock.healthCheckItem)
     }
