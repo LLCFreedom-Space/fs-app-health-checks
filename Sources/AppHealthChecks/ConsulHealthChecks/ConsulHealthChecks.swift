@@ -53,17 +53,12 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Get connection status for consul
     /// - Returns: `HTTPResponseStatus.ok` or `HTTPResponseStatus.notFound` depending on whether the status was obtained from the service
     public func getStatus() async -> HTTPResponseStatus {
-        var status: HTTPResponseStatus = .notFound
         let url = app.consulConfigData?.url ?? Constants.consulUrl
         let path = app.consulConfigData?.statusPath ?? Constants.consulStatusPath
         let uri = URI(string: url + path)
-        do {
-            status = try await app.client.get(uri).status
-            app.logger.debug("Consul status - \(String(describing: status)). Consul url: \(url), path: \(path)")
-        } catch {
-            app.logger.error("Get consul status by uri: \(uri) fail with error: \(error)")
-        }
-        return status
+        let status = try? await app.client.get(uri).status
+        app.logger.debug("Consul status - \(String(describing: status)). Consul url: \(url), path: \(path)")
+        return status ?? .notFound
     }
 
     /// Check with setup options
