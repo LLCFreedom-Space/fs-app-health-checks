@@ -61,17 +61,19 @@ extension Application {
         get { storage[PsqlIdKey.self] }
         set { storage[PsqlIdKey.self] = newValue }
     }
+}
 
-    /// A `consulIdKey` conform to StorageKey protocol
-    private struct ConsulIdKey: StorageKey {
-        /// Less verbose typealias for `String`.
-        typealias Value = String
+extension Application {
+    /// A `ConsulConfigDataKey` conform to StorageKey protocol
+    private struct ConsulConfigDataKey: StorageKey {
+        /// Less verbose typealias for `ConsulConfigData`.
+        typealias Value = ConsulConfigData
     }
 
-    /// Setup `consulIdKey` in application storage
-    public var consulId: String? {
-        get { storage[ConsulIdKey.self] }
-        set { storage[ConsulIdKey.self] = newValue }
+    /// Setup `consulConfigData` in application storage
+    public var consulConfigData: ConsulConfigData? {
+        get { storage[ConsulConfigDataKey.self] }
+        set { storage[ConsulConfigDataKey.self] = newValue }
     }
 }
 

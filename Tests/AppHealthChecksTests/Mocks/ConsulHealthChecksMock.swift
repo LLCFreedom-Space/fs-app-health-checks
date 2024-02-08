@@ -40,22 +40,17 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
         node: nil
     )
 
-    public func connection(by url: String, and path: String) async -> HealthCheckItem {
+    public func getResponseTime() async -> HealthCheckItem {
         ConsulHealthChecksMock.healthCheckItem
     }
 
-    public func getResponseTime(by url: String, and path: String) async -> HealthCheckItem {
-        ConsulHealthChecksMock.healthCheckItem
-    }
-
-    public func getStatus(by url: String, and path: String) async -> HTTPResponseStatus {
+    public func getStatus() async -> HTTPResponseStatus {
         HTTPResponseStatus.ok
     }
 
-    public func checkHealth(by url: String, and path: String, for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem,
-            "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
+            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem
         ]
         return result
     }

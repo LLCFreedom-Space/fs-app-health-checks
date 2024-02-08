@@ -16,13 +16,25 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulHealthChecksProtocol.swift
+//  ConsulConfigData.swift
 //
 //
-//  Created by Mykola Buhaiov on 07.02.2024.
+//  Created by Mykola Buhaiov on 08.02.2024.
 //
 
 import Vapor
 
-/// Groups func for get consul health check
-public protocol ConsulHealthChecksProtocol: ConsulChecksProtocol, ChecksProtocol {}
+/// A generic `ConsulConfigData` data that can be save in storage.
+public struct ConsulConfigData {
+    /// Is a unique identifier of the consul, in the application scope
+    /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
+    public let id: String
+
+    /// Consul url
+    /// Example: `http://127.0.0.1:8500`, `https://xmpl-consul.example.com`
+    public let url: String
+
+    /// Path for get consul status
+    /// Example: `/v1/status/leader`
+    public let statusPath: String
+}
