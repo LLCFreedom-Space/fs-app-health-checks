@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulConfigData.swift
+//  ConsulConfig.swift
 //
 //
 //  Created by Mykola Buhaiov on 08.02.2024.
@@ -24,8 +24,8 @@
 
 import Vapor
 
-/// A generic `ConsulConfigData` data that can be save in storage.
-public struct ConsulConfigData {
+/// A generic `ConsulConfig` data that can be save in storage.
+public struct ConsulConfig {
     /// Is a unique identifier of the consul, in the application scope
     /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
     public let id: String

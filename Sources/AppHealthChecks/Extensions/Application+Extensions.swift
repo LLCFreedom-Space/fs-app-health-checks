@@ -64,16 +64,16 @@ extension Application {
 }
 
 extension Application {
-    /// A `ConsulConfigDataKey` conform to StorageKey protocol
-    private struct ConsulConfigDataKey: StorageKey {
-        /// Less verbose typealias for `ConsulConfigData`.
-        typealias Value = ConsulConfigData
+    /// A `ConsulConfigKey` conform to StorageKey protocol
+    private struct ConsulConfigKey: StorageKey {
+        /// Less verbose typealias for `ConsulConfig`.
+        typealias Value = ConsulConfig
     }
 
-    /// Setup `consulConfigData` in application storage
-    public var consulConfigData: ConsulConfigData? {
-        get { storage[ConsulConfigDataKey.self] }
-        set { storage[ConsulConfigDataKey.self] = newValue }
+    /// Setup `consulConfig` in application storage
+    public var consulConfig: ConsulConfig? {
+        get { storage[ConsulConfigKey.self] }
+        set { storage[ConsulConfigKey.self] = newValue }
     }
 }
 

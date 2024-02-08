@@ -29,21 +29,42 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
 
-    /// Get response time from consul
+    /// Get  consul connection
     /// - Returns: `HealthCheckItem`
-    public func getResponseTime() async -> HealthCheckItem {
-        let url = app.consulConfigData?.url ?? Constants.consulUrl
-        let path = app.consulConfigData?.statusPath ?? Constants.consulStatusPath
+    public func connection() async -> HealthCheckItem {
+        let url = app.consulConfig?.url ?? Constants.consulUrl
+        let path = app.consulConfig?.statusPath ?? Constants.consulStatusPath
         let dateNow = Date().timeIntervalSinceReferenceDate
         let status = await getStatus()
         let result = HealthCheckItem(
-            componentId: app.consulConfigData?.id,
+            componentId: app.consulConfig?.id,
             componentType: .component,
             observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
             observedUnit: "s",
             status: status == .ok ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: status != .ok ? "\(url + path)" : nil,
+            output: status != .ok ? "ERROR: No connection at this url: \(url + path)" : nil,
+            links: nil,
+            node: nil
+        )
+        return result
+    }
+
+    /// Get response time from consul
+    /// - Returns: `HealthCheckItem`
+    public func getResponseTime() async -> HealthCheckItem {
+        let url = app.consulConfig?.url ?? Constants.consulUrl
+        let path = app.consulConfig?.statusPath ?? Constants.consulStatusPath
+        let dateNow = Date().timeIntervalSinceReferenceDate
+        let status = await getStatus()
+        let result = HealthCheckItem(
+            componentId: app.consulConfig?.id,
+            componentType: .component,
+            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
+            observedUnit: "s",
+            status: status == .ok ? .pass : .fail,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: status != .ok ? "ERROR: No connection at this url: \(url + path)" : nil,
             links: nil,
             node: nil
         )
@@ -53,12 +74,12 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Get connection status for consul
     /// - Returns: `HTTPResponseStatus.ok` or `HTTPResponseStatus.notFound` depending on whether the status was obtained from the service
     public func getStatus() async -> HTTPResponseStatus {
-        let url = app.consulConfigData?.url ?? Constants.consulUrl
-        let path = app.consulConfigData?.statusPath ?? Constants.consulStatusPath
+        let url = app.consulConfig?.url ?? Constants.consulUrl
+        let path = app.consulConfig?.statusPath ?? Constants.consulStatusPath
         let uri = URI(string: url + path)
         let status = try? await app.client.get(uri).status
         app.logger.debug("Consul status - \(String(describing: status)). Consul url: \(url), path: \(path)")
-        return status ?? .notFound
+        return status ?? .badRequest
     }
 
     /// Check with setup options
@@ -72,6 +93,8 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
             switch type {
             case .responseTime:
                 result["\(ComponentName.consul):\(MeasurementType.responseTime)"] = await getResponseTime()
+            case .connections:
+                result["\(ComponentName.consul):\(MeasurementType.connections)"] = await connection()
             default:
                 break
             }

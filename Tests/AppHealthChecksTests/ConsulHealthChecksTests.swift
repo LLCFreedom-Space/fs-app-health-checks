@@ -27,6 +27,14 @@ import XCTest
 @testable import AppHealthChecks
 
 final class ConsulHealthChecksTests: XCTestCase {
+    func testConnection() async throws {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        app.consulHealthChecks = ConsulHealthChecksMock()
+        let result = await app.consulHealthChecks?.connection()
+        XCTAssertEqual(result, ConsulHealthChecksMock.healthCheckItem)
+    }
+
     func testGetResponseTime() async {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -42,6 +50,8 @@ final class ConsulHealthChecksTests: XCTestCase {
         let result = await app.consulHealthChecks?.checkHealth(for: [MeasurementType.responseTime, MeasurementType.connections])
         let responseTimes = result?["\(ComponentName.consul):\(MeasurementType.responseTime)"]
         XCTAssertEqual(responseTimes, ConsulHealthChecksMock.healthCheckItem)
+        let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
+        XCTAssertEqual(connections, ConsulHealthChecksMock.healthCheckItem)
     }
 
     func testGetStatus() async {
@@ -55,14 +65,14 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testCheckConsulConfigData() async {
         let app = Application(.testing)
         defer { app.shutdown() }
-        let consulConfigData = ConsulConfigData(
+        let consulConfigData = ConsulConfig(
             id: UUID().uuidString,
             url: Constants.consulUrl,
             statusPath: Constants.consulStatusPath
         )
-        app.consulConfigData = consulConfigData
-        XCTAssertEqual(app.consulConfigData?.id, consulConfigData.id)
-        XCTAssertEqual(app.consulConfigData?.url, consulConfigData.url)
-        XCTAssertEqual(app.consulConfigData?.statusPath, consulConfigData.statusPath)
+        app.consulConfig = consulConfigData
+        XCTAssertEqual(app.consulConfig?.id, consulConfigData.id)
+        XCTAssertEqual(app.consulConfig?.url, consulConfigData.url)
+        XCTAssertEqual(app.consulConfig?.statusPath, consulConfigData.statusPath)
     }
 }

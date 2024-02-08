@@ -40,6 +40,10 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
         node: nil
     )
 
+    public func connection() async -> HealthCheckItem {
+        ConsulHealthChecksMock.healthCheckItem
+    }
+
     public func getResponseTime() async -> HealthCheckItem {
         ConsulHealthChecksMock.healthCheckItem
     }
@@ -50,7 +54,8 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
 
     public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem
+            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem,
+            "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
         ]
         return result
     }

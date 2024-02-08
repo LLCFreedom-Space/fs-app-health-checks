@@ -26,6 +26,10 @@ import Vapor
 
 /// Groups func for get consul health check
 public protocol ConsulChecksProtocol {
+    /// Get  consul connection
+    /// - Returns: `HealthCheckItem`
+    func connection() async -> HealthCheckItem
+
     /// Get response time from consul
     /// - Returns: `HealthCheckItem`
     func getResponseTime() async -> HealthCheckItem
