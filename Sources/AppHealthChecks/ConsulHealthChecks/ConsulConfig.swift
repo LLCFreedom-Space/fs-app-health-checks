@@ -33,4 +33,12 @@ public struct ConsulConfig {
     /// Consul url
     /// Example: `http://127.0.0.1:8500`, `https://xmpl-consul.example.com`
     public let url: String
+
+    /// Consul username
+    /// Example: `username`
+    public let username: String?
+
+    /// Consul password
+    /// Example: `password`
+    public let password: String?
 }

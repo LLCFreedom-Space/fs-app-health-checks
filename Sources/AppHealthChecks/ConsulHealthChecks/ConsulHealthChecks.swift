@@ -29,51 +29,17 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
 
-    /// Get  consul connection
-    /// - Returns: `HealthCheckItem`
-    public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
-        let connectionDescription = await getStatus()
-        let result = HealthCheckItem(
-            componentId: app.consulConfig?.id,
-            componentType: .component,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
-            status: !connectionDescription.contains("ERROR:") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
-            links: nil,
-            node: nil
-        )
-        return result
-    }
-
-    /// Get response time from consul
-    /// - Returns: `HealthCheckItem`
-    public func getResponseTime() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
-        let connectionDescription = await getStatus()
-        let result = HealthCheckItem(
-            componentId: app.consulConfig?.id,
-            componentType: .component,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
-            status: !connectionDescription.contains("ERROR:") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
-            links: nil,
-            node: nil
-        )
-        return result
-    }
-
     /// Get connection status for consul
     /// - Returns: `String`
     public func getStatus() async -> String {
         let url = app.consulConfig?.url ?? Constants.consulUrl
         let path = Constants.consulStatusPath
         let uri = URI(string: url + path)
-        let status = try? await app.client.get(uri).status
+        var headers = HTTPHeaders()
+        if let username = app.consulConfig?.username, !username.isEmpty, let password = app.consulConfig?.password, !password.isEmpty {
+            headers.basicAuthorization = BasicAuthorization(username: username, password: password)
+        }
+        let status = try? await app.client.get(uri, headers: headers).status
         return status == .ok ? "Consul response status: \(String(describing: status))" : "ERROR: Consul response was not a successful HTTP status code, by uri: \(uri) response code: \(String(describing: status))"
     }
 
@@ -84,12 +50,23 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
+        let dateNow = Date().timeIntervalSinceReferenceDate
+        let connectionDescription = await getStatus()
+        let responseTime = HealthCheckItem(
+            componentId: app.consulConfig?.id,
+            componentType: .component,
+            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
+            observedUnit: "s",
+            status: !connectionDescription.contains("ERROR:") ? .pass : .fail,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
+            links: nil,
+            node: nil
+        )
         for type in measurementTypes {
             switch type {
             case .responseTime:
-                result["\(ComponentName.consul):\(MeasurementType.responseTime)"] = await getResponseTime()
-            case .connections:
-                result["\(ComponentName.consul):\(MeasurementType.connections)"] = await connection()
+                result["\(ComponentName.consul):\(MeasurementType.responseTime)"] = responseTime
             default:
                 break
             }
