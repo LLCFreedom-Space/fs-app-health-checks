@@ -40,14 +40,6 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
         node: nil
     )
 
-    public func connection() async -> HealthCheckItem {
-        ConsulHealthChecksMock.healthCheckItem
-    }
-
-    public func getResponseTime() async -> HealthCheckItem {
-        ConsulHealthChecksMock.healthCheckItem
-    }
-
     public func getStatus() async -> String {
         "Ok"
     }
