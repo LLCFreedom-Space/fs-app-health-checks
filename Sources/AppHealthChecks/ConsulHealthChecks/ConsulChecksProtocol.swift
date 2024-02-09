@@ -35,6 +35,6 @@ public protocol ConsulChecksProtocol {
     func getResponseTime() async -> HealthCheckItem
 
     /// Get connection status for consul
-    /// - Returns: `HTTPResponseStatus.ok` or `HTTPResponseStatus.notFound` depending on whether the status was obtained from the service
-    func getStatus() async -> HTTPResponseStatus
+    /// - Returns: `String`
+    func getStatus() async -> String
 }

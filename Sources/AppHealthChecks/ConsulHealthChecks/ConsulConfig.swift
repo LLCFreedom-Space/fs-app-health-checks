@@ -33,8 +33,4 @@ public struct ConsulConfig {
     /// Consul url
     /// Example: `http://127.0.0.1:8500`, `https://xmpl-consul.example.com`
     public let url: String
-
-    /// Path for get consul status
-    /// Example: `/v1/status/leader`
-    public let statusPath: String
 }

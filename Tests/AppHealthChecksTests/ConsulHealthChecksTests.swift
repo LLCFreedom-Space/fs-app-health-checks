@@ -59,7 +59,7 @@ final class ConsulHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.consulHealthChecks = ConsulHealthChecksMock()
         let result = await app.consulHealthChecks?.getStatus()
-        XCTAssertEqual(result, .ok)
+        XCTAssertEqual(result, "Ok")
     }
 
     func testCheckConsulConfigData() async {
@@ -67,12 +67,10 @@ final class ConsulHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         let consulConfigData = ConsulConfig(
             id: UUID().uuidString,
-            url: Constants.consulUrl,
-            statusPath: Constants.consulStatusPath
+            url: Constants.consulUrl
         )
         app.consulConfig = consulConfigData
         XCTAssertEqual(app.consulConfig?.id, consulConfigData.id)
         XCTAssertEqual(app.consulConfig?.url, consulConfigData.url)
-        XCTAssertEqual(app.consulConfig?.statusPath, consulConfigData.statusPath)
     }
 }

@@ -48,8 +48,8 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
         ConsulHealthChecksMock.healthCheckItem
     }
 
-    public func getStatus() async -> HTTPResponseStatus {
-        HTTPResponseStatus.ok
+    public func getStatus() async -> String {
+        "Ok"
     }
 
     public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
