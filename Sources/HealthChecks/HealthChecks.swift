@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  AppHealthChecks.swift
+//  HealthChecks.swift
 //
 //
 //  Created by Mykola Buhaiov on 30.01.2024.
@@ -25,7 +25,7 @@
 import Vapor
 
 /// Service that provides app health check functionality
-public struct AppHealthChecks {
+public struct HealthChecks {
     /// Get app major version
     /// - Parameter serverVersion: `String`
     /// - Returns: `Int`

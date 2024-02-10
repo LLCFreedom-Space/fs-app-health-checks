@@ -16,34 +16,31 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulHealthChecksMock.swift
+//  ApplicationHealthChecksMock.swift
 //
 //
-//  Created by Mykola Buhaiov on 07.02.2024.
+//  Created by Mykola Buhaiov on 10.02.2024.
 //
 
 import Vapor
-@testable import AppHealthChecks
+@testable import HealthChecks
 
-public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
-    static let consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+public struct ApplicationHealthChecksMock: ApplicationHealthChecksProtocol {
     static let healthCheckItem = HealthCheckItem(
-        componentId: consulId,
-        componentType: .component,
+        componentType: .system,
         observedValue: 1,
         observedUnit: "s",
         status: .pass,
-        affectedEndpoints: nil,
-        time: "2024-02-01T11:11:59.364",
-        output: "Ok",
-        links: nil,
-        node: nil
+        time: "2024-02-01T11:11:59.364"
     )
+
+    public func uptime() -> HealthCheckItem {
+        ApplicationHealthChecksMock.healthCheckItem
+    }
 
     public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem,
-            "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
+            MeasurementType.uptime.rawValue: ApplicationHealthChecksMock.healthCheckItem
         ]
         return result
     }

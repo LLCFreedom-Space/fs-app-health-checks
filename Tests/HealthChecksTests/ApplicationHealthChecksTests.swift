@@ -16,35 +16,32 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  AppHealthChecksTests.swift
+//  ApplicationHealthChecksTests.swift
 //
 //
-//  Created by Mykola Buhaiov on 09.03.2023.
+//  Created by Mykola Buhaiov on 10.02.2024.
 //
 
 import Vapor
 import XCTest
-@testable import AppHealthChecks
+@testable import HealthChecks
 
-final class AppHealthChecksTests: XCTestCase {
-    let serviceId = UUID()
-    let releaseId = "1.0.0"
-
-    func testGetMajorVersion() {
+final class ApplicationHealthChecksTests: XCTestCase {
+    func testUptime() {
         let app = Application(.testing)
         defer { app.shutdown() }
-        let version = AppHealthChecks().getPublicVersion(from: releaseId)
-        XCTAssertEqual(version, "1")
+        app.applicationHealthChecks = ApplicationHealthChecksMock()
+        let response = app.applicationHealthChecks?.uptime()
+        XCTAssertEqual(response, ApplicationHealthChecksMock.healthCheckItem)
     }
 
-    func testGetHealth() {
+    func testGetHealth() async {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.serviceId = serviceId
-        app.releaseId = releaseId
-        let response = AppHealthChecks().getHealth(from: app)
-        XCTAssertEqual(response.version, "1")
-        XCTAssertEqual(response.releaseId, releaseId)
-        XCTAssertEqual(response.serviceId, serviceId)
+        app.launchTime = Date().timeIntervalSinceReferenceDate
+        app.applicationHealthChecks = ApplicationHealthChecksMock()
+        let result = await app.applicationHealthChecks?.checkHealth(for: [MeasurementType.uptime])
+        let uptime = result?[MeasurementType.uptime.rawValue]
+        XCTAssertEqual(uptime, ApplicationHealthChecksMock.healthCheckItem)
     }
 }

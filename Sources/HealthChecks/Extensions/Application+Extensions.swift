@@ -61,6 +61,18 @@ extension Application {
         get { storage[PsqlIdKey.self] }
         set { storage[PsqlIdKey.self] = newValue }
     }
+
+    /// A `launchTimeKey` conform to StorageKey protocol
+    private struct LaunchTimeKey: StorageKey {
+        /// Less verbose typealias for `Double`.
+        typealias Value = Double
+    }
+
+    /// Setup `launchTimeKey` in application storage
+    public var launchTime: Double {
+        get { storage[LaunchTimeKey.self] ?? Date().timeIntervalSinceReferenceDate }
+        set { storage[LaunchTimeKey.self] = newValue }
+    }
 }
 
 extension Application {
@@ -100,6 +112,18 @@ extension Application {
     public var consulHealthChecks: ConsulHealthChecksProtocol? {
         get { storage[ConsulHealthChecksKey.self] }
         set { storage[ConsulHealthChecksKey.self] = newValue }
+    }
+
+    /// A `ApplicationHealthChecksKey` conform to StorageKey protocol
+    public struct ApplicationHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `ApplicationHealthChecksProtocol`.
+        public typealias Value = ApplicationHealthChecksProtocol
+    }
+
+    /// Setup `applicationHealthChecks` in application storage
+    public var applicationHealthChecks: ApplicationHealthChecksProtocol? {
+        get { storage[ApplicationHealthChecksKey.self] }
+        set { storage[ApplicationHealthChecksKey.self] = newValue }
     }
 }
 
