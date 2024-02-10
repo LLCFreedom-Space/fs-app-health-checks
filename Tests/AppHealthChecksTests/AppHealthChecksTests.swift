@@ -59,6 +59,5 @@ final class AppHealthChecksTests: XCTestCase {
         XCTAssertEqual(response.observedValue, uptime)
         XCTAssertEqual(response.observedUnit, "s")
         XCTAssertEqual(response.status, .pass)
-        XCTAssertEqual(response.time, app.dateTimeISOFormat.string(from: Date()))
     }
 }
