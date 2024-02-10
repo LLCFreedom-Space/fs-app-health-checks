@@ -46,43 +46,4 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertEqual(app.consulConfig?.username, consulConfig.username)
         XCTAssertEqual(app.consulConfig?.password, consulConfig.password)
     }
-
-    func testGetStatus() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulHealthChecks = ConsulHealthChecksMock()
-        let result = await app.consulHealthChecks?.getStatus()
-        XCTAssertEqual(result?.status, .ok)
-    }
-
-    func testStatus() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulHealthChecks = ConsulHealthChecksMock()
-        let result = app.consulHealthChecks?.status(ClientResponse())
-        XCTAssertEqual(result, ConsulHealthChecksMock.healthCheckItem)
-    }
-
-    func testResponseTimeWithPass() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulHealthChecks = ConsulHealthChecksMock()
-        let result = app.consulHealthChecks?.responseTime(from: ClientResponse(status: .ok), TimeInterval(1))
-        XCTAssertEqual(result, ConsulHealthChecksMock.healthCheckItem)
-    }
-
-    func testResponseTimeWithFail() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let consulConfig = ConsulConfig(
-            id: UUID().uuidString,
-            url: Constants.consulUrl,
-            username: "username",
-            password: "password"
-        )
-        app.consulConfig = consulConfig
-        app.consulHealthChecks = ConsulHealthChecksMock()
-        let result = app.consulHealthChecks?.responseTime(from: ClientResponse(status: .badRequest), TimeInterval(1))
-        XCTAssertEqual(result, ConsulHealthChecksMock.healthCheckItemFail)
-    }
 }

@@ -38,7 +38,6 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         let measurementTypes = Array(Set(options))
         let dateNow = Date().timeIntervalSinceReferenceDate
         let response = await getStatus()
-
         for type in measurementTypes {
             switch type {
             case .responseTime:
@@ -56,7 +55,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
 
     /// Get response for consul
     /// - Returns: `ClientResponse`
-    public func getStatus() async -> ClientResponse {
+    func getStatus() async -> ClientResponse {
         let url = app.consulConfig?.url ?? Constants.consulUrl
         let path = Constants.consulStatusPath
         let uri = URI(string: url + path)
@@ -68,14 +67,14 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
             return try await app.client.get(uri, headers: headers)
         } catch {
             app.logger.error("ERROR: Send request by uri - \(uri) and method get fail with error - \(error)")
-            return ClientResponse(status: .badRequest)
+            return ClientResponse()
         }
     }
     
     /// Get status for consul
     /// - Parameter response: `ClientResponse`
     /// - Returns: `HealthCheckItem`
-    public func status(_ response: ClientResponse) -> HealthCheckItem {
+    func status(_ response: ClientResponse) -> HealthCheckItem {
         let url = app.consulConfig?.url ?? Constants.consulUrl
         let path = Constants.consulStatusPath
         return HealthCheckItem(
@@ -83,7 +82,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
             componentType: .component,
             status: response.status == .ok ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: "Error response from url - \(url + path), with http status - \(response.status)",
+            output: response.status != .ok ? "Error response from uri - \(url + path), with http status - \(response.status)" : nil,
             links: nil,
             node: nil
         )
@@ -94,26 +93,19 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - response: `ClientResponse`
     ///   - start: `TimeInterval`
     /// - Returns: `HealthCheckItem`
-    public func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
+    func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
         let url = app.consulConfig?.url ?? Constants.consulUrl
         let path = Constants.consulStatusPath
-        var healthCheckItem = HealthCheckItem(
+        return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
-            observedValue: Date().timeIntervalSinceReferenceDate - start,
+            observedValue: Date().timeIntervalSinceReferenceDate - start, 
             observedUnit: "s",
+            status: response.status == .ok ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: nil,
+            output: response.status != .ok ? "Error response from uri - \(url + path), with http status - \(response.status)" : nil,
             links: nil,
             node: nil
         )
-        if response.status == .ok {
-            healthCheckItem.status = .pass
-            return healthCheckItem
-        } else {
-            healthCheckItem.status = .fail
-            healthCheckItem.output = "Error response from url - \(url + path), with http status - \(response.status)"
-            return healthCheckItem
-        }
     }
 }

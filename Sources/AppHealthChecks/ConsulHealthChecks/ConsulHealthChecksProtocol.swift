@@ -25,4 +25,4 @@
 import Vapor
 
 /// Groups func for get consul health check
-public protocol ConsulHealthChecksProtocol: ConsulChecksProtocol, ChecksProtocol {}
+public protocol ConsulHealthChecksProtocol: ChecksProtocol {}
