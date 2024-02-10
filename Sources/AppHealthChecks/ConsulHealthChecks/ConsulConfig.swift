@@ -16,22 +16,29 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  Constants.swift
+//  ConsulConfig.swift
 //
 //
-//  Created by Mykola Buhaiov on 06.02.2024.
+//  Created by Mykola Buhaiov on 08.02.2024.
 //
 
 import Vapor
 
-/// Constants
-public enum Constants {
-    /// Default date format
-    static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+/// A generic `ConsulConfig` data that can be save in storage.
+public struct ConsulConfig {
+    /// Is a unique identifier of the consul, in the application scope
+    /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
+    public let id: String
 
-    /// Default url for consul
-    static let consulUrl = "http://127.0.0.1:8500"
+    /// Consul url
+    /// Example: `http://127.0.0.1:8500`, `https://xmpl-consul.example.com`
+    public let url: String
 
-    /// Default path for get consul status
-    static let consulStatusPath = "/v1/status/leader"
+    /// Consul username
+    /// Example: `username`
+    public let username: String?
+
+    /// Consul password
+    /// Example: `password`
+    public let password: String?
 }

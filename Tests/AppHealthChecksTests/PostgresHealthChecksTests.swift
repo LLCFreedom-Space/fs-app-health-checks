@@ -39,7 +39,6 @@ final class PostgresHealthChecksTests: XCTestCase {
     func testGetResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
-        let dateFormat = app.dateTimeISOFormat
         app.psqlHealthChecks = PostgresHealthChecksMock()
         let result = await app.psqlHealthChecks?.getResponseTime()
         XCTAssertEqual(result, PostgresHealthChecksMock.healthCheckItem)

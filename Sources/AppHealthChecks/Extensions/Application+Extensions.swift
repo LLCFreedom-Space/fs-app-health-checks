@@ -64,6 +64,20 @@ extension Application {
 }
 
 extension Application {
+    /// A `ConsulConfigKey` conform to StorageKey protocol
+    private struct ConsulConfigKey: StorageKey {
+        /// Less verbose typealias for `ConsulConfig`.
+        typealias Value = ConsulConfig
+    }
+
+    /// Setup `consulConfig` in application storage
+    public var consulConfig: ConsulConfig? {
+        get { storage[ConsulConfigKey.self] }
+        set { storage[ConsulConfigKey.self] = newValue }
+    }
+}
+
+extension Application {
     /// A `PostgresHealthChecksKey` conform to StorageKey protocol
     public struct PostgresHealthChecksKey: StorageKey {
         /// Less verbose typealias for `PostgresHealthChecksProtocol`.
@@ -74,6 +88,18 @@ extension Application {
     public var psqlHealthChecks: PostgresHealthChecksProtocol? {
         get { storage[PostgresHealthChecksKey.self] }
         set { storage[PostgresHealthChecksKey.self] = newValue }
+    }
+
+    /// A `ConsulHealthChecksKey` conform to StorageKey protocol
+    public struct ConsulHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `ConsulHealthChecksProtocol`.
+        public typealias Value = ConsulHealthChecksProtocol
+    }
+
+    /// Setup `consulHealthChecks` in application storage
+    public var consulHealthChecks: ConsulHealthChecksProtocol? {
+        get { storage[ConsulHealthChecksKey.self] }
+        set { storage[ConsulHealthChecksKey.self] = newValue }
     }
 }
 
