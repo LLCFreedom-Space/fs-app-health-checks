@@ -29,9 +29,34 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
 
-    /// Get connection status for consul
-    /// - Returns: `String`
-    public func getStatus() async -> String {
+    /// Check with setup options
+    /// - Parameters:
+    ///   - options: array of `MeasurementType`
+    /// - Returns: dictionary `[String: HealthCheckItem]`
+    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+        var dict = ["": HealthCheckItem()]
+        let measurementTypes = Array(Set(options))
+        let dateNow = Date().timeIntervalSinceReferenceDate
+        let response = await getStatus()
+
+        for type in measurementTypes {
+            switch type {
+            case .responseTime:
+                let result = responseTime(from: response, dateNow)
+                dict["\(ComponentName.consul):\(MeasurementType.responseTime)"] = result
+            case .connections:
+                let result = status(response)
+                dict["\(ComponentName.consul):\(MeasurementType.connections)"] = result
+            default:
+                break
+            }
+        }
+        return dict
+    }
+
+    /// Get response for consul
+    /// - Returns: `ClientResponse`
+    public func getStatus() async -> ClientResponse {
         let url = app.consulConfig?.url ?? Constants.consulUrl
         let path = Constants.consulStatusPath
         let uri = URI(string: url + path)
@@ -39,38 +64,56 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         if let username = app.consulConfig?.username, !username.isEmpty, let password = app.consulConfig?.password, !password.isEmpty {
             headers.basicAuthorization = BasicAuthorization(username: username, password: password)
         }
-        let status = try? await app.client.get(uri, headers: headers).status
-        return status == .ok ? "Consul response status: \(String(describing: status))" : "ERROR: Consul response was not a successful HTTP status code, by uri: \(uri) response code: \(String(describing: status))"
+        do {
+            return try await app.client.get(uri, headers: headers)
+        } catch {
+            app.logger.error("ERROR: Send request by uri - \(uri) and method get fail with error - \(error)")
+            return ClientResponse(status: .badRequest)
+        }
     }
-
-    /// Check with setup options
-    /// - Parameters:
-    ///   - options: array of `MeasurementType`
-    /// - Returns: dictionary `[String: HealthCheckItem]`
-    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
-        let measurementTypes = Array(Set(options))
-        let dateNow = Date().timeIntervalSinceReferenceDate
-        let connectionDescription = await getStatus()
-        let responseTime = HealthCheckItem(
+    
+    /// Get status for consul
+    /// - Parameter response: `ClientResponse`
+    /// - Returns: `HealthCheckItem`
+    public func status(_ response: ClientResponse) -> HealthCheckItem {
+        let url = app.consulConfig?.url ?? Constants.consulUrl
+        let path = Constants.consulStatusPath
+        return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
-            status: !connectionDescription.contains("ERROR:") ? .pass : .fail,
+            status: response.status == .ok ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription.contains("ERROR:") ? connectionDescription : nil,
+            output: "Error response from url - \(url + path), with http status - \(response.status)",
             links: nil,
             node: nil
         )
-        for type in measurementTypes {
-            switch type {
-            case .responseTime:
-                result["\(ComponentName.consul):\(MeasurementType.responseTime)"] = responseTime
-            default:
-                break
-            }
+    }
+    
+    /// Get response time for consul
+    /// - Parameters:
+    ///   - response: `ClientResponse`
+    ///   - start: `TimeInterval`
+    /// - Returns: `HealthCheckItem`
+    public func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
+        let url = app.consulConfig?.url ?? Constants.consulUrl
+        let path = Constants.consulStatusPath
+        var healthCheckItem = HealthCheckItem(
+            componentId: app.consulConfig?.id,
+            componentType: .component,
+            observedValue: Date().timeIntervalSinceReferenceDate - start,
+            observedUnit: "s",
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: nil,
+            links: nil,
+            node: nil
+        )
+        if response.status == .ok {
+            healthCheckItem.status = .pass
+            return healthCheckItem
+        } else {
+            healthCheckItem.status = .fail
+            healthCheckItem.output = "Error response from url - \(url + path), with http status - \(response.status)"
+            return healthCheckItem
         }
-        return result
     }
 }
