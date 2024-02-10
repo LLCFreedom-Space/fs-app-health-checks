@@ -26,7 +26,7 @@ import Vapor
 
 /// Groups func for get application health check
 public protocol ApplicationChecksProtocol {
-    /// Get  uptime of application
+    /// Get uptime of application
     /// - Returns: `HealthCheckItem`
     func uptime() -> HealthCheckItem
 }

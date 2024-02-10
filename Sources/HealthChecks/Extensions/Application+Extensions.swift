@@ -62,16 +62,16 @@ extension Application {
         set { storage[PsqlIdKey.self] = newValue }
     }
 
-    /// A `uptimeKey` conform to StorageKey protocol
-    private struct UptimeKey: StorageKey {
+    /// A `launchTimeKey` conform to StorageKey protocol
+    private struct LaunchTimeKey: StorageKey {
         /// Less verbose typealias for `Double`.
         typealias Value = Double
     }
 
-    /// Setup `uptimeKey` in application storage
-    public var uptime: Double {
-        get { storage[UptimeKey.self] ?? Date().timeIntervalSinceReferenceDate }
-        set { storage[UptimeKey.self] = newValue }
+    /// Setup `launchTimeKey` in application storage
+    public var launchTime: Double {
+        get { storage[LaunchTimeKey.self] ?? Date().timeIntervalSinceReferenceDate }
+        set { storage[LaunchTimeKey.self] = newValue }
     }
 }
 

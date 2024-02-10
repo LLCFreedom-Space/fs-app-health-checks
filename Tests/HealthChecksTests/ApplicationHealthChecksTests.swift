@@ -38,7 +38,7 @@ final class ApplicationHealthChecksTests: XCTestCase {
     func testGetHealth() async {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.uptime = Date().timeIntervalSinceReferenceDate
+        app.launchTime = Date().timeIntervalSinceReferenceDate
         app.applicationHealthChecks = ApplicationHealthChecksMock()
         let result = await app.applicationHealthChecks?.checkHealth(for: [MeasurementType.uptime])
         let uptime = result?[MeasurementType.uptime.rawValue]
