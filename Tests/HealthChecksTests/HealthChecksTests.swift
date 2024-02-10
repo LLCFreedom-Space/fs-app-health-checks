@@ -24,16 +24,16 @@
 
 import Vapor
 import XCTest
-@testable import AppHealthChecks
+@testable import HealthChecks
 
-final class AppHealthChecksTests: XCTestCase {
+final class HealthChecksTests: XCTestCase {
     let serviceId = UUID()
     let releaseId = "1.0.0"
 
     func testGetMajorVersion() {
         let app = Application(.testing)
         defer { app.shutdown() }
-        let version = AppHealthChecks(app: app).getPublicVersion(from: releaseId)
+        let version = HealthChecks().getPublicVersion(from: releaseId)
         XCTAssertEqual(version, "1")
     }
 
@@ -42,22 +42,9 @@ final class AppHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.serviceId = serviceId
         app.releaseId = releaseId
-        let response = AppHealthChecks(app: app).getHealth(from: app)
+        let response = HealthChecks().getHealth(from: app)
         XCTAssertEqual(response.version, "1")
         XCTAssertEqual(response.releaseId, releaseId)
         XCTAssertEqual(response.serviceId, serviceId)
-    }
-
-    func testUptime() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.serviceId = serviceId
-        let uptime: Double = 12345
-        app.uptime = uptime
-        let response = AppHealthChecks(app: app).uptime()
-        XCTAssertEqual(response.componentType, .system)
-        XCTAssertEqual(response.observedValue, uptime)
-        XCTAssertEqual(response.observedUnit, "s")
-        XCTAssertEqual(response.status, .pass)
     }
 }

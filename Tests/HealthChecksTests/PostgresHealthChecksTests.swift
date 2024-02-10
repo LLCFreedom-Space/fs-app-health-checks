@@ -24,7 +24,7 @@
 
 import Vapor
 import XCTest
-@testable import AppHealthChecks
+@testable import HealthChecks
 
 final class PostgresHealthChecksTests: XCTestCase {
     func testConnection() async throws {

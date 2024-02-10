@@ -16,22 +16,20 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PostgresHealthChecksMock.swift
+//  ConsulHealthChecksMock.swift
 //
 //
-//  Created by Mykola Buhaiov on 31.01.2024.
+//  Created by Mykola Buhaiov on 07.02.2024.
 //
 
 import Vapor
-import FluentPostgresDriver
-@testable import AppHealthChecks
+@testable import HealthChecks
 
-public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
-    static let psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-    static let version = "database version - 15"
+public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
+    static let consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     static let healthCheckItem = HealthCheckItem(
-        componentId: psqlId,
-        componentType: .datastore,
+        componentId: consulId,
+        componentType: .component,
         observedValue: 1,
         observedUnit: "s",
         status: .pass,
@@ -42,22 +40,10 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
         node: nil
     )
 
-    public func connection() async -> HealthCheckItem {
-        PostgresHealthChecksMock.healthCheckItem
-    }
-
-    public func getResponseTime() async -> HealthCheckItem {
-        PostgresHealthChecksMock.healthCheckItem
-    }
-
-    public func getVersion() async -> String {
-        PostgresHealthChecksMock.version
-    }
-
     public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.postgresql):\(MeasurementType.responseTime)": PostgresHealthChecksMock.healthCheckItem,
-            "\(ComponentName.postgresql):\(MeasurementType.connections)": PostgresHealthChecksMock.healthCheckItem
+            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem,
+            "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
         ]
         return result
     }

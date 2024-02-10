@@ -69,8 +69,8 @@ extension Application {
     }
 
     /// Setup `uptimeKey` in application storage
-    public var uptime: Double? {
-        get { storage[UptimeKey.self] }
+    public var uptime: Double {
+        get { storage[UptimeKey.self] ?? Date().timeIntervalSinceReferenceDate }
         set { storage[UptimeKey.self] = newValue }
     }
 }
@@ -112,6 +112,18 @@ extension Application {
     public var consulHealthChecks: ConsulHealthChecksProtocol? {
         get { storage[ConsulHealthChecksKey.self] }
         set { storage[ConsulHealthChecksKey.self] = newValue }
+    }
+
+    /// A `ApplicationHealthChecksKey` conform to StorageKey protocol
+    public struct ApplicationHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `ApplicationHealthChecksProtocol`.
+        public typealias Value = ApplicationHealthChecksProtocol
+    }
+
+    /// Setup `applicationHealthChecks` in application storage
+    public var applicationHealthChecks: ApplicationHealthChecksProtocol? {
+        get { storage[ApplicationHealthChecksKey.self] }
+        set { storage[ApplicationHealthChecksKey.self] = newValue }
     }
 }
 

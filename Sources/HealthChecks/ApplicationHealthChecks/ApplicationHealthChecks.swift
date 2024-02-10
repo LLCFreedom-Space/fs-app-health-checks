@@ -16,48 +16,46 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  AppHealthChecks.swift
+//  ApplicationHealthChecks.swift
 //
 //
-//  Created by Mykola Buhaiov on 30.01.2024.
+//  Created by Mykola Buhaiov on 10.02.2024.
 //
 
 import Vapor
 
 /// Service that provides app health check functionality
-public struct AppHealthChecks {
+public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
 
-    /// Get app major version
-    /// - Parameter serverVersion: `String`
-    /// - Returns: `Int`
-    public func getPublicVersion(from version: String?) -> String? {
-        let components = version?.components(separatedBy: ".")
-        return components?.first
-    }
-    
-    /// Get health for application
-    /// - Parameter app: `Application`
-    /// - Returns: `HealthCheck`
-    public func getHealth(from app: Application) -> HealthCheck {
-        let healthCheck = HealthCheck(
-            version: self.getPublicVersion(from: app.releaseId),
-            releaseId: app.releaseId,
-            serviceId: app.serviceId
-        )
-        return healthCheck
-    }
-    
     /// Get uptime of system
     /// - Returns: `HealthCheckItem`
     public func uptime() -> HealthCheckItem {
+        let uptime = Date().timeIntervalSinceReferenceDate - app.uptime
         return HealthCheckItem(
             componentType: .system,
-            observedValue: app.uptime,
+            observedValue: uptime,
             observedUnit: "s",
             status: .pass,
             time: app.dateTimeISOFormat.string(from: Date())
         )
+    }
+
+    /// Check with setup options
+    /// - Parameter options: array of `MeasurementType`
+    /// - Returns: dictionary `[String: HealthCheckItem]`
+    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+        var result = ["": HealthCheckItem()]
+        let measurementTypes = Array(Set(options))
+        for type in measurementTypes {
+            switch type {
+            case .uptime:
+                result["\(MeasurementType.uptime)"] = uptime()
+            default:
+                break
+            }
+        }
+        return result
     }
 }

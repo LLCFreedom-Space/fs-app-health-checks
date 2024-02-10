@@ -24,10 +24,10 @@
 
 import Vapor
 import XCTest
-@testable import AppHealthChecks
+@testable import HealthChecks
 
 final class HealthCheckItemTests: XCTestCase {
-    func testPublicKeyEquatable() {
+    func testHealthCheckItemEquatable() {
         let firstHealthCheckItem = HealthCheckItem(
             componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
             componentType: .datastore,
