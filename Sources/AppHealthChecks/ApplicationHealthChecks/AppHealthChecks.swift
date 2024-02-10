@@ -26,6 +26,9 @@ import Vapor
 
 /// Service that provides app health check functionality
 public struct AppHealthChecks {
+    /// Instance of app as `Application`
+    public let app: Application
+
     /// Get app major version
     /// - Parameter serverVersion: `String`
     /// - Returns: `Int`
@@ -44,5 +47,17 @@ public struct AppHealthChecks {
             serviceId: app.serviceId
         )
         return healthCheck
+    }
+    
+    /// Get uptime of system
+    /// - Returns: `HealthCheckItem`
+    public func uptime() -> HealthCheckItem {
+        return HealthCheckItem(
+            componentType: .system,
+            observedValue: app.uptime,
+            observedUnit: "s",
+            status: .pass,
+            time: app.dateTimeISOFormat.string(from: Date())
+        )
     }
 }

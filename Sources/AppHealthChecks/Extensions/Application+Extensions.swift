@@ -61,6 +61,18 @@ extension Application {
         get { storage[PsqlIdKey.self] }
         set { storage[PsqlIdKey.self] = newValue }
     }
+
+    /// A `uptimeKey` conform to StorageKey protocol
+    private struct UptimeKey: StorageKey {
+        /// Less verbose typealias for `Double`.
+        typealias Value = Double
+    }
+
+    /// Setup `uptimeKey` in application storage
+    public var uptime: Double? {
+        get { storage[UptimeKey.self] }
+        set { storage[UptimeKey.self] = newValue }
+    }
 }
 
 extension Application {
