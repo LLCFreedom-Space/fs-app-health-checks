@@ -39,9 +39,12 @@ final class RedisHealthChecksTests: XCTestCase {
     func testGetResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
+        let redisId = UUID().uuidString
+        app.redisId = redisId
         app.redisHealthChecks = RedisHealthChecksMock()
         let result = await app.redisHealthChecks?.getResponseTime()
         XCTAssertEqual(result, RedisHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(app.redisId, redisId)
     }
 
     func testCheckHealth() async throws {
