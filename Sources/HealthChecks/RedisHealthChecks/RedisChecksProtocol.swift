@@ -36,5 +36,5 @@ public protocol RedisChecksProtocol {
 
     /// Get pong from redis
     /// - Returns: `String`
-    func getPong() async -> String
+    func pong() async -> String
 }

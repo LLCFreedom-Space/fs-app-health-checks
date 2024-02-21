@@ -59,7 +59,7 @@ final class RedisHealthChecksTests: XCTestCase {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.redisHealthChecks = RedisHealthChecksMock()
-        let result = await app.redisHealthChecks?.getPong()
+        let result = await app.redisHealthChecks?.pong()
         XCTAssertEqual(result, "PONG")
     }
 }

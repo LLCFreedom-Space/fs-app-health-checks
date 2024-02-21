@@ -35,7 +35,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
-        let response = await getPong()
+        let response = await pong()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
@@ -54,7 +54,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// - Returns: `HealthCheckItem`
     public func getResponseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
-        let response = await getPong()
+        let response = await pong()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
@@ -71,7 +71,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
 
     /// Get pong from redis
     /// - Returns: `String`
-    public func getPong() async -> String {
+    public func pong() async -> String {
         let result = try? await app.redis.ping().get()
         var connectionDescription = "ERROR: No connect to Redis database"
         if let result, result.lowercased().contains("pong") {

@@ -48,7 +48,7 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
         RedisHealthChecksMock.healthCheckItem
     }
 
-    public func getPong() async -> String {
+    public func pong() async -> String {
         "PONG"
     }
 
