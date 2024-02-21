@@ -20,7 +20,9 @@ let package = Package(
         // 🖋 Swift ORM (queries, models, and relations) for NoSQL and SQL databases.
         .package(url: "https://github.com/vapor/fluent.git", from: "4.1.0"),
         // 🐘 Swift ORM (queries, models, relations, etc) built on PostgreSQL.
-        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.1.1")
+        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.1.1"),
+        //  Vapor provider for RedisKit + RedisNIO
+        .package(url: "https://github.com/vapor/redis.git", from: "5.0.0-alpha.2.2"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -30,7 +32,8 @@ let package = Package(
             dependencies: [
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "Fluent", package: "fluent"),
-                .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver")
+                .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
+                .product(name: "Redis", package: "redis"),
             ]
         ),
         .testTarget(

@@ -73,6 +73,18 @@ extension Application {
         get { storage[LaunchTimeKey.self] ?? Date().timeIntervalSinceReferenceDate }
         set { storage[LaunchTimeKey.self] = newValue }
     }
+
+    /// A `redisIdKey` conform to StorageKey protocol
+    private struct RedisIdKey: StorageKey {
+        /// Less verbose typealias for `String`.
+        typealias Value = String
+    }
+
+    /// Setup `redisIdKey` in application storage
+    public var redisId: String? {
+        get { storage[RedisIdKey.self] }
+        set { storage[RedisIdKey.self] = newValue }
+    }
 }
 
 extension Application {
@@ -124,6 +136,18 @@ extension Application {
     public var applicationHealthChecks: ApplicationHealthChecksProtocol? {
         get { storage[ApplicationHealthChecksKey.self] }
         set { storage[ApplicationHealthChecksKey.self] = newValue }
+    }
+
+    /// A `RedisHealthChecksKey` conform to StorageKey protocol
+    public struct RedisHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `RedisHealthChecksProtocol`.
+        public typealias Value = RedisHealthChecksProtocol
+    }
+
+    /// Setup `redisHealthChecks` in application storage
+    public var redisHealthChecks: RedisHealthChecksProtocol? {
+        get { storage[RedisHealthChecksKey.self] }
+        set { storage[RedisHealthChecksKey.self] = newValue }
     }
 }
 
