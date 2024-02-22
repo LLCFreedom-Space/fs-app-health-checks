@@ -24,9 +24,12 @@
 
 import Vapor
 
-/// Groups func for get application health check
+/// Groups functions for getting application health checks.
 public protocol ApplicationChecksProtocol {
     /// Get uptime of application
-    /// - Returns: `HealthCheckItem`
+    ///
+    /// This method provides a basic indication of the application's system-level health.
+    /// Concrete implementations may extend this to provide more granular or platform-specific checks.
+    /// - Returns: A `HealthCheckItem` representing the application's uptime in seconds.
     func uptime() -> HealthCheckItem
 }

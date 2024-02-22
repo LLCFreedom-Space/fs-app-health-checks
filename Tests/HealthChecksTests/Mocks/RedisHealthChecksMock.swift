@@ -44,15 +44,15 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
         RedisHealthChecksMock.healthCheckItem
     }
 
-    public func getResponseTime() async -> HealthCheckItem {
+    public func responseTime() async -> HealthCheckItem {
         RedisHealthChecksMock.healthCheckItem
     }
 
-    public func pong() async -> String {
+    public func ping() async -> String {
         "PONG"
     }
 
-    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+    public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             "\(ComponentName.redis):\(MeasurementType.responseTime)": RedisHealthChecksMock.healthCheckItem,
             "\(ComponentName.redis):\(MeasurementType.connections)": RedisHealthChecksMock.healthCheckItem

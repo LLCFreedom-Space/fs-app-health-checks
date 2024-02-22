@@ -33,7 +33,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Parameters:
     ///   - options: array of `MeasurementType`
     /// - Returns: dictionary `[String: HealthCheckItem]`
-    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+    public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var dict = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
         let dateNow = Date().timeIntervalSinceReferenceDate

@@ -35,7 +35,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
-        let response = await pong()
+        let response = await ping()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
@@ -52,9 +52,9 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
 
     /// Get response time from redis
     /// - Returns: `HealthCheckItem`
-    public func getResponseTime() async -> HealthCheckItem {
+    public func responseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
-        let response = await pong()
+        let response = await ping()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
@@ -69,9 +69,9 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         return result
     }
 
-    /// Get pong from redis
+    /// Get ping from redis
     /// - Returns: `String`
-    public func pong() async -> String {
+    public func ping() async -> String {
         let result = try? await app.redis.ping().get()
         var connectionDescription = "ERROR: No connect to Redis database"
         if let result, result.lowercased().contains("pong") {
@@ -83,13 +83,13 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Check with setup options
     /// - Parameter options: array of `MeasurementType`
     /// - Returns: dictionary `[String: HealthCheckItem]`
-    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+    public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
         for type in measurementTypes {
             switch type {
             case .responseTime:
-                result["\(ComponentName.redis):\(MeasurementType.responseTime)"] = await getResponseTime()
+                result["\(ComponentName.redis):\(MeasurementType.responseTime)"] = await responseTime()
             case .connections:
                 result["\(ComponentName.redis):\(MeasurementType.connections)"] = await connection()
             default:

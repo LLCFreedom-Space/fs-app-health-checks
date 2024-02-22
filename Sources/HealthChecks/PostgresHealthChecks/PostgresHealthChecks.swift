@@ -31,7 +31,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
     
-    /// Get  postgresql version
+    /// Get  psql version
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
@@ -50,9 +50,9 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         return result
     }
 
-    /// Get response time from postgresql
+    /// Get psql response time
     /// - Returns: `HealthCheckItem`
-    public func getResponseTime() async -> HealthCheckItem {
+    public func responseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
         let versionDescription = await getVersion()
         let result = HealthCheckItem(
@@ -69,7 +69,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         return result
     }
 
-    /// Get version from postgresql
+    /// Get psql version
     /// - Returns: `String`
     public func getVersion() async -> String {
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
@@ -84,13 +84,13 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Check with setup options
     /// - Parameter options: array of `MeasurementType`
     /// - Returns: dictionary `[String: HealthCheckItem]`
-    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+    public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
         for type in measurementTypes {
             switch type {
             case .responseTime:
-                result["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = await getResponseTime()
+                result["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = await responseTime()
             case .connections:
                 result["\(ComponentName.postgresql):\(MeasurementType.connections)"] = await connection()
             default:

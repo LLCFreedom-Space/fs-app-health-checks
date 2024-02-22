@@ -36,33 +36,33 @@ final class RedisHealthChecksTests: XCTestCase {
         XCTAssertEqual(result, RedisHealthChecksMock.healthCheckItem)
     }
 
-    func testGetResponseTime() async throws {
+    func testResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         let redisId = UUID().uuidString
         app.redisId = redisId
         app.redisHealthChecks = RedisHealthChecksMock()
-        let result = await app.redisHealthChecks?.getResponseTime()
+        let result = await app.redisHealthChecks?.responseTime()
         XCTAssertEqual(result, RedisHealthChecksMock.healthCheckItem)
         XCTAssertEqual(app.redisId, redisId)
     }
 
-    func testCheckHealth() async throws {
+    func testHealthCheck() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.redisHealthChecks = RedisHealthChecksMock()
-        let result = await app.redisHealthChecks?.checkHealth(for: [MeasurementType.responseTime, MeasurementType.connections])
+        let result = await app.redisHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
         let redisConnections = result?["\(ComponentName.redis):\(MeasurementType.connections)"]
         XCTAssertEqual(redisConnections, RedisHealthChecksMock.healthCheckItem)
         let redisResponseTimes = result?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
         XCTAssertEqual(redisResponseTimes, RedisHealthChecksMock.healthCheckItem)
     }
 
-    func testGetPong() async throws {
+    func testPing() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.redisHealthChecks = RedisHealthChecksMock()
-        let result = await app.redisHealthChecks?.pong()
+        let result = await app.redisHealthChecks?.ping()
         XCTAssertEqual(result, "PONG")
     }
 }
