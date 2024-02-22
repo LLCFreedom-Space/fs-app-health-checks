@@ -38,7 +38,7 @@ public struct ApplicationHealthChecksMock: ApplicationHealthChecksProtocol {
         ApplicationHealthChecksMock.healthCheckItem
     }
 
-    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+    public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             MeasurementType.uptime.rawValue: ApplicationHealthChecksMock.healthCheckItem
         ]

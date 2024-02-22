@@ -29,5 +29,5 @@ public protocol ChecksProtocol {
     /// Check with setup options
     /// - Parameter options: array of `MeasurementType`
     /// - Returns: dictionary `[String: HealthCheckItem]`
-    func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem]
+    func check(for options: [MeasurementType]) async -> [String: HealthCheckItem]
 }

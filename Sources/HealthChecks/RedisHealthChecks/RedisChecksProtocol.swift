@@ -32,9 +32,9 @@ public protocol RedisChecksProtocol {
 
     /// Get response time from redis
     /// - Returns: `HealthCheckItem`
-    func getResponseTime() async -> HealthCheckItem
+    func responseTime() async -> HealthCheckItem
 
-    /// Get pong from redis
+    /// Get ping from redis
     /// - Returns: `String`
-    func pong() async -> String
+    func ping() async -> String
 }

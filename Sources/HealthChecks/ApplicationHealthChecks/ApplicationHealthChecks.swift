@@ -24,15 +24,17 @@
 
 import Vapor
 
-/// Service that provides app health check functionality
+/// Service that provides functionality to check the health of an application.
+///
+/// This struct implements the `ApplicationHealthChecksProtocol`, allowing you to perform various checks on your application's health.
 public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
-    /// Instance of app as `Application`
+    /// Reference to the application instance.
     public let app: Application
-
-    /// Get uptime of system
-    /// - Returns: `HealthCheckItem`
+    
+    /// Get uptime of the system.
+    /// - Returns: A `HealthCheckItem` representing the application's uptime.
     public func uptime() -> HealthCheckItem {
-        let uptime = Date().timeIntervalSinceReferenceDate - app.launchTime
+        let uptime = Date().timeIntervalSinceReferenceDate - app.launchTime 
         return HealthCheckItem(
             componentType: .system,
             observedValue: uptime,
@@ -41,11 +43,11 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
             time: app.dateTimeISOFormat.string(from: Date())
         )
     }
-
-    /// Check with setup options
-    /// - Parameter options: array of `MeasurementType`
-    /// - Returns: dictionary `[String: HealthCheckItem]`
-    public func checkHealth(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+    
+    /// Performs health checks based on the specified `MeasurementType` options.
+    /// - Parameter options: An array of `MeasurementType` values indicating which checks to perform.
+    /// - Returns: A dictionary mapping each `MeasurementType` to a corresponding `HealthCheckItem` representing the result of the check.
+    public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
         for type in measurementTypes {

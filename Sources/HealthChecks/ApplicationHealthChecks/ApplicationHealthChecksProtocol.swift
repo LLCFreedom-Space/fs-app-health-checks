@@ -24,5 +24,5 @@
 
 import Vapor
 
-/// Groups func for get application health check
+/// Protocol for checking application health.
 public protocol ApplicationHealthChecksProtocol: ApplicationChecksProtocol, ChecksProtocol {}

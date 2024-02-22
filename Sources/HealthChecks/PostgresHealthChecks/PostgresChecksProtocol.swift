@@ -26,15 +26,15 @@ import Vapor
 
 /// Groups func for get psql health check
 public protocol PostgresChecksProtocol {
-    /// Get  Postgresql version
+    /// Get Postgres connection
     /// - Returns: `HealthCheckItem`
     func connection() async -> HealthCheckItem
-
-    /// Get response time from postgresql
-    /// - Returns: `HealthCheckItem`
-    func getResponseTime() async -> HealthCheckItem
     
-    /// Get version from postgresql
+    /// Get psql response time
+    /// - Returns: `HealthCheckItem`
+    func responseTime() async -> HealthCheckItem
+    
+    /// Get psql version
     /// - Returns: `String`
     func getVersion() async -> String
 }

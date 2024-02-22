@@ -36,20 +36,20 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(result, PostgresHealthChecksMock.healthCheckItem)
     }
 
-    func testGetResponseTime() async throws {
+    func testResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlHealthChecks = PostgresHealthChecksMock()
-        let result = await app.psqlHealthChecks?.getResponseTime()
+        let result = await app.psqlHealthChecks?.responseTime()
         XCTAssertEqual(result, PostgresHealthChecksMock.healthCheckItem)
     }
 
-    func testCheckHealth() async throws {
+    func testHealthCheck() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlId = UUID().uuidString
         app.psqlHealthChecks = PostgresHealthChecksMock()
-        let result = await app.psqlHealthChecks?.checkHealth(for: [MeasurementType.responseTime, MeasurementType.connections])
+        let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
         let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
         XCTAssertEqual(psqlConnections, PostgresHealthChecksMock.healthCheckItem)
         let psqlResponseTimes = result?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]

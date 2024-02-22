@@ -27,7 +27,7 @@ import XCTest
 @testable import HealthChecks
 
 final class ConsulHealthChecksTests: XCTestCase {
-    func testCheckHealth() async {
+    func testHealthCheck() async {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.consulHealthChecks = ConsulHealthChecksMock()
@@ -38,7 +38,7 @@ final class ConsulHealthChecksTests: XCTestCase {
             password: "password"
         )
         app.consulConfig = consulConfig
-        let result = await app.consulHealthChecks?.checkHealth(for: [MeasurementType.responseTime, MeasurementType.connections])
+        let result = await app.consulHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
         let responseTimes = result?["\(ComponentName.consul):\(MeasurementType.responseTime)"]
         XCTAssertEqual(responseTimes, ConsulHealthChecksMock.healthCheckItem)
         XCTAssertEqual(app.consulConfig?.id, consulConfig.id)

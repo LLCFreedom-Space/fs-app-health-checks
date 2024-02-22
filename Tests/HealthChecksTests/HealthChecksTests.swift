@@ -30,7 +30,7 @@ final class HealthChecksTests: XCTestCase {
     let serviceId = UUID()
     let releaseId = "1.0.0"
 
-    func testGetMajorVersion() {
+    func testGetPublicVersion() {
         let app = Application(.testing)
         defer { app.shutdown() }
         let version = HealthChecks().getPublicVersion(from: releaseId)
