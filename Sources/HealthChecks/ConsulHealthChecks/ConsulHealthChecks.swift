@@ -99,7 +99,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
-            observedValue: Date().timeIntervalSinceReferenceDate - start, 
+            observedValue: Date().timeIntervalSinceReferenceDate - start,
             observedUnit: "s",
             status: response.status == .ok ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),

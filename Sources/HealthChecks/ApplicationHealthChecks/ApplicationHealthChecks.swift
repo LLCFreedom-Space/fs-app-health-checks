@@ -34,7 +34,7 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// Get uptime of the system.
     /// - Returns: A `HealthCheckItem` representing the application's uptime.
     public func uptime() -> HealthCheckItem {
-        let uptime = Date().timeIntervalSince1970 - app.launchTime
+        let uptime = Date().timeIntervalSinceReferenceDate - app.launchTime 
         return HealthCheckItem(
             componentType: .system,
             observedValue: uptime,

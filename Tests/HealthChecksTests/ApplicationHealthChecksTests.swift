@@ -48,7 +48,7 @@ final class ApplicationHealthChecksTests: XCTestCase {
         XCTAssertEqual(item.status, .pass)
         
         // Assert time is within a reasonable range of actual uptime
-        let expectedUptime = Date().timeIntervalSince1970 - app.launchTime
+        let expectedUptime = Date().timeIntervalSinceReferenceDate - app.launchTime
         guard let value = item.observedValue else {
             return XCTFail()
         }
@@ -83,7 +83,8 @@ final class ApplicationHealthChecksTests: XCTestCase {
         guard let observedValue = uptimeItem.observedValue else {
             return XCTFail()
         }
-        XCTAssertGreaterThan(observedValue, 0)  // Expect positive uptime
+        let expectedUptime = Date().timeIntervalSinceReferenceDate - app.launchTime
+        XCTAssertTrue(abs(observedValue - expectedUptime) < 1.0)
     }
     
     func testCheckHandlesUnsupportedTypes() async {
