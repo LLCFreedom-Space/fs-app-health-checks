@@ -50,6 +50,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
                 break
             }
         }
+        dict[""] = nil
         return dict
     }
 

@@ -46,4 +46,80 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertEqual(app.consulConfig?.username, consulConfig.username)
         XCTAssertEqual(app.consulConfig?.password, consulConfig.password)
     }
+    
+    func testCheckForBothSuccess() async {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        let clientResponse = ClientResponse(status: .ok)
+        app.clients.use { app in
+            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+        }
+        let healthChecks = ConsulHealthChecks(app: app)
+        let check = await healthChecks.check(for: [.responseTime, .connections])
+        print(check)
+        XCTAssertEqual(check.count, 2)
+        
+        // Response time check
+        let responseTimeCheck = check["\(ComponentName.consul):\(MeasurementType.responseTime)"]!
+        XCTAssertEqual(responseTimeCheck.status, .pass)
+        guard let observedValue = responseTimeCheck.observedValue else {
+            return XCTFail("no have observed value")
+        }
+        XCTAssertGreaterThan(observedValue, 0)
+        XCTAssertNil(responseTimeCheck.output)
+        
+        // Connections check
+        let connectionsCheck = check["\(ComponentName.consul):\(MeasurementType.connections)"]!
+        XCTAssertEqual(connectionsCheck.status, .pass)
+        XCTAssertNil(connectionsCheck.observedValue)
+        XCTAssertNil(connectionsCheck.output)
+    }
+    
+    func testCheckStatusSuccess() async {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        let clientResponse = ClientResponse(status: .ok)
+        app.clients.use { app in
+            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+        }
+        let healthChecks = ConsulHealthChecks(app: app)
+        let response = await healthChecks.getStatus()
+        let result = healthChecks.status(response)
+        
+        XCTAssertEqual(result.status, .pass)
+        XCTAssertNil(result.observedValue)
+        XCTAssertNil(result.output)
+    }
+    
+    func testCheckResponseTimeSuccess() async {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        let clientResponse = ClientResponse(status: .ok)
+        app.clients.use { app in
+            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+        }
+        let healthChecks = ConsulHealthChecks(app: app)
+        let response = await healthChecks.getStatus()
+        
+        let result = healthChecks.responseTime(from: response, Date().timeIntervalSinceReferenceDate)
+        XCTAssertEqual(result.status, .pass)
+        guard let observedValue = result.observedValue else {
+            return XCTFail("no have observed value")
+        }
+        XCTAssertGreaterThan(observedValue, 0)
+        XCTAssertNil(result.output)
+    }
+}
+
+struct MockClient: Client {
+    var eventLoop: EventLoop
+    var clientResponse: ClientResponse
+    
+    func send(_ request: ClientRequest) -> EventLoopFuture<ClientResponse> {
+        self.eventLoop.makeSucceededFuture(self.clientResponse)
+    }
+    
+    func delegating(to eventLoop: EventLoop) -> Client {
+        self
+    }
 }
