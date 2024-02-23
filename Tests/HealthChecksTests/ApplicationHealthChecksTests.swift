@@ -71,7 +71,7 @@ final class ApplicationHealthChecksTests: XCTestCase {
         
         let healthChecks = ApplicationHealthChecks(app: app)
         let checks = await healthChecks.check(for: [.uptime])
-        
+        XCTAssertEqual(checks.count, 1)
         XCTAssertNotNil(checks)
         XCTAssertTrue(checks.keys.contains("uptime"))
         guard let uptimeItem = checks["uptime"] else {
@@ -93,20 +93,6 @@ final class ApplicationHealthChecksTests: XCTestCase {
         
         let healthChecks = ApplicationHealthChecks(app: app)
         let checks = await healthChecks.check(for: [.connections])
-        let expectedResult = [
-            "": HealthCheckItem(
-                componentId: nil,
-                componentType: nil,
-                observedValue: nil,
-                observedUnit: nil,
-                status: nil,
-                affectedEndpoints: nil,
-                time: nil,
-                output: nil,
-                links: nil,
-                node: nil
-            )
-        ]
-        XCTAssertEqual(checks, expectedResult)  // Expect empty result, as .memory is not supported
+        XCTAssertEqual(checks.count, 0)  // Expect empty result, as .memory is not supported
     }
 }

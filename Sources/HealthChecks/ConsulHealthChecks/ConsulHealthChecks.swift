@@ -24,43 +24,48 @@
 
 import Vapor
 
-/// Service that provides consul health check functionality
+/// Service that provides Consul health check functionality
 public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
-    /// Instance of app as `Application`
+    /// Instance of the application as `Application`
     public let app: Application
-
+    
     /// Check with setup options
     /// - Parameters:
     ///   - options: array of `MeasurementType`
     /// - Returns: dictionary `[String: HealthCheckItem]`
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var dict = ["": HealthCheckItem()]
+        var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
         let dateNow = Date().timeIntervalSinceReferenceDate
         let response = await getStatus()
         for type in measurementTypes {
             switch type {
             case .responseTime:
-                let result = responseTime(from: response, dateNow)
-                dict["\(ComponentName.consul):\(MeasurementType.responseTime)"] = result
+                result["\(ComponentName.consul):\(MeasurementType.responseTime)"] = responseTime(from: response, dateNow)
             case .connections:
-                let result = status(response)
-                dict["\(ComponentName.consul):\(MeasurementType.connections)"] = result
+                result["\(ComponentName.consul):\(MeasurementType.connections)"] = status(response)
             default:
                 break
             }
         }
-        return dict
+        result[""] = nil
+        return result
     }
-
+    
     /// Get response for consul
     /// - Returns: `ClientResponse`
     func getStatus() async -> ClientResponse {
-        let url = app.consulConfig?.url ?? Constants.consulUrl
+        guard let url = app.consulConfig?.url else {
+            app.logger.error("ERROR: Consul URL is not configured.")
+            return ClientResponse()
+        }
         let path = Constants.consulStatusPath
         let uri = URI(string: url + path)
         var headers = HTTPHeaders()
-        if let username = app.consulConfig?.username, !username.isEmpty, let password = app.consulConfig?.password, !password.isEmpty {
+        if let username = app.consulConfig?.username,
+           !username.isEmpty,
+           let password = app.consulConfig?.password,
+           !password.isEmpty {
             headers.basicAuthorization = BasicAuthorization(username: username, password: password)
         }
         do {
@@ -75,14 +80,12 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Parameter response: `ClientResponse`
     /// - Returns: `HealthCheckItem`
     func status(_ response: ClientResponse) -> HealthCheckItem {
-        let url = app.consulConfig?.url ?? Constants.consulUrl
-        let path = Constants.consulStatusPath
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
             status: response.status == .ok ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: response.status != .ok ? "Error response from uri - \(url + path), with http status - \(response.status)" : nil,
+            time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,
+            output: response.status != .ok ? "Error response from consul, with http status - \(response.status)" : nil,
             links: nil,
             node: nil
         )
@@ -94,16 +97,14 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - start: `TimeInterval`
     /// - Returns: `HealthCheckItem`
     func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
-        let url = app.consulConfig?.url ?? Constants.consulUrl
-        let path = Constants.consulStatusPath
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
-            observedValue: Date().timeIntervalSinceReferenceDate - start,
+            observedValue: response.status == .ok ? Date().timeIntervalSinceReferenceDate - start : 0,
             observedUnit: "s",
             status: response.status == .ok ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: response.status != .ok ? "Error response from uri - \(url + path), with http status - \(response.status)" : nil,
+            time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,
+            output: response.status != .ok ? "Error response from consul, with http status - \(response.status)" : nil,
             links: nil,
             node: nil
         )
