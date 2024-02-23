@@ -61,7 +61,9 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertEqual(check.count, 2)
         
         // Response time check
-        let responseTimeCheck = check["\(ComponentName.consul):\(MeasurementType.responseTime)"]!
+        guard let responseTimeCheck = check["\(ComponentName.consul):\(MeasurementType.responseTime)"] else {
+            return XCTFail("no have key for response time")
+        }
         XCTAssertEqual(responseTimeCheck.status, .pass)
         guard let observedValue = responseTimeCheck.observedValue else {
             return XCTFail("no have observed value")
@@ -70,7 +72,9 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertNil(responseTimeCheck.output)
         
         // Connections check
-        let connectionsCheck = check["\(ComponentName.consul):\(MeasurementType.connections)"]!
+        guard let connectionsCheck = check["\(ComponentName.consul):\(MeasurementType.connections)"] else {
+            return XCTFail("no have key for connections")
+        }
         XCTAssertEqual(connectionsCheck.status, .pass)
         XCTAssertNil(connectionsCheck.observedValue)
         XCTAssertNil(connectionsCheck.output)
