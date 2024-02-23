@@ -80,21 +80,12 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Parameter response: `ClientResponse`
     /// - Returns: `HealthCheckItem`
     func status(_ response: ClientResponse) -> HealthCheckItem {
-        guard let url = app.consulConfig?.url else {
-            return HealthCheckItem(
-                componentId: app.consulConfig?.id,
-                componentType: .component,
-                status: .fail,
-                output: "Consul URL is not configured."
-            )
-        }
-        let path = Constants.consulStatusPath
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
             status: response.status == .ok ? .pass : .fail,
-            time: response.status == .ok ?  app.dateTimeISOFormat.string(from: Date()) : nil,
-            output: response.status != .ok ? "Error response from uri - \(url + path), with http status - \(response.status)" : nil,
+            time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,
+            output: response.status != .ok ? "Error response from consul, with http status - \(response.status)" : nil,
             links: nil,
             node: nil
         )
@@ -106,15 +97,6 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - start: `TimeInterval`
     /// - Returns: `HealthCheckItem`
     func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
-        guard let url = app.consulConfig?.url else {
-            return HealthCheckItem(
-                componentId: app.consulConfig?.id,
-                componentType: .component,
-                status: .fail,
-                output: "Consul URL is not configured."
-            )
-        }
-        let path = Constants.consulStatusPath
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
@@ -122,7 +104,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
             observedUnit: "s",
             status: response.status == .ok ? .pass : .fail,
             time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,
-            output: response.status != .ok ? "Error response from uri - \(url + path), with http status - \(response.status)" : nil,
+            output: response.status != .ok ? "Error response from consul, with http status - \(response.status)" : nil,
             links: nil,
             node: nil
         )

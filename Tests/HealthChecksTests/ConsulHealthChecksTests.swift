@@ -104,12 +104,9 @@ final class ConsulHealthChecksTests: XCTestCase {
         let app = Application(.testing)
         defer { app.shutdown() }
         let clientResponse = ClientResponse(status: .badRequest)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-        }
         let healthChecks = ConsulHealthChecks(app: app)
         let response = await healthChecks.getStatus()
-        let result = healthChecks.status(response)
+        let result = healthChecks.status(clientResponse)
         
         XCTAssertEqual(result.status, .fail)
         XCTAssertNil(result.observedValue)
@@ -142,18 +139,10 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testCheckResponseTimeFail() async {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.consulConfig = ConsulConfig(
-            id: String(UUID()),
-            url: "consul-url"
-        )
         let clientResponse = ClientResponse(status: .badRequest)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-        }
         let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
         
-        let result = healthChecks.responseTime(from: response, Date().timeIntervalSinceReferenceDate)
+        let result = healthChecks.responseTime(from: clientResponse, Date().timeIntervalSinceReferenceDate)
         XCTAssertEqual(result.status, .fail)
         guard let observedValue = result.observedValue else {
             return XCTFail("no have observed value")
