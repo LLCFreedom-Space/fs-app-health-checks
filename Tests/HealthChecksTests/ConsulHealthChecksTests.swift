@@ -56,7 +56,6 @@ final class ConsulHealthChecksTests: XCTestCase {
         }
         let healthChecks = ConsulHealthChecks(app: app)
         let check = await healthChecks.check(for: [.responseTime, .connections])
-        print(check)
         XCTAssertEqual(check.count, 2)
         
         // Response time check
@@ -91,6 +90,22 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertNil(result.output)
     }
     
+    func testCheckStatusFail() async {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        let clientResponse = ClientResponse(status: .badRequest)
+        app.clients.use { app in
+            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+        }
+        let healthChecks = ConsulHealthChecks(app: app)
+        let response = await healthChecks.getStatus()
+        let result = healthChecks.status(response)
+        
+        XCTAssertEqual(result.status, .fail)
+        XCTAssertNil(result.observedValue)
+        XCTAssertNotNil(result.output)
+    }
+    
     func testCheckResponseTimeSuccess() async {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -109,17 +124,54 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertGreaterThan(observedValue, 0)
         XCTAssertNil(result.output)
     }
-}
-
-struct MockClient: Client {
-    var eventLoop: EventLoop
-    var clientResponse: ClientResponse
     
-    func send(_ request: ClientRequest) -> EventLoopFuture<ClientResponse> {
-        self.eventLoop.makeSucceededFuture(self.clientResponse)
+    func testCheckResponseTimeFail() async {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        let clientResponse = ClientResponse(status: .badRequest)
+        app.clients.use { app in
+            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+        }
+        let healthChecks = ConsulHealthChecks(app: app)
+        let response = await healthChecks.getStatus()
+        
+        let result = healthChecks.responseTime(from: response, Date().timeIntervalSinceReferenceDate)
+        XCTAssertEqual(result.status, .fail)
+        guard let observedValue = result.observedValue else {
+            return XCTFail("no have observed value")
+        }
+        XCTAssertEqual(observedValue, 0)
+        XCTAssertNotNil(result.output)
     }
     
-    func delegating(to eventLoop: EventLoop) -> Client {
-        self
+    func testGetStatusSuccessWithAuth() async {
+        let expectedUrl = "https://example.com/status"
+        let expectedUsername = "user"
+        let expectedPassword = "password"
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        app.consulConfig = ConsulConfig(
+            id: String(UUID()),
+            url: expectedUrl,
+            username: expectedUsername,
+            password: expectedPassword
+        )
+        let clientResponse = ClientResponse(status: .ok)
+        app.clients.use { app in
+            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+        }
+        let healthChecks = ConsulHealthChecks(app: app)
+        let response = await healthChecks.getStatus()
+        
+        XCTAssertEqual(response.status, .ok)
+    }
+    
+    func testCheckHandlesUnsupportedTypes() async {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        
+        let healthChecks = ConsulHealthChecks(app: app)
+        let checks = await healthChecks.check(for: [.uptime])
+        XCTAssertEqual(checks.count, 0)  // Expect empty result, as .memory is not supported
     }
 }
