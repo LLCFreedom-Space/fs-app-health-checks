@@ -24,9 +24,9 @@
 
 import Vapor
 
-/// Service that provides consul health check functionality
+/// Service that provides Consul health check functionality
 public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
-    /// Instance of app as `Application`
+    /// Instance of the application as `Application`
     public let app: Application
     
     /// Check with setup options
@@ -55,7 +55,10 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Get response for consul
     /// - Returns: `ClientResponse`
     func getStatus() async -> ClientResponse {
-        let url = app.consulConfig?.url ?? Constants.consulUrl
+        guard let url = app.consulConfig?.url else {
+            app.logger.error("ERROR: Consul URL is not configured.")
+            return ClientResponse()
+        }
         let path = Constants.consulStatusPath
         let uri = URI(string: url + path)
         var headers = HTTPHeaders()
@@ -77,7 +80,14 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Parameter response: `ClientResponse`
     /// - Returns: `HealthCheckItem`
     func status(_ response: ClientResponse) -> HealthCheckItem {
-        let url = app.consulConfig?.url ?? Constants.consulUrl
+        guard let url = app.consulConfig?.url else {
+            return HealthCheckItem(
+                componentId: app.consulConfig?.id,
+                componentType: .component,
+                status: .fail,
+                output: "Consul URL is not configured."
+            )
+        }
         let path = Constants.consulStatusPath
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
@@ -96,7 +106,14 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - start: `TimeInterval`
     /// - Returns: `HealthCheckItem`
     func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
-        let url = app.consulConfig?.url ?? Constants.consulUrl
+        guard let url = app.consulConfig?.url else {
+            return HealthCheckItem(
+                componentId: app.consulConfig?.id,
+                componentType: .component,
+                status: .fail,
+                output: "Consul URL is not configured."
+            )
+        }
         let path = Constants.consulStatusPath
         return HealthCheckItem(
             componentId: app.consulConfig?.id,

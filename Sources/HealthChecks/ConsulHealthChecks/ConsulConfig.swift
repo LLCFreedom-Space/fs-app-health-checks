@@ -24,21 +24,41 @@
 
 import Vapor
 
-/// A generic `ConsulConfig` data that can be save in storage.
+/// Represents configuration details for connecting to a Consul server.
 public struct ConsulConfig {
-    /// Is a unique identifier of the consul, in the application scope
-    /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
+    /// A unique identifier for this Consul configuration within your application.
+    /// This ID is not related to Consul itself and can be used for internal reference.
+    /// Example: "43119325-63f5-4e14-9175-84e0e296c527"
     public let id: String
-
-    /// Consul url
-    /// Example: `http://127.0.0.1:8500`, `https://xmpl-consul.example.com`
+    
+    /// The URL of the Consul server to connect to.
+    /// Example: "http://127.0.0.1:8500", "https://xmpl-consul.example.com"
     public let url: String
-
-    /// Consul username
-    /// Example: `username`
+    
+    /// The username for authenticating with Consul (optional).
+    /// Example: "username"
     public let username: String?
-
-    /// Consul password
-    /// Example: `password`
+    
+    /// The password for authenticating with Consul (optional).
+    /// Example: "password"
     public let password: String?
+    
+    /// Initializes a `ConsulConfig` with the specified details.
+    ///
+    /// - Parameters:
+    ///   - id: The unique identifier for this configuration.
+    ///   - url: The URL of the Consul server.
+    ///   - username: The username for authentication (optional).
+    ///   - password: The password for authentication (optional).
+    public init(
+        id: String,
+        url: String,
+        username: String? = nil,
+        password: String? = nil
+    ) {
+        self.id = id
+        self.url = url
+        self.username = username
+        self.password = password
+    }
 }

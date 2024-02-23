@@ -33,9 +33,7 @@ final class ConsulHealthChecksTests: XCTestCase {
         app.consulHealthChecks = ConsulHealthChecksMock()
         let consulConfig = ConsulConfig(
             id: UUID().uuidString,
-            url: Constants.consulUrl,
-            username: "username",
-            password: "password"
+            url: Constants.consulUrl
         )
         app.consulConfig = consulConfig
         let result = await app.consulHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
@@ -50,6 +48,10 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testCheckForBothSuccess() async {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.consulConfig = ConsulConfig(
+            id: String(UUID()),
+            url: "consul-url"
+        )
         let clientResponse = ClientResponse(status: .ok)
         app.clients.use { app in
             MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
@@ -77,6 +79,10 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testCheckStatusSuccess() async {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.consulConfig = ConsulConfig(
+            id: String(UUID()),
+            url: "consul-url"
+        )
         let clientResponse = ClientResponse(status: .ok)
         app.clients.use { app in
             MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
@@ -109,6 +115,10 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testCheckResponseTimeSuccess() async {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.consulConfig = ConsulConfig(
+            id: String(UUID()),
+            url: "consul-url"
+        )
         let clientResponse = ClientResponse(status: .ok)
         app.clients.use { app in
             MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
@@ -128,6 +138,10 @@ final class ConsulHealthChecksTests: XCTestCase {
     func testCheckResponseTimeFail() async {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.consulConfig = ConsulConfig(
+            id: String(UUID()),
+            url: "consul-url"
+        )
         let clientResponse = ClientResponse(status: .badRequest)
         app.clients.use { app in
             MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
@@ -145,16 +159,13 @@ final class ConsulHealthChecksTests: XCTestCase {
     }
     
     func testGetStatusSuccessWithAuth() async {
-        let expectedUrl = "https://example.com/status"
-        let expectedUsername = "user"
-        let expectedPassword = "password"
         let app = Application(.testing)
         defer { app.shutdown() }
         app.consulConfig = ConsulConfig(
             id: String(UUID()),
-            url: expectedUrl,
-            username: expectedUsername,
-            password: expectedPassword
+            url: "https://example.com/status",
+            username: "user",
+            password: "password"
         )
         let clientResponse = ClientResponse(status: .ok)
         app.clients.use { app in

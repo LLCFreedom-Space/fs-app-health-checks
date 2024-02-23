@@ -24,5 +24,5 @@
 
 import Vapor
 
-/// Groups func for get consul health check
+/// Protocol defining an interface for performing Consul health checks.
 public protocol ConsulHealthChecksProtocol: ChecksProtocol {}
