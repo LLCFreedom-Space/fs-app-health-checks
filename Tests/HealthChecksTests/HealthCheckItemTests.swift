@@ -22,12 +22,14 @@
 //  Created by Mykola Buhaiov on 06.02.2024.
 //
 
-import Vapor
-import XCTest
+import XCTVapor
 @testable import HealthChecks
 
+/// Unit tests for the `HealthCheckItem` equatable conformance.
 final class HealthCheckItemTests: XCTestCase {
+    /// Tests the equality of two `HealthCheckItem` instances.
     func testHealthCheckItemEquatable() {
+        // Create the first `HealthCheckItem` instance with specific values.
         let firstHealthCheckItem = HealthCheckItem(
             componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
             componentType: .datastore,
@@ -40,6 +42,7 @@ final class HealthCheckItemTests: XCTestCase {
             links: nil,
             node: nil
         )
+        // Create the second `HealthCheckItem` instance with the same values as the first one.
         var secondHealthCheckItem = HealthCheckItem(
             componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
             componentType: .datastore,
@@ -52,8 +55,11 @@ final class HealthCheckItemTests: XCTestCase {
             links: nil,
             node: nil
         )
+        // Assert that the two instances are equal.
         XCTAssertEqual(firstHealthCheckItem, secondHealthCheckItem)
+        // Modify a property in the second instance.
         secondHealthCheckItem.observedValue = 4
+        // Assert that the two instances are not equal after the modification.
         XCTAssertNotEqual(firstHealthCheckItem, secondHealthCheckItem)
     }
 }

@@ -23,7 +23,6 @@
 //
 
 import Vapor
-import Fluent
 import Redis
 
 /// Service that provides redis health check functionality

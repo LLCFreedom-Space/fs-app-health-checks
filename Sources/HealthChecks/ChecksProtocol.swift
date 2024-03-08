@@ -26,11 +26,9 @@ import Vapor
 
 /// The protocol defines a basic interface for performing health checks against different systems or services.
 public protocol ChecksProtocol {
-    /// Performs health checks against Consul, returning a dictionary
-    /// of `HealthCheckItem`s for the specified components.
+    /// Performs health checks, returning a dictionary of `HealthCheckItem`s for the specified components.
     ///
-    /// - Parameters:
-    ///   - options: An array of `MeasurementType`s indicating which checks to perform.
-    /// - Returns: A dictionary of `HealthCheckItem`s, keyed by  component ID and measurement type.
+    /// - Parameter options: An array of `MeasurementType`s indicating which checks to perform.
+    /// - Returns: A dictionary of `HealthCheckItem`s, keyed by component ID and measurement type.
     func check(for options: [MeasurementType]) async -> [String: HealthCheckItem]
 }

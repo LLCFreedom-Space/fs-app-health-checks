@@ -17,13 +17,12 @@
 
 //
 //  RedisHealthChecksTests.swift
-//  
+//
 //
 //  Created by Mykola Buhaiov on 21.02.2024.
 //
 
-import Vapor
-import XCTest
+import XCTVapor
 @testable import HealthChecks
 
 final class RedisHealthChecksTests: XCTestCase {
@@ -35,7 +34,7 @@ final class RedisHealthChecksTests: XCTestCase {
         let result = await app.redisHealthChecks?.connection()
         XCTAssertEqual(result, RedisHealthChecksMock.healthCheckItem)
     }
-
+    
     func testResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -46,7 +45,7 @@ final class RedisHealthChecksTests: XCTestCase {
         XCTAssertEqual(result, RedisHealthChecksMock.healthCheckItem)
         XCTAssertEqual(app.redisId, redisId)
     }
-
+    
     func testHealthCheck() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -57,7 +56,7 @@ final class RedisHealthChecksTests: XCTestCase {
         let redisResponseTimes = result?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
         XCTAssertEqual(redisResponseTimes, RedisHealthChecksMock.healthCheckItem)
     }
-
+    
     func testPing() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }

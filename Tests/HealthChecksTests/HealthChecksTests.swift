@@ -22,27 +22,42 @@
 //  Created by Mykola Buhaiov on 09.03.2023.
 //
 
-import Vapor
-import XCTest
+import XCTVapor
 @testable import HealthChecks
 
+/// Unit tests for the HealthChecks service.
 final class HealthChecksTests: XCTestCase {
     let serviceId = UUID()
     let releaseId = "1.0.0"
-
+    
     func testGetPublicVersion() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
+        // Simulate retrieving the major version from a valid release version string.
         let version = HealthChecks().getPublicVersion(from: releaseId)
         XCTAssertEqual(version, "1")
+        
+        // Simulate retrieving the major version from an invalid release version string.
+        let invalidVersion = HealthChecks().getPublicVersion(from: "invalidVersion")
+        XCTAssertNil(invalidVersion)
+        
+        // Simulate retrieving the major version from a version string without dots.
+        let versionWithoutDots = HealthChecks().getPublicVersion(from: "12345")
+        XCTAssertNil(versionWithoutDots)
+        
+        // Simulate retrieving the major version from a version string with letters and dots.
+        let versionWithLettersAndDots = HealthChecks().getPublicVersion(from: "1a.b.c")
+        XCTAssertNil(versionWithLettersAndDots)
     }
-
+    
+    /// Tests the `getHealth(from:)` method of the `HealthChecks` service.
     func testGetHealth() {
         let app = Application(.testing)
         defer { app.shutdown() }
+        // Set up the application with a service ID and release version.
         app.serviceId = serviceId
         app.releaseId = releaseId
+        // Retrieve the health information using the `getHealth` method.
         let response = HealthChecks().getHealth(from: app)
+        // Assert that the health information matches the expected values.
         XCTAssertEqual(response.version, "1")
         XCTAssertEqual(response.releaseId, releaseId)
         XCTAssertEqual(response.serviceId, serviceId)

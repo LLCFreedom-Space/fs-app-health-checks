@@ -30,14 +30,42 @@ let package = Package(
         .target(
             name: "HealthChecks",
             dependencies: [
-                .product(name: "Vapor", package: "vapor"),
-                .product(name: "Fluent", package: "fluent"),
-                .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
-                .product(name: "Redis", package: "redis"),
+                .product(
+                    name: "Vapor",
+                    package: "vapor"
+                ),
+                .product(
+                    name: "Fluent",
+                    package: "fluent"
+                ),
+                .product(
+                    name: "FluentPostgresDriver",
+                    package: "fluent-postgres-driver"
+                ),
+                .product(
+                    name: "Redis",
+                    package: "redis"
+                ),
             ]
         ),
         .testTarget(
             name: "HealthChecksTests",
-            dependencies: ["HealthChecks"])
+            dependencies: [
+                .target(
+                    name: "HealthChecks"
+                ),
+                .product(
+                    name: "XCTVapor",
+                    package: "vapor"
+                ),
+            ]
+        )
     ]
 )
+
+#if swift(>=5.6)
+  // Add the documentation compiler plugin if possible
+  package.dependencies.append(
+    .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
+  )
+#endif

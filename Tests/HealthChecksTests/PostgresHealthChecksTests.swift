@@ -22,8 +22,7 @@
 //  Created by Mykola Buhaiov on 09.03.2023.
 //
 
-import Vapor
-import XCTest
+import XCTVapor
 @testable import HealthChecks
 
 final class PostgresHealthChecksTests: XCTestCase {
