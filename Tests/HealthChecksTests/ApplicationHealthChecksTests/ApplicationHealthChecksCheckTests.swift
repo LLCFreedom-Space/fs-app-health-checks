@@ -71,4 +71,3 @@ final class ApplicationHealthChecksCheckTests: XCTestCase {
         XCTAssertEqual(checks.count, 0)  // Expect empty result, as .memory is not supported
     }
 }
-
