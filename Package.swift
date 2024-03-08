@@ -30,14 +30,35 @@ let package = Package(
         .target(
             name: "HealthChecks",
             dependencies: [
-                .product(name: "Vapor", package: "vapor"),
-                .product(name: "Fluent", package: "fluent"),
-                .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
-                .product(name: "Redis", package: "redis"),
+                .product(
+                    name: "Vapor",
+                    package: "vapor"
+                ),
+                .product(
+                    name: "Fluent",
+                    package: "fluent"
+                ),
+                .product(
+                    name: "FluentPostgresDriver",
+                    package: "fluent-postgres-driver"
+                ),
+                .product(
+                    name: "Redis",
+                    package: "redis"
+                ),
             ]
         ),
         .testTarget(
             name: "HealthChecksTests",
-            dependencies: ["HealthChecks"])
+            dependencies: [
+                .target(
+                    name: "HealthChecks"
+                ),
+                .product(
+                    name: "XCTVapor",
+                    package: "vapor"
+                ),
+            ]
+        )
     ]
 )

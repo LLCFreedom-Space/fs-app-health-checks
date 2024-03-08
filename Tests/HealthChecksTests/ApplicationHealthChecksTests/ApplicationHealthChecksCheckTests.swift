@@ -16,45 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ApplicationHealthChecksTests.swift
+//  ApplicationHealthChecksCheckTests.swift
 //
 //
 //  Created by Mykola Buhaiov on 10.02.2024.
 //
 
-import Vapor
-import XCTest
+import XCTVapor
 @testable import HealthChecks
 
-final class ApplicationHealthChecksTests: XCTestCase {
-    func testUptime() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.applicationHealthChecks = ApplicationHealthChecksMock()
-        let response = app.applicationHealthChecks?.uptime()
-        XCTAssertEqual(response, ApplicationHealthChecksMock.healthCheckItem)
-    }
-    
-    func testUptimeReturnsValidItem() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        
-        let healthChecks = ApplicationHealthChecks(app: app)
-        let item = healthChecks.uptime()
-        
-        XCTAssertNotNil(item)
-        XCTAssertEqual(item.componentType, .system)
-        XCTAssertEqual(item.observedUnit, "s")
-        XCTAssertEqual(item.status, .pass)
-        
-        // Assert time is within a reasonable range of actual uptime
-        let expectedUptime = Date().timeIntervalSinceReferenceDate - app.launchTime
-        guard let value = item.observedValue else {
-            return XCTFail("no have observed value")
-        }
-        XCTAssertTrue(abs(value - expectedUptime) < 1.0)
-    }
-    
+/// Integration tests for the check functionality in ApplicationHealthChecks.
+final class ApplicationHealthChecksCheckTests: XCTestCase {
+    /// Tests the interaction of multiple components during the check operation.
     func testCheck() async {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -65,6 +38,7 @@ final class ApplicationHealthChecksTests: XCTestCase {
         XCTAssertEqual(uptime, ApplicationHealthChecksMock.healthCheckItem)
     }
     
+    /// Tests if the check operation returns valid items.
     func testCheckReturnsValidItems() async {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -87,6 +61,7 @@ final class ApplicationHealthChecksTests: XCTestCase {
         XCTAssertTrue(abs(observedValue - expectedUptime) < 1.0)
     }
     
+    /// Tests how the check operation handles unsupported types.
     func testCheckHandlesUnsupportedTypes() async {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -96,3 +71,4 @@ final class ApplicationHealthChecksTests: XCTestCase {
         XCTAssertEqual(checks.count, 0)  // Expect empty result, as .memory is not supported
     }
 }
+

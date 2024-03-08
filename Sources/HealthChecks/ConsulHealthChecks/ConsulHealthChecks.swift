@@ -24,15 +24,19 @@
 
 import Vapor
 
-/// Service that provides Consul health check functionality
+/// A service providing health check functionality for Consul services.
+///
+/// This struct conforms to the `ConsulHealthChecksProtocol` and allows for checking the health status
+/// of a Consul service by performing various measurements such as response time and connection status.
 public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
-    /// Instance of the application as `Application`
+    /// The instance of the Vapor application as `Application`.
     public let app: Application
     
-    /// Check with setup options
+    /// Performs health checks for specified measurement types.
+    ///
     /// - Parameters:
-    ///   - options: array of `MeasurementType`
-    /// - Returns: dictionary `[String: HealthCheckItem]`
+    ///   - options: An array of `MeasurementType` specifying the types of measurements to perform.
+    /// - Returns: A dictionary containing health check items for each specified measurement type.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
@@ -52,8 +56,9 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         return result
     }
     
-    /// Get response for consul
-    /// - Returns: `ClientResponse`
+    /// Retrieves the status of the Consul service.
+    ///
+    /// - Returns: A `ClientResponse` containing the status of the Consul service.
     func getStatus() async -> ClientResponse {
         guard let url = app.consulConfig?.url else {
             app.logger.error("ERROR: Consul URL is not configured.")
@@ -76,9 +81,10 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         }
     }
     
-    /// Get status for consul
-    /// - Parameter response: `ClientResponse`
-    /// - Returns: `HealthCheckItem`
+    /// Creates a `HealthCheckItem` based on the response status of the Consul service.
+    ///
+    /// - Parameter response: The `ClientResponse` containing the status of the Consul service.
+    /// - Returns: A `HealthCheckItem` representing the health status of the Consul service based on connection status.
     func status(_ response: ClientResponse) -> HealthCheckItem {
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
@@ -91,11 +97,12 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         )
     }
     
-    /// Get response time for consul
+    /// Creates a `HealthCheckItem` based on the response time of the Consul service.
+    ///
     /// - Parameters:
-    ///   - response: `ClientResponse`
-    ///   - start: `TimeInterval`
-    /// - Returns: `HealthCheckItem`
+    ///   - response: The `ClientResponse` containing the status of the Consul service.
+    ///   - start: The start time for measuring response time.
+    /// - Returns: A `HealthCheckItem` representing the response time of the Consul service.
     func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
         return HealthCheckItem(
             componentId: app.consulConfig?.id,

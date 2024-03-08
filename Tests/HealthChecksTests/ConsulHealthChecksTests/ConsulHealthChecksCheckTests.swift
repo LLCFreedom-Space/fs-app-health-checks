@@ -16,17 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulHealthChecksTests.swift
+//  ConsulHealthChecksCheckTests.swift
 //
 //
 //  Created by Mykola Buhaiov on 07.02.2024.
 //
 
-import Vapor
-import XCTest
+import XCTVapor
 @testable import HealthChecks
 
-final class ConsulHealthChecksTests: XCTestCase {
+/// Integration tests for overall check functionality in ConsulHealthChecks.
+final class ConsulHealthChecksCheckTests: XCTestCase {
+    /// Additional test related to health check functionality in ConsulHealthChecks.
     func testHealthCheck() async {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -45,6 +46,7 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertEqual(app.consulConfig?.password, consulConfig.password)
     }
     
+    /// Tests the overall check functionality for ConsulHealthChecks.
     func testCheckForBothSuccess() async {
         let app = Application(.testing)
         defer { app.shutdown() }
@@ -80,96 +82,7 @@ final class ConsulHealthChecksTests: XCTestCase {
         XCTAssertNil(connectionsCheck.output)
     }
     
-    func testCheckStatusSuccess() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulConfig = ConsulConfig(
-            id: String(UUID()),
-            url: "consul-url"
-        )
-        let clientResponse = ClientResponse(status: .ok)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-        }
-        let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
-        let result = healthChecks.status(response)
-        
-        XCTAssertEqual(result.status, .pass)
-        XCTAssertNil(result.observedValue)
-        XCTAssertNil(result.output)
-    }
-    
-    func testCheckStatusFail() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let clientResponse = ClientResponse(status: .badRequest)
-        let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
-        let result = healthChecks.status(clientResponse)
-        
-        XCTAssertEqual(result.status, .fail)
-        XCTAssertNil(result.observedValue)
-        XCTAssertNotNil(result.output)
-    }
-    
-    func testCheckResponseTimeSuccess() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulConfig = ConsulConfig(
-            id: String(UUID()),
-            url: "consul-url"
-        )
-        let clientResponse = ClientResponse(status: .ok)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-        }
-        let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
-        
-        let result = healthChecks.responseTime(from: response, Date().timeIntervalSinceReferenceDate)
-        XCTAssertEqual(result.status, .pass)
-        guard let observedValue = result.observedValue else {
-            return XCTFail("no have observed value")
-        }
-        XCTAssertGreaterThan(observedValue, 0)
-        XCTAssertNil(result.output)
-    }
-    
-    func testCheckResponseTimeFail() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let clientResponse = ClientResponse(status: .badRequest)
-        let healthChecks = ConsulHealthChecks(app: app)
-        
-        let result = healthChecks.responseTime(from: clientResponse, Date().timeIntervalSinceReferenceDate)
-        XCTAssertEqual(result.status, .fail)
-        guard let observedValue = result.observedValue else {
-            return XCTFail("no have observed value")
-        }
-        XCTAssertEqual(observedValue, 0)
-        XCTAssertNotNil(result.output)
-    }
-    
-    func testGetStatusSuccessWithAuth() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulConfig = ConsulConfig(
-            id: String(UUID()),
-            url: "https://example.com/status",
-            username: "user",
-            password: "password"
-        )
-        let clientResponse = ClientResponse(status: .ok)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-        }
-        let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
-        
-        XCTAssertEqual(response.status, .ok)
-    }
-    
+    /// Tests the handling of unsupported types in ConsulHealthChecks.
     func testCheckHandlesUnsupportedTypes() async {
         let app = Application(.testing)
         defer { app.shutdown() }
