@@ -26,19 +26,14 @@ import XCTVapor
 @testable import HealthChecks
 
 final class PostgresHealthChecksTests: XCTestCase {
-    func testConnectionMock() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlId = UUID().uuidString
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let result = await app.psqlHealthChecks?.connection()
-        XCTAssertEqual(result, PostgresHealthChecksMock.healthCheckItem)
-    }
-
     func testConnection() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+        app.psqlHealthChecks = PostgresHealthChecksMock()
+        let mockResult = await app.psqlHealthChecks?.connection()
+        XCTAssertEqual(mockResult, PostgresHealthChecksMock.healthCheckItem)
+
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.connection()
         XCTAssertEqual(result?.componentType, .datastore)
@@ -51,17 +46,13 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertNil(result?.node)
     }
 
-    func testResponseTimeMock() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let result = await app.psqlHealthChecks?.responseTime()
-        XCTAssertEqual(result, PostgresHealthChecksMock.healthCheckItem)
-    }
-
     func testResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
+        app.psqlHealthChecks = PostgresHealthChecksMock()
+        let resultMock = await app.psqlHealthChecks?.responseTime()
+        XCTAssertEqual(resultMock, PostgresHealthChecksMock.healthCheckItem)
+
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.responseTime()
         XCTAssertEqual(result?.componentType, .datastore)
@@ -86,19 +77,14 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(psqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
     }
 
-    func testGetVersionMock() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlId = UUID().uuidString
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let result = await app.psqlHealthChecks?.getVersion()
-        XCTAssertEqual(result, PostgresHealthChecksMock.version)
-    }
-
     func testGetVersion() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlId = UUID().uuidString
+        app.psqlHealthChecks = PostgresHealthChecksMock()
+        let resultMock = await app.psqlHealthChecks?.getVersion()
+        XCTAssertEqual(resultMock, PostgresHealthChecksMock.version)
+
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.getVersion()
         XCTAssertEqual(result, "PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit")
