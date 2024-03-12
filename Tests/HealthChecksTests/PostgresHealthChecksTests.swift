@@ -26,13 +26,30 @@ import XCTVapor
 @testable import HealthChecks
 
 final class PostgresHealthChecksTests: XCTestCase {
-    func testConnection() async throws {
+    func testConnectionMock() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.psqlId = UUID().uuidString
         app.psqlHealthChecks = PostgresHealthChecksMock()
         let result = await app.psqlHealthChecks?.connection()
         XCTAssertEqual(result, PostgresHealthChecksMock.healthCheckItem)
+    }
+
+    func testConnection() async throws {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        app.psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+        app.psqlHealthChecks = PostgresHealthChecks(app: app)
+        let result = await app.psqlHealthChecks?.connection()
+        XCTAssertEqual(result?.componentType, .datastore)
+        XCTAssertNotEqual(result?.observedValue, 1.0)
+        XCTAssertEqual(result?.observedUnit, "s")
+        XCTAssertEqual(result?.status, .pass)
+        XCTAssertNil(result?.affectedEndpoints)
+        XCTAssertEqual(result?.time, app.dateTimeISOFormat.string(from: Date()))
+        XCTAssertNil(result?.output)
+        XCTAssertNil(result?.links)
+        XCTAssertNil(result?.node)
     }
 
     func testResponseTime() async throws {
