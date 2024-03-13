@@ -70,11 +70,34 @@ final class PostgresHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.psqlId = UUID().uuidString
         app.psqlHealthChecks = PostgresHealthChecksMock()
+        let mockResult = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+        let mockPsqlConnections = mockResult?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
+        XCTAssertEqual(mockPsqlConnections, PostgresHealthChecksMock.healthCheckItem)
+        let mockPsqlResponseTimes = mockResult?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
+        XCTAssertEqual(mockPsqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
+
+        app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
         let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
-        XCTAssertEqual(psqlConnections, PostgresHealthChecksMock.healthCheckItem)
-        let psqlResponseTimes = result?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
+        XCTAssertEqual(psqlConnections?.componentType, .datastore)
+        XCTAssertNotEqual(psqlConnections?.observedValue, 1.0)
+        XCTAssertEqual(psqlConnections?.observedUnit, "s")
+        XCTAssertEqual(psqlConnections?.status, .pass)
+        XCTAssertNil(psqlConnections?.affectedEndpoints)
+        XCTAssertNil(psqlConnections?.output)
+        XCTAssertNil(psqlConnections?.links)
+        XCTAssertNil(psqlConnections?.node)
+        let psqlResponseTimes = mockResult?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
         XCTAssertEqual(psqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(psqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(psqlResponseTimes?.componentType, .datastore)
+        XCTAssertEqual(psqlResponseTimes?.observedValue, 1.0)
+        XCTAssertEqual(psqlResponseTimes?.observedUnit, "s")
+        XCTAssertEqual(psqlResponseTimes?.status, .pass)
+        XCTAssertNil(psqlResponseTimes?.affectedEndpoints)
+        XCTAssertEqual(psqlResponseTimes?.output, "Ok")
+        XCTAssertNil(psqlResponseTimes?.links)
+        XCTAssertNil(psqlResponseTimes?.node)
     }
 
     func testGetVersion() async throws {
