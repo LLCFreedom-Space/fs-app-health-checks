@@ -1,4 +1,4 @@
-name: Deploy DocC
+name: docc
 
 on:
   # Runs on pushes targeting the default branch
