@@ -71,7 +71,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Get ping from redis
     /// - Returns: `String`
     public func ping() async -> String {
-        let result = try? await app.redis.ping().get()
+        let result = try? await app.redisRequest?.getPong()
         var connectionDescription = "ERROR: No connect to Redis database"
         if let result, result.lowercased().contains("pong") {
             connectionDescription = result
