@@ -34,6 +34,7 @@ final class PostgresHealthChecksTests: XCTestCase {
         let mockResult = await app.psqlHealthChecks?.connection()
         XCTAssertEqual(mockResult, PostgresHealthChecksMock.healthCheckItem)
 
+        app.psqlRequest = PsqlRequestMock()
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.connection()
         XCTAssertEqual(result?.componentType, .datastore)
@@ -52,8 +53,8 @@ final class PostgresHealthChecksTests: XCTestCase {
         app.psqlHealthChecks = PostgresHealthChecksMock()
         let resultMock = await app.psqlHealthChecks?.responseTime()
         XCTAssertEqual(resultMock, PostgresHealthChecksMock.healthCheckItem)
-        app.psqlRequest = MockPsqlRequest()
 
+        app.psqlRequest = PsqlRequestMock()
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.responseTime()
         XCTAssertEqual(result?.componentType, .datastore)
@@ -77,6 +78,7 @@ final class PostgresHealthChecksTests: XCTestCase {
         let mockPsqlResponseTimes = mockResult?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
         XCTAssertEqual(mockPsqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
 
+        app.psqlRequest = PsqlRequestMock()
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
         let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
@@ -109,6 +111,7 @@ final class PostgresHealthChecksTests: XCTestCase {
         let resultMock = await app.psqlHealthChecks?.getVersion()
         XCTAssertEqual(resultMock, PostgresHealthChecksMock.version)
 
+        app.psqlRequest = PsqlRequestMock()
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.getVersion()
         XCTAssertEqual(result, "PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit")
