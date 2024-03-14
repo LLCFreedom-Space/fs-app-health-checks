@@ -160,3 +160,17 @@ extension Application {
         return formatter
     }
 }
+
+extension Application {
+    /// `StorageKey` for PsqlRequestSendable
+    public struct PsqlRequestKey: StorageKey {
+        /// PsqlRequestSendable
+        public typealias Value = PsqlRequestSendable
+    }
+
+    /// Computed property for `PsqlRequestSendable`
+    public var psqlRequest: PsqlRequestSendable? {
+        get { storage[PsqlRequestKey.self] }
+        set { storage[PsqlRequestKey.self] = newValue }
+    }
+}

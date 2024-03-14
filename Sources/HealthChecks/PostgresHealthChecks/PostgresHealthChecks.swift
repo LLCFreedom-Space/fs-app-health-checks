@@ -30,7 +30,7 @@ import FluentPostgresDriver
 public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
-    
+
     /// Get  psql version
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
@@ -72,13 +72,10 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Get psql version
     /// - Returns: `String`
     public func getVersion() async -> String {
-        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
-        let row = rows?.first?.makeRandomAccess()
-        var connectionDescription = "ERROR: No connect to Postgres database"
-        if let result = (row?[data: "version"].string) {
-            connectionDescription = result
+        guard let result = try? await app.psqlRequest?.getVersionDescription() else {
+            return "ERROR: No connect to Postgres database"
         }
-        return connectionDescription
+        return result
     }
 
     /// Check with setup options
