@@ -52,6 +52,7 @@ final class PostgresHealthChecksTests: XCTestCase {
         app.psqlHealthChecks = PostgresHealthChecksMock()
         let resultMock = await app.psqlHealthChecks?.responseTime()
         XCTAssertEqual(resultMock, PostgresHealthChecksMock.healthCheckItem)
+        app.psqlRequest = MockPsqlRequest()
 
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.responseTime()
