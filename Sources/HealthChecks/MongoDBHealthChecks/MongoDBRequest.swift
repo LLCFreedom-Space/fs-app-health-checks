@@ -30,8 +30,11 @@ public struct MongoDBRequest: MongoDBRequestSendable {
     /// Instance of app as `Application`
     public let app: Application
 
+    /// Get mongoDB connection
+    /// - Parameter url: `String`
+    /// - Returns: `String`
     public func getConnection(by url: String) async throws -> String {
-        app.mongoCluster = try await MongoCluster(connectingTo: ConnectionSettings(url))
+        app.mongoCluster = try? await MongoCluster(connectingTo: ConnectionSettings(url))
         return "\(app.mongoCluster?.connectionState ?? .disconnected)"
     }
 }

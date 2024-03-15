@@ -29,10 +29,12 @@ final class MongoDBHealthChecksTests: XCTestCase {
     func testConnection() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+        let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+        app.mongoId = mongoId
         app.mongoDBHealthChecks = MongoDBHealthChecksMock()
         let mockResult = await app.mongoDBHealthChecks?.connection()
         XCTAssertEqual(mockResult, MongoDBHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(app.mongoId, mongoId)
 
         app.mongoDBRequest = MongoDBRequestMock()
         app.mongoDBHealthChecks = MongoDBHealthChecks(app: app, url: "url")
