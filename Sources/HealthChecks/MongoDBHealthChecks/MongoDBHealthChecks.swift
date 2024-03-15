@@ -26,9 +26,12 @@ import Vapor
 import MongoClient
 
 /// Service that provides mongoDB health check functionality
-public struct MongoDBHealthChecks: MongoDBChecksProtocol {
+public struct MongoDBHealthChecks: MongoDBHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
+
+    /// Instance of url as `String` for mongo
+    public let url: String
 
     public func connection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
@@ -65,11 +68,10 @@ public struct MongoDBHealthChecks: MongoDBChecksProtocol {
     }
     
     public func getConnection() async -> String {
-//        guard let result = try? await app.Request?.getVersionDescription() else {
-//            return "ERROR: No connect to Postgres database"
-//        }
-//        return result
-        return ""
+        guard let result = try? await app.mongoDBRequest?.getConnection(by: url) else {
+           return "disconnected"
+        }
+        return result
     }
 
     /// Check with setup options

@@ -162,6 +162,18 @@ extension Application {
         get { storage[RedisHealthChecksKey.self] }
         set { storage[RedisHealthChecksKey.self] = newValue }
     }
+
+    /// A `MongoDBHealthChecksKey` conform to StorageKey protocol
+    public struct MongoDBHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `MongoDBHealthChecksProtocol`.
+        public typealias Value = MongoDBHealthChecksProtocol
+    }
+
+    /// Setup `mongoHealthChecks` in application storage
+    public var mongoDBHealthChecks: MongoDBHealthChecksProtocol? {
+        get { storage[MongoDBHealthChecksKey.self] }
+        set { storage[MongoDBHealthChecksKey.self] = newValue }
+    }
 }
 
 extension Application {
@@ -199,6 +211,19 @@ extension Application {
     public var redisRequest: RedisRequestSendable? {
         get { storage[RedisRequestKey.self] }
         set { storage[RedisRequestKey.self] = newValue }
+    }
+}
+
+extension Application {
+    /// `StorageKey` for MongoDBRequestSendableKey
+    public struct MongoDBRequestSendableKey: StorageKey {
+        public typealias Value = MongoDBRequestSendable
+    }
+
+    /// Computed property for `MongoDBRequestSendable`
+    public var mongoDBRequest: MongoDBRequestSendable? {
+        get { storage[MongoDBRequestSendableKey.self] }
+        set { storage[MongoDBRequestSendableKey.self] = newValue }
     }
 }
 
