@@ -27,7 +27,10 @@ import Vapor
 enum Constants {
     // swiftlint:disable numbers_smell
     /// PostgreSQL version description
-    static let psqlVersionDescription = "PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit"
+    static let psqlVersionDescription = 
+        """
+        PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+        """
     // swiftlint:enable numbers_smell
 
     /// Default url for consul
