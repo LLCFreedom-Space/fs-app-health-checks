@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PsqlRequestMock.swift
+//  RedisRequestMock.swift
 //
 //
 //  Created by Mykola Buhaiov on 14.03.2024.
@@ -25,8 +25,8 @@
 import Vapor
 @testable import HealthChecks
 
-public struct PsqlRequestMock: PsqlRequestSendable {
-    public func getVersionDescription() async throws -> String {
-        Constants.psqlVersionDescription
+public struct RedisRequestMock: RedisRequestSendable {
+    public func getPong() async throws -> String {
+        "PONG"
     }
 }

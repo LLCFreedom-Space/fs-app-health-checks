@@ -162,7 +162,7 @@ extension Application {
 }
 
 extension Application {
-    /// `StorageKey` for PsqlRequestSendable
+    /// `StorageKey` for PsqlRequestKey
     public struct PsqlRequestKey: StorageKey {
         /// PsqlRequestSendable
         public typealias Value = PsqlRequestSendable
@@ -172,5 +172,19 @@ extension Application {
     public var psqlRequest: PsqlRequestSendable? {
         get { storage[PsqlRequestKey.self] }
         set { storage[PsqlRequestKey.self] = newValue }
+    }
+}
+
+extension Application {
+    /// `StorageKey` for RedisRequestKey
+    public struct RedisRequestKey: StorageKey {
+        /// RedisRequestSendable
+        public typealias Value = RedisRequestSendable
+    }
+
+    /// Computed property for `RedisRequestSendable`
+    public var redisRequest: RedisRequestSendable? {
+        get { storage[RedisRequestKey.self] }
+        set { storage[RedisRequestKey.self] = newValue }
     }
 }

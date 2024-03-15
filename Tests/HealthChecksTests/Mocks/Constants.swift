@@ -16,17 +16,23 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PsqlRequestMock.swift
+//  Constants.swift
 //
 //
-//  Created by Mykola Buhaiov on 14.03.2024.
+//  Created by Mykola Buhaiov on 15.03.2024.
 //
 
 import Vapor
-@testable import HealthChecks
 
-public struct PsqlRequestMock: PsqlRequestSendable {
-    public func getVersionDescription() async throws -> String {
-        Constants.psqlVersionDescription
-    }
+enum Constants {
+    // swiftlint:disable numbers_smell
+    /// PostgreSQL version description
+    static let psqlVersionDescription = 
+        """
+        PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+        """
+    // swiftlint:enable numbers_smell
+
+    /// Default url for consul
+    static let consulUrl = "http://127.0.0.1:8500"
 }

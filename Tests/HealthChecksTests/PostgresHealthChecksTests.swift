@@ -114,6 +114,6 @@ final class PostgresHealthChecksTests: XCTestCase {
         app.psqlRequest = PsqlRequestMock()
         app.psqlHealthChecks = PostgresHealthChecks(app: app)
         let result = await app.psqlHealthChecks?.getVersion()
-        XCTAssertEqual(result, "PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit")
+        XCTAssertEqual(result, Constants.psqlVersionDescription)
     }
 }
