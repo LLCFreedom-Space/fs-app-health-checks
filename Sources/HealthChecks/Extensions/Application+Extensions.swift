@@ -23,6 +23,7 @@
 //
 
 import Vapor
+import MongoKitten
 
 /// Extension for core type representing a Vapor application.
 extension Application {
@@ -84,6 +85,18 @@ extension Application {
     public var redisId: String? {
         get { storage[RedisIdKey.self] }
         set { storage[RedisIdKey.self] = newValue }
+    }
+
+    /// A `mongoIdKey` conform to StorageKey protocol
+    private struct MongoIdKey: StorageKey {
+        /// Less verbose typealias for `String`.
+        typealias Value = String
+    }
+
+    /// Setup `mongoIdKey` in application storage
+    public var mongoId: String? {
+        get { storage[MongoIdKey.self] }
+        set { storage[MongoIdKey.self] = newValue }
     }
 }
 
@@ -186,5 +199,18 @@ extension Application {
     public var redisRequest: RedisRequestSendable? {
         get { storage[RedisRequestKey.self] }
         set { storage[RedisRequestKey.self] = newValue }
+    }
+}
+
+extension Application {
+    /// `StorageKey` for MongoClusterKey
+    public struct MongoClusterKey: StorageKey {
+        public typealias Value = MongoCluster
+    }
+
+    /// Variable for `MongoDatabase`
+    public var mongoCluster: MongoCluster? {
+        get { storage[MongoClusterKey.self] }
+        set { storage[MongoClusterKey.self] = newValue }
     }
 }

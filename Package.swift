@@ -23,6 +23,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.1.1"),
         //  Vapor provider for RedisKit + RedisNIO
         .package(url: "https://github.com/vapor/redis.git", from: "5.0.0-alpha.2.2"),
+        // 🐈 MongoDB driver based on Swift NIO.
+        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", exact: "7.6.4"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -46,6 +48,10 @@ let package = Package(
                     name: "Redis",
                     package: "redis"
                 ),
+                .product(
+                    name: "MongoKitten",
+                    package: "MongoKitten"
+                ),
             ]
         ),
         .testTarget(
@@ -64,8 +70,8 @@ let package = Package(
 )
 
 #if swift(>=5.6)
-  // Add the documentation compiler plugin if possible
-  package.dependencies.append(
+// Add the documentation compiler plugin if possible
+package.dependencies.append(
     .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
-  )
+)
 #endif
