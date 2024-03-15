@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBRequestTests.swift
+//  MongoHealthChecksTests.swift
 //
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
@@ -25,20 +25,20 @@
 import XCTVapor
 @testable import HealthChecks
 
-final class MongoDBRequestTests: XCTestCase {
+final class MongoHealthChecksTests: XCTestCase {
     func testConnection() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
         let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
         app.mongoId = mongoId
-        app.mongoDBHealthChecks = MongoDBHealthChecksMock()
-        let mockResult = await app.mongoDBHealthChecks?.connection()
-        XCTAssertEqual(mockResult, MongoDBHealthChecksMock.healthCheckItem)
+        app.mongoHealthChecks = MongoHealthChecksMock()
+        let mockResult = await app.mongoHealthChecks?.connection()
+        XCTAssertEqual(mockResult, MongoHealthChecksMock.healthCheckItem)
         XCTAssertEqual(app.mongoId, mongoId)
 
-        app.mongoDBRequest = MongoDBRequestMock()
-        app.mongoDBHealthChecks = MongoDBHealthChecks(app: app, url: "url")
-        let result = await app.mongoDBHealthChecks?.connection()
+        app.mongoRequest = MongoRequestMock()
+        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+        let result = await app.mongoHealthChecks?.connection()
         XCTAssertEqual(result?.componentType, .datastore)
         XCTAssertNotEqual(result?.observedValue, 1.0)
         XCTAssertEqual(result?.observedUnit, "s")
@@ -52,13 +52,13 @@ final class MongoDBRequestTests: XCTestCase {
     func testResponseTime() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.mongoDBHealthChecks = MongoDBHealthChecksMock()
-        let resultMock = await app.mongoDBHealthChecks?.responseTime()
-        XCTAssertEqual(resultMock, MongoDBHealthChecksMock.healthCheckItem)
+        app.mongoHealthChecks = MongoHealthChecksMock()
+        let resultMock = await app.mongoHealthChecks?.responseTime()
+        XCTAssertEqual(resultMock, MongoHealthChecksMock.healthCheckItem)
 
-        app.mongoDBRequest = MongoDBRequestMock()
-        app.mongoDBHealthChecks = MongoDBHealthChecks(app: app, url: "url")
-        let result = await app.mongoDBHealthChecks?.responseTime()
+        app.mongoRequest = MongoRequestMock()
+        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+        let result = await app.mongoHealthChecks?.responseTime()
         XCTAssertEqual(result?.componentType, .datastore)
         XCTAssertNotEqual(result?.observedValue, 1.0)
         XCTAssertEqual(result?.observedUnit, "s")
@@ -73,16 +73,16 @@ final class MongoDBRequestTests: XCTestCase {
         let app = Application(.testing)
         defer { app.shutdown() }
         app.mongoId = UUID().uuidString
-        app.mongoDBHealthChecks = MongoDBHealthChecksMock()
-        let mockResult = await app.mongoDBHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+        app.mongoHealthChecks = MongoHealthChecksMock()
+        let mockResult = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
         let mockMongoConnections = mockResult?["\(ComponentName.mongo):\(MeasurementType.connections)"]
-        XCTAssertEqual(mockMongoConnections, MongoDBHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(mockMongoConnections, MongoHealthChecksMock.healthCheckItem)
         let mockMongoResponseTimes = mockResult?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(mockMongoResponseTimes, MongoDBHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(mockMongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
 
-        app.mongoDBRequest = MongoDBRequestMock()
-        app.mongoDBHealthChecks = MongoDBHealthChecks(app: app, url: "url")
-        let result = await app.mongoDBHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+        app.mongoRequest = MongoRequestMock()
+        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+        let result = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
         let mongoConnections = result?["\(ComponentName.mongo):\(MeasurementType.connections)"]
         XCTAssertEqual(mongoConnections?.componentType, .datastore)
         XCTAssertNotEqual(mongoConnections?.observedValue, 1.0)
@@ -93,8 +93,8 @@ final class MongoDBRequestTests: XCTestCase {
         XCTAssertNil(mongoConnections?.links)
         XCTAssertNil(mongoConnections?.node)
         let mongoResponseTimes = mockResult?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(mongoResponseTimes, MongoDBHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(mongoResponseTimes, MongoDBHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(mongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
+        XCTAssertEqual(mongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
         XCTAssertEqual(mongoResponseTimes?.componentType, .datastore)
         XCTAssertEqual(mongoResponseTimes?.observedValue, 1.0)
         XCTAssertEqual(mongoResponseTimes?.observedUnit, "s")
@@ -108,13 +108,13 @@ final class MongoDBRequestTests: XCTestCase {
     func testGetConnection() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.mongoDBHealthChecks = MongoDBHealthChecksMock()
-        let resultMock = await app.mongoDBHealthChecks?.getConnection()
+        app.mongoHealthChecks = MongoHealthChecksMock()
+        let resultMock = await app.mongoHealthChecks?.getConnection()
         XCTAssertEqual(resultMock, "connecting")
 
-        app.mongoDBRequest = MongoDBRequestMock()
-        app.mongoDBHealthChecks = MongoDBHealthChecks(app: app, url: "url")
-        let result = await app.mongoDBHealthChecks?.getConnection()
+        app.mongoRequest = MongoRequestMock()
+        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+        let result = await app.mongoHealthChecks?.getConnection()
         XCTAssertEqual(result, "connecting")
     }
 }

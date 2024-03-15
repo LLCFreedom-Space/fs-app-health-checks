@@ -16,20 +16,26 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBHealthChecksTests.swift
+//  MongoChecksProtocol.swift
 //
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
-import XCTVapor
-@testable import HealthChecks
+import Vapor
+import MongoClient
 
-final class MongoDBHealthChecksTests: XCTestCase {
-    func testGetConnection() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let result = try await MongoDBRequest(app: app).getConnection(by: "url")
-        XCTAssertEqual(result, "disconnected")
-    }
+/// Groups func for get mongo health check
+public protocol MongoChecksProtocol {
+    /// Get mongo connection
+    /// - Returns: `HealthCheckItem`
+    func connection() async -> HealthCheckItem
+
+    /// Get mongo response time
+    /// - Returns: `HealthCheckItem`
+    func responseTime() async -> HealthCheckItem
+
+    /// Get mongo connection
+    /// - Returns: `String`
+    func getConnection() async -> String
 }

@@ -163,16 +163,16 @@ extension Application {
         set { storage[RedisHealthChecksKey.self] = newValue }
     }
 
-    /// A `MongoDBHealthChecksKey` conform to StorageKey protocol
-    public struct MongoDBHealthChecksKey: StorageKey {
-        /// Less verbose typealias for `MongoDBHealthChecksProtocol`.
-        public typealias Value = MongoDBHealthChecksProtocol
+    /// A `MongoHealthChecksKey` conform to StorageKey protocol
+    public struct MongoHealthChecksKey: StorageKey {
+        /// Less verbose typealias for `MongoHealthChecksProtocol`.
+        public typealias Value = MongoHealthChecksProtocol
     }
 
     /// Setup `mongoHealthChecks` in application storage
-    public var mongoDBHealthChecks: MongoDBHealthChecksProtocol? {
-        get { storage[MongoDBHealthChecksKey.self] }
-        set { storage[MongoDBHealthChecksKey.self] = newValue }
+    public var mongoHealthChecks: MongoHealthChecksProtocol? {
+        get { storage[MongoHealthChecksKey.self] }
+        set { storage[MongoHealthChecksKey.self] = newValue }
     }
 }
 
@@ -215,15 +215,15 @@ extension Application {
 }
 
 extension Application {
-    /// `StorageKey` for MongoDBRequestSendableKey
-    public struct MongoDBRequestSendableKey: StorageKey {
-        public typealias Value = MongoDBRequestSendable
+    /// `StorageKey` for MongoRequestSendableKey
+    public struct MongoRequestSendableKey: StorageKey {
+        public typealias Value = MongoRequestSendable
     }
 
-    /// Computed property for `MongoDBRequestSendable`
-    public var mongoDBRequest: MongoDBRequestSendable? {
-        get { storage[MongoDBRequestSendableKey.self] }
-        set { storage[MongoDBRequestSendableKey.self] = newValue }
+    /// Computed property for `MongoRequestSendable`
+    public var mongoRequest: MongoRequestSendable? {
+        get { storage[MongoRequestSendableKey.self] }
+        set { storage[MongoRequestSendableKey.self] = newValue }
     }
 }
 

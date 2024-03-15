@@ -16,26 +16,25 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBChecksProtocol.swift
+//  MongoRequest.swift
 //
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
 import Vapor
+import MongoCore
 import MongoClient
 
-/// Groups func for get mongoDB health check
-public protocol MongoDBChecksProtocol {
+public struct MongoRequest: MongoRequestSendable {
+    /// Instance of app as `Application`
+    public let app: Application
+
     /// Get mongo connection
-    /// - Returns: `HealthCheckItem`
-    func connection() async -> HealthCheckItem
-
-    /// Get mongoDB response time
-    /// - Returns: `HealthCheckItem`
-    func responseTime() async -> HealthCheckItem
-
-    /// Get mongoDB connection
+    /// - Parameter url: `String`
     /// - Returns: `String`
-    func getConnection() async -> String
+    public func getConnection(by url: String) async throws -> String {
+        app.mongoCluster = try? await MongoCluster(connectingTo: ConnectionSettings(url))
+        return "\(app.mongoCluster?.connectionState ?? .disconnected)"
+    }
 }

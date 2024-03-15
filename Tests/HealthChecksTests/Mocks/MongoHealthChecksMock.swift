@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBHealthChecksMock.swift
+//  MongoHealthChecksMock.swift
 //
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
@@ -25,7 +25,7 @@
 import Vapor
 @testable import HealthChecks
 
-public struct MongoDBHealthChecksMock: MongoDBHealthChecksProtocol {
+public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
     static let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     static let healthCheckItem = HealthCheckItem(
         componentId: mongoId,
@@ -41,11 +41,11 @@ public struct MongoDBHealthChecksMock: MongoDBHealthChecksProtocol {
     )
 
     public func connection() async -> HealthCheckItem {
-        MongoDBHealthChecksMock.healthCheckItem
+        MongoHealthChecksMock.healthCheckItem
     }
 
     public func responseTime() async -> HealthCheckItem {
-        MongoDBHealthChecksMock.healthCheckItem
+        MongoHealthChecksMock.healthCheckItem
     }
 
     public func getConnection() async -> String {
@@ -54,8 +54,8 @@ public struct MongoDBHealthChecksMock: MongoDBHealthChecksProtocol {
 
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.mongo):\(MeasurementType.responseTime)": MongoDBHealthChecksMock.healthCheckItem,
-            "\(ComponentName.mongo):\(MeasurementType.connections)": MongoDBHealthChecksMock.healthCheckItem
+            "\(ComponentName.mongo):\(MeasurementType.responseTime)": MongoHealthChecksMock.healthCheckItem,
+            "\(ComponentName.mongo):\(MeasurementType.connections)": MongoHealthChecksMock.healthCheckItem
         ]
         return result
     }

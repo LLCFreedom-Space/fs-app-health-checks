@@ -23,7 +23,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.1.1"),
         //  Vapor provider for RedisKit + RedisNIO
         .package(url: "https://github.com/vapor/redis.git", from: "5.0.0-alpha.2.2"),
-        // 🐈 MongoDB driver based on Swift NIO.
+        // 🐈 Mongo driver based on Swift NIO.
         .package(url: "https://github.com/orlandos-nl/MongoKitten.git", exact: "7.6.4"),
     ],
     targets: [

@@ -16,13 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBHealthChecksProtocol.swift
+//  MongoRequestMock.swift
 //
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
 import Vapor
+@testable import HealthChecks
 
-/// Groups func for get mongoDB health check
-public protocol MongoDBHealthChecksProtocol: MongoDBChecksProtocol, ChecksProtocol {}
+public struct MongoRequestMock: MongoRequestSendable {
+    public func getConnection(by url: String) async throws -> String {
+        "connecting"
+    }
+}

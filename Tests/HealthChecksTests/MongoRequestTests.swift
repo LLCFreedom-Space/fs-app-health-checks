@@ -16,17 +16,20 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBRequestSendable.swift
+//  MongoRequestTests.swift
 //
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
-import Vapor
+import XCTVapor
+@testable import HealthChecks
 
-/// Groups func for get mongoDB request
-public protocol MongoDBRequestSendable {
-    /// Get connection description
-    /// - Returns: `String`
-    func getConnection(by url: String) async throws -> String
+final class MongoRequestTests: XCTestCase {
+    func testGetConnection() async throws {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        let result = try await MongoRequest(app: app).getConnection(by: "url")
+        XCTAssertEqual(result, "disconnected")
+    }
 }

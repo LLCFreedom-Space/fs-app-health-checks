@@ -16,17 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBRequestMock.swift
+//  MongoRequestSendable.swift
 //
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
 import Vapor
-@testable import HealthChecks
 
-public struct MongoDBRequestMock: MongoDBRequestSendable {
-    public func getConnection(by url: String) async throws -> String {
-        "connecting"
-    }
+/// Groups func for get mongo request
+public protocol MongoRequestSendable {
+    /// Get connection description
+    /// - Returns: `String`
+    func getConnection(by url: String) async throws -> String
 }

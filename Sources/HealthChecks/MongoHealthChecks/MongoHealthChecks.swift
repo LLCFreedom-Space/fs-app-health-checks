@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoDBHealthChecks.swift
+//  MongoHealthChecks.swift
 //  
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
@@ -25,14 +25,16 @@
 import Vapor
 import MongoClient
 
-/// Service that provides mongoDB health check functionality
-public struct MongoDBHealthChecks: MongoDBHealthChecksProtocol {
+/// Service that provides mongo health check functionality
+public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
 
     /// Instance of url as `String` for mongo
     public let url: String
 
+    /// Get  mongo connection
+    /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
         let connectionDescription = await getConnection()
@@ -50,6 +52,8 @@ public struct MongoDBHealthChecks: MongoDBHealthChecksProtocol {
         return result
     }
     
+    /// Get mongo response time
+    /// - Returns: `HealthCheckItem`
     public func responseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSinceReferenceDate
         let connectionDescription = await getConnection()
@@ -67,8 +71,10 @@ public struct MongoDBHealthChecks: MongoDBHealthChecksProtocol {
         return result
     }
     
+    /// Get connection of mongo
+    /// - Returns: `String`
     public func getConnection() async -> String {
-        guard let result = try? await app.mongoDBRequest?.getConnection(by: url) else {
+        guard let result = try? await app.mongoRequest?.getConnection(by: url) else {
            return "disconnected"
         }
         return result
