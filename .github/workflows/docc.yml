@@ -30,10 +30,10 @@ jobs:
           swift package resolve;
           xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS';
           $(xcrun --find docc) process-archive \
-            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/AppHealthChecks.doccarchive \
+            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/HealthChecks.doccarchive \
             --output-path docs \
-            --hosting-base-path apphealthchecks;
-          echo "<script>window.location.href += \"/documentation/apphealthchecks\"</script>" > docs/index.html;
+            --hosting-base-path healthchecks;
+          echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html;
 
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v1
