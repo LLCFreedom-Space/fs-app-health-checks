@@ -6,7 +6,6 @@ import PackageDescription
 let package = Package(
     name: "fs-app-health-checks",
     platforms: [
-        .iOS(.v16),
         .macOS(.v13)
     ],
     products: [
