@@ -32,7 +32,7 @@ jobs:
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/HealthChecks.doccarchive \
             --output-path docs \
-            --hosting-base-path healthchecks;
+            --hosting-base-path apphealthchecks;
           echo "<script>window.location.href += \"/documentation/apphealthchecks\"</script>" > docs/index.html;
 
       - name: Upload artifact 📜
