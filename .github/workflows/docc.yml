@@ -20,7 +20,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://llcfreedom-space.github.io/fs-app-health-checks/
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
