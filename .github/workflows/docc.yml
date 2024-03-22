@@ -21,7 +21,7 @@ jobs:
     environment:
       name: github-pages
       url: https://llcfreedom-space.github.io/fs-app-health-checks/
-    runs-on: ubuntu-latest
+    runs-on: macos-13
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
