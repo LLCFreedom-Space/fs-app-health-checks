@@ -28,11 +28,11 @@ jobs:
       - name: Build All DocC 🛠
         run: |
          swift package resolve;
-         xcodebuild docbuild -scheme HealthChecks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS,OS=16';
+         xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS,OS=16';
          $(xcrun --find docc) process-archive \
            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/HealthChecks.doccarchive \
            --output-path docs \
-           --hosting-base-path healthchecks;
+           --hosting-base-path Healthchecks;
          echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html;
 
       - name: Upload artifact 📜
