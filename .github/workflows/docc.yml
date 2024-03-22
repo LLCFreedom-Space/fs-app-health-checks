@@ -20,7 +20,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: https://llcfreedom-space.github.io/fs-app-health-checks/documentation
+      url: https://llcfreedom-space.github.io/fs-app-health-checks
     runs-on: macos-13
     steps:
       - name: Checkout 🛎️
