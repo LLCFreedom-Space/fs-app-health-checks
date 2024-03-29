@@ -30,6 +30,12 @@ public struct PsqlRequest: PsqlRequestSendable {
     /// Instance of app as `Application`
     public let app: Application
     
+    /// Initializer for PsqlRequest
+    /// - Parameter app: `Application`
+    public init(app: Application) {
+        self.app = app
+    }
+
     /// Get version description
     /// - Returns: `String`
     public func getVersionDescription() async throws -> String {

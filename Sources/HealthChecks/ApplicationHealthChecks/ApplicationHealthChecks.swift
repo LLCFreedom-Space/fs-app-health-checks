@@ -33,7 +33,7 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     
     /// Initializer for ApplicationHealthChecks
     /// - Parameter app: `Application`
-   public init(app: Application) {
+    public init(app: Application) {
         self.app = app
     }
 

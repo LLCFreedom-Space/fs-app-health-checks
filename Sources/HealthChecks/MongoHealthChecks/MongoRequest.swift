@@ -30,6 +30,12 @@ public struct MongoRequest: MongoRequestSendable {
     /// Instance of app as `Application`
     public let app: Application
 
+    /// Initializer for MongoRequest
+    /// - Parameter app: `Application`
+    public init(app: Application) {
+        self.app = app
+    }
+
     /// Get mongo connection
     /// - Parameter url: `String`
     /// - Returns: `String`

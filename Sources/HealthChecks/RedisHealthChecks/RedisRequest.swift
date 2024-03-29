@@ -29,6 +29,12 @@ public struct RedisRequest: RedisRequestSendable {
     /// Instance of app as `Application`
     public let app: Application
 
+    /// Initializer for RedisRequest
+    /// - Parameter app: `Application`
+    public init(app: Application) {
+        self.app = app
+    }
+
     public func getPong() async throws -> String {
         try await app.redis.ping().get()
     }
