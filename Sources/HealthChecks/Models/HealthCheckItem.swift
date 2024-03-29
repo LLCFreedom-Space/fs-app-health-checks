@@ -64,4 +64,41 @@ public struct HealthCheckItem: Content {
     /// Number of node
     /// Example: `1`
     public var node: Int?
+
+    
+    /// Initializer for HealthCheckItem
+    /// - Parameters:
+    ///   - componentId: optional `String`
+    ///   - componentType: optional `ComponentType`
+    ///   - observedValue: optional `Double`
+    ///   - observedUnit: optional `String`
+    ///   - status: optional `HealthCheckStatus`
+    ///   - affectedEndpoints: optional `[String]`
+    ///   - time: optional `String`
+    ///   - output: optional `String`
+    ///   - links: optional `[String : String]`
+    ///   - node: optional `Int`
+    public init(
+        componentId: String? = nil,
+        componentType: ComponentType? = nil,
+        observedValue: Double? = nil,
+        observedUnit: String? = nil,
+        status: HealthCheckStatus? = nil,
+        affectedEndpoints: [String]? = nil,
+        time: String? = nil,
+        output: String? = nil,
+        links: [String : String]? = nil,
+        node: Int? = nil
+    ) {
+        self.componentId = componentId
+        self.componentType = componentType
+        self.observedValue = observedValue
+        self.observedUnit = observedUnit
+        self.status = status
+        self.affectedEndpoints = affectedEndpoints
+        self.time = time
+        self.output = output
+        self.links = links
+        self.node = node
+    }
 }

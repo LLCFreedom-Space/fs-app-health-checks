@@ -60,4 +60,37 @@ public struct HealthCheck: Content {
     /// Is a human-friendly description of the service
     /// Example: `"This service use for get application health"`
     public var description: String?
+    
+    /// Initializer for HealthCheck
+    /// - Parameters:
+    ///   - status: optional `HealthCheckStatus`
+    ///   - version: optional `String`
+    ///   - releaseId: optional `String`
+    ///   - notes: optional `[String]`
+    ///   - output: optional `String`
+    ///   - checks: optional `[String : [HealthCheckItem]]`
+    ///   - links: optional `[String : String]`
+    ///   - serviceId: optional `UUID`
+    ///   - description: optional `String`
+    public init(
+        status: HealthCheckStatus? = nil,
+        version: String? = nil,
+        releaseId: String? = nil,
+        notes: [String]? = nil,
+        output: String? = nil,
+        checks: [String : [HealthCheckItem]]? = nil,
+        links: [String : String]? = nil,
+        serviceId: UUID? = nil,
+        description: String? = nil
+    ) {
+        self.status = status
+        self.version = version
+        self.releaseId = releaseId
+        self.notes = notes
+        self.output = output
+        self.checks = checks
+        self.links = links
+        self.serviceId = serviceId
+        self.description = description
+    }
 }
