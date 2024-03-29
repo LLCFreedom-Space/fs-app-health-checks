@@ -29,6 +29,12 @@ import Redis
 public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
+    
+    /// Initializer for RedisHealthChecks
+    /// - Parameter app: `Application`
+    public init(app: Application) {
+        self.app = app
+    }
 
     /// Get  redis connection
     /// - Returns: `HealthCheckItem`

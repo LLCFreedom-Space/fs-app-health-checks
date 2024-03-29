@@ -30,6 +30,12 @@ import FluentPostgresDriver
 public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
+    
+    /// Initializer for PostgresHealthChecks
+    /// - Parameter app: `Application`
+    public init(app: Application) {
+        self.app = app
+    }
 
     /// Get  psql version
     /// - Returns: `HealthCheckItem`

@@ -32,6 +32,12 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// The instance of the Vapor application as `Application`.
     public let app: Application
     
+    /// Initializer for ConsulHealthChecks
+    /// - Parameter app: `Application`
+   public init(app: Application) {
+        self.app = app
+    }
+
     /// Performs health checks for specified measurement types.
     ///
     /// - Parameters:

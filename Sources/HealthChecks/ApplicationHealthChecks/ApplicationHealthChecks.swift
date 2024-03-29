@@ -31,6 +31,12 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// Reference to the application instance.
     public let app: Application
     
+    /// Initializer for ApplicationHealthChecks
+    /// - Parameter app: `Application`
+   public init(app: Application) {
+        self.app = app
+    }
+
     /// Get uptime of the system.
     /// - Returns: A `HealthCheckItem` representing the application's uptime.
     public func uptime() -> HealthCheckItem {

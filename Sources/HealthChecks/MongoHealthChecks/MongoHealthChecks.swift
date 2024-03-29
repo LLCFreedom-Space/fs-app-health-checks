@@ -32,7 +32,16 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
 
     /// Instance of url as `String` for mongo
     public let url: String
-
+    
+    /// Initializer for MongoHealthChecks
+    /// - Parameters:
+    ///   - app: `Application`
+    ///   - url: `String`
+    public init(app: Application, url: String) {
+        self.app = app
+        self.url = url
+    }
+    
     /// Get  mongo connection
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
