@@ -26,6 +26,10 @@ import Vapor
 
 /// Service that provides app health check functionality
 public struct HealthChecks {
+    
+    /// Initializer for HealthChecks
+    public init() {}
+
     /// Gets the major version of the provided server version.
     ///
     /// - Parameter serverVersion: The version of the server as a `String`.
