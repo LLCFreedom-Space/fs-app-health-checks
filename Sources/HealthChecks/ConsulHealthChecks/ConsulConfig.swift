@@ -29,19 +29,19 @@ public struct ConsulConfig {
     /// A unique identifier for this Consul configuration within your application.
     /// This ID is not related to Consul itself and can be used for internal reference.
     /// Example: "43119325-63f5-4e14-9175-84e0e296c527"
-    public let id: String
-    
+    public var id: String
+
     /// The URL of the Consul server to connect to.
     /// Example: "http://127.0.0.1:8500", "https://xmpl-consul.example.com"
-    public let url: String
-    
+    public var url: String
+
     /// The username for authenticating with Consul (optional).
     /// Example: "username"
-    public let username: String?
-    
+    public var username: String?
+
     /// The password for authenticating with Consul (optional).
     /// Example: "password"
-    public let password: String?
+    public var password: String?
     
     /// Initializes a `ConsulConfig` with the specified details.
     ///

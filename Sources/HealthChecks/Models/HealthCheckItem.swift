@@ -64,7 +64,6 @@ public struct HealthCheckItem: Content {
     /// Number of node
     /// Example: `1`
     public var node: Int?
-
     
     /// Initializer for HealthCheckItem
     /// - Parameters:
