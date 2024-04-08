@@ -94,3 +94,20 @@ public struct HealthCheck: Content {
         self.description = description
     }
 }
+
+/// Example of `HealthCheck`
+extension HealthCheck {
+    public static var example: HealthCheck {
+        HealthCheck(
+            status: .pass,
+            version: "1",
+            releaseId: "1.0.0",
+            notes: [""],
+            output: "",
+            checks: ["component": [HealthCheckItem.example]],
+            links: ["about": "http://api.example.com/about/authz"],
+            serviceId: UUID(),
+            description: "health of authz service"
+        )
+    }
+}
