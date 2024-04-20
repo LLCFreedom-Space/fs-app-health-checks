@@ -113,8 +113,8 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
-            observedValue: response.status == .ok ? Date().timeIntervalSince1970 - start : 0,
-            observedUnit: "s",
+            observedValue: response.status == .ok ? (Date().timeIntervalSince1970 - start) * 1000 : 0,
+            observedUnit: "ms",
             status: response.status == .ok ? .pass : .fail,
             time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,
             output: response.status != .ok ? "Error response from consul, with http status - \(response.status)" : nil,

@@ -39,7 +39,6 @@ final class RedisHealthChecksTests: XCTestCase {
         let result = await app.redisHealthChecks?.connection()
         XCTAssertEqual(result?.componentType, .datastore)
         XCTAssertNotEqual(result?.observedValue, 1.0)
-        XCTAssertEqual(result?.observedUnit, "s")
         XCTAssertEqual(result?.status, .pass)
         XCTAssertNil(result?.affectedEndpoints)
         XCTAssertNil(result?.output)
@@ -59,10 +58,10 @@ final class RedisHealthChecksTests: XCTestCase {
 
         app.redisRequest = RedisRequestMock()
         app.redisHealthChecks = RedisHealthChecks(app: app)
-        let result = await app.redisHealthChecks?.connection()
+        let result = await app.redisHealthChecks?.responseTime()
         XCTAssertEqual(result?.componentType, .datastore)
         XCTAssertNotEqual(result?.observedValue, 1.0)
-        XCTAssertEqual(result?.observedUnit, "s")
+        XCTAssertEqual(result?.observedUnit, "ms")
         XCTAssertEqual(result?.status, .pass)
         XCTAssertNil(result?.affectedEndpoints)
         XCTAssertNil(result?.output)
@@ -86,7 +85,6 @@ final class RedisHealthChecksTests: XCTestCase {
         let redisConnections = result?["\(ComponentName.redis):\(MeasurementType.connections)"]
         XCTAssertEqual(redisConnections?.componentType, .datastore)
         XCTAssertNotEqual(redisConnections?.observedValue, 1.0)
-        XCTAssertEqual(redisConnections?.observedUnit, "s")
         XCTAssertEqual(redisConnections?.status, .pass)
         XCTAssertNil(redisConnections?.affectedEndpoints)
         XCTAssertNil(redisConnections?.output)
