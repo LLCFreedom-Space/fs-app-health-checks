@@ -42,7 +42,7 @@ final class ConsulHealthChecksResponseTimeTests: XCTestCase {
         let healthChecks = ConsulHealthChecks(app: app)
         let response = await healthChecks.getStatus()
         
-        let result = healthChecks.responseTime(from: response, Date().timeIntervalSinceReferenceDate)
+        let result = healthChecks.responseTime(from: response, Date().timeIntervalSince1970)
         XCTAssertEqual(result.status, .pass)
         guard let observedValue = result.observedValue else {
             return XCTFail("no have observed value")
@@ -58,7 +58,7 @@ final class ConsulHealthChecksResponseTimeTests: XCTestCase {
         let clientResponse = ClientResponse(status: .badRequest)
         let healthChecks = ConsulHealthChecks(app: app)
         
-        let result = healthChecks.responseTime(from: clientResponse, Date().timeIntervalSinceReferenceDate)
+        let result = healthChecks.responseTime(from: clientResponse, Date().timeIntervalSince1970)
         XCTAssertEqual(result.status, .fail)
         guard let observedValue = result.observedValue else {
             return XCTFail("no have observed value")

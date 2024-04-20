@@ -31,7 +31,7 @@ final class ApplicationHealthChecksCheckTests: XCTestCase {
     func testCheck() async {
         let app = Application(.testing)
         defer { app.shutdown() }
-        app.launchTime = Date().timeIntervalSinceReferenceDate
+        app.launchTime = Date().timeIntervalSince1970
         app.applicationHealthChecks = ApplicationHealthChecksMock()
         let result = await app.applicationHealthChecks?.check(for: [MeasurementType.uptime])
         let uptime = result?[MeasurementType.uptime.rawValue]
@@ -57,7 +57,7 @@ final class ApplicationHealthChecksCheckTests: XCTestCase {
         guard let observedValue = uptimeItem.observedValue else {
             return XCTFail("no have observed value")
         }
-        let expectedUptime = Date().timeIntervalSinceReferenceDate - app.launchTime
+        let expectedUptime = Date().timeIntervalSince1970 - app.launchTime
         XCTAssertTrue(abs(observedValue - expectedUptime) < 1.0)
     }
     

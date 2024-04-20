@@ -46,7 +46,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
-        let dateNow = Date().timeIntervalSinceReferenceDate
+        let dateNow = Date().timeIntervalSince1970
         let response = await getStatus()
         for type in measurementTypes {
             switch type {
@@ -113,7 +113,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
-            observedValue: response.status == .ok ? Date().timeIntervalSinceReferenceDate - start : 0,
+            observedValue: response.status == .ok ? Date().timeIntervalSince1970 - start : 0,
             observedUnit: "s",
             status: response.status == .ok ? .pass : .fail,
             time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,

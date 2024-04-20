@@ -45,13 +45,13 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Get  mongo connection
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
+        let dateNow = Date().timeIntervalSince1970
         let connectionDescription = await getConnection()
         let result = HealthCheckItem(
-            componentId: app.psqlId,
+            componentId: app.mongoId,
             componentType: .datastore,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
+            // TODO: need get active connection
+            //            observedValue: "",
             status: connectionDescription.contains("connecting") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !connectionDescription.contains("connecting") ? connectionDescription : nil,
@@ -64,13 +64,13 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Get mongo response time
     /// - Returns: `HealthCheckItem`
     public func responseTime() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
+        let dateNow = Date().timeIntervalSince1970
         let connectionDescription = await getConnection()
         let result = HealthCheckItem(
-            componentId: app.psqlId,
+            componentId: app.mongoId,
             componentType: .datastore,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
+            observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
+            observedUnit: "ms",
             status: connectionDescription.contains("connecting") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !connectionDescription.contains("connecting") ? connectionDescription : nil,

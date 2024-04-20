@@ -71,7 +71,7 @@ extension Application {
 
     /// Setup `launchTimeKey` in application storage
     public var launchTime: Double {
-        get { storage[LaunchTimeKey.self] ?? Date().timeIntervalSinceReferenceDate }
+        get { storage[LaunchTimeKey.self] ?? Date().timeIntervalSince1970 }
         set { storage[LaunchTimeKey.self] = newValue }
     }
 

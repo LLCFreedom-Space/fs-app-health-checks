@@ -39,13 +39,13 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Get  redis connection
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
+        let dateNow = Date().timeIntervalSince1970
         let response = await ping()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
+            // TODO: need get active connection
+            //            observedValue: "",
             status: response.lowercased().contains("pong") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !response.lowercased().contains("pong") ? response : nil,
@@ -58,13 +58,13 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Get response time from redis
     /// - Returns: `HealthCheckItem`
     public func responseTime() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
+        let dateNow = Date().timeIntervalSince1970
         let response = await ping()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
+            observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
+            observedUnit: "ms",
             status: response.lowercased().contains("pong") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !response.lowercased().contains("pong") ? response : nil,

@@ -50,7 +50,7 @@ final class ApplicationHealthChecksUptimeTests: XCTestCase {
         XCTAssertEqual(item.status, .pass)
         
         // Assert time is within a reasonable range of actual uptime
-        let expectedUptime = Date().timeIntervalSinceReferenceDate - app.launchTime
+        let expectedUptime = Date().timeIntervalSince1970 - app.launchTime
         guard let value = item.observedValue else {
             return XCTFail("no have observed value")
         }

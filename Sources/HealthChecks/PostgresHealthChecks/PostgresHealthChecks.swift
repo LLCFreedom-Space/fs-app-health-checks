@@ -40,13 +40,13 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Get  psql version
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
+        let dateNow = Date().timeIntervalSince1970
         let versionDescription = await getVersion()
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
+            // TODO: need get active connection
+            //            observedValue: "",
             status: versionDescription.contains("PostgreSQL") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !versionDescription.contains("PostgreSQL") ? versionDescription : nil,
@@ -59,13 +59,13 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Get psql response time
     /// - Returns: `HealthCheckItem`
     public func responseTime() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSinceReferenceDate
+        let dateNow = Date().timeIntervalSince1970
         let versionDescription = await getVersion()
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
-            observedValue: Date().timeIntervalSinceReferenceDate - dateNow,
-            observedUnit: "s",
+            observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
+            observedUnit: "ms",
             status: versionDescription.contains("PostgreSQL") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !versionDescription.contains("PostgreSQL") ? versionDescription : nil,
