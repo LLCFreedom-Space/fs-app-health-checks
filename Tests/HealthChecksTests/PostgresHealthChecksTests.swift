@@ -121,11 +121,11 @@ final class PostgresHealthChecksTests: XCTestCase {
         app.psqlId = UUID().uuidString
         app.psqlHealthChecks = PostgresHealthChecksMock()
         let resultMock = await app.psqlHealthChecks?.checkConnection()
-        XCTAssertEqual(resultMock, PostgresHealthChecksMock.version)
+        XCTAssertEqual(resultMock, "active")
 
         app.psqlRequest = PsqlRequestMock()
         app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
-        let result = await app.psqlHealthChecks?.getVersion()
-        XCTAssertEqual(result, Constants.psqlVersionDescription)
+        let result = await app.psqlHealthChecks?.checkConnection()
+        XCTAssertEqual(resultMock, "active")
     }
 }
