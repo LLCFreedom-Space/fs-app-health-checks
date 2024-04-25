@@ -35,6 +35,9 @@ public struct RedisRequest: RedisRequestSendable {
         self.app = app
     }
 
+    // Create new connection every time, when you use this code
+    /// Get pong from Redis
+    /// - Returns: `String`
     public func getPong() async throws -> String {
         try await app.redis.ping().get()
     }

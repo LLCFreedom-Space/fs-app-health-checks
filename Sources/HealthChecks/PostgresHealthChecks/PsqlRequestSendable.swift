@@ -29,4 +29,8 @@ public protocol PsqlRequestSendable {
     /// Get version description
     /// - Returns: `String`
     func getVersionDescription() async throws -> String
+
+    /// Check connection description
+    /// - Returns: `String`
+    func checkConnection(for datname: String) async throws -> String 
 }

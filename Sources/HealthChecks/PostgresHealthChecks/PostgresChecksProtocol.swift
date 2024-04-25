@@ -37,4 +37,8 @@ public protocol PostgresChecksProtocol {
     /// Get psql version
     /// - Returns: `String`
     func getVersion() async -> String
+
+    /// Check connection
+    /// - Returns: `String`
+    func checkConnection() async -> String
 }

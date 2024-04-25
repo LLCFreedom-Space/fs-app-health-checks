@@ -29,4 +29,8 @@ public struct PsqlRequestMock: PsqlRequestSendable {
     public func getVersionDescription() async throws -> String {
         Constants.psqlVersionDescription
     }
+
+    public func checkConnection(for datname: String) async throws -> String {
+        "active"
+    }
 }
