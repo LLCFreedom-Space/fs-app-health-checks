@@ -32,5 +32,5 @@ public protocol PsqlRequestSendable {
 
     /// Check connection description
     /// - Returns: `String`
-    func checkConnection(for datname: String) async throws -> String 
+    func checkConnection(for databaseName: String) async throws -> String
 }
