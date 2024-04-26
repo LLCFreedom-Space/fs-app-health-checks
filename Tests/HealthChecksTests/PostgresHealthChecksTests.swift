@@ -126,6 +126,6 @@ final class PostgresHealthChecksTests: XCTestCase {
         app.psqlRequest = PsqlRequestMock()
         app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
         let result = await app.psqlHealthChecks?.checkConnection()
-        XCTAssertEqual(resultMock, "active")
+        XCTAssertEqual(result, "active")
     }
 }
