@@ -36,7 +36,7 @@ public struct MongoRequest: MongoRequestSendable {
         self.app = app
     }
 
-    // Create new connection every time, when you use this code
+    // WARNING: - This method create new connection every time, when you use it
     /// Get mongo connection
     /// - Parameter url: `String`
     /// - Returns: `String`

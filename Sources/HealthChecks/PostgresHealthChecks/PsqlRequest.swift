@@ -36,7 +36,7 @@ public struct PsqlRequest: PsqlRequestSendable {
         self.app = app
     }
 
-    // Create new connection every time, when you use this code
+    // WARNING: - This method create new connection every time, when you use it
     /// Get version description
     /// - Returns: `String`
     public func getVersionDescription() async throws -> String {
@@ -49,11 +49,11 @@ public struct PsqlRequest: PsqlRequestSendable {
         return connectionDescription
     }
 
-    // Create new connection every time, when you use this code
-    /// Check connection description
+    // WARNING: - This method create new connection every time, when you use it
+    /// Check for exist connection
     /// - Returns: `String`
-    public func checkConnection(for datname: String) async throws -> String {
-        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT * FROM pg_stat_activity WHERE datname = '\(datname)' and state = 'active';").get()
+    public func checkConnection(for databaseName: String) async throws -> String {
+        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT * FROM pg_stat_activity WHERE datname = '\(databaseName)' and state = 'active';").get()
         let row = rows?.first?.makeRandomAccess()
         var connectionDescription = "ERROR: No connect to Postgres database"
         if let result = (row?[data: "state"].string) {

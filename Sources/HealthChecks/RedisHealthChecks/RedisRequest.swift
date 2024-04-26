@@ -35,7 +35,7 @@ public struct RedisRequest: RedisRequestSendable {
         self.app = app
     }
 
-    // Create new connection every time, when you use this code
+    // WARNING: - This method create new connection every time, when you use it
     /// Get pong from Redis
     /// - Returns: `String`
     public func getPong() async throws -> String {
