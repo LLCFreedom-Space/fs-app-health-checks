@@ -91,7 +91,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// - Returns: `String`
     public func checkConnection() async -> String {
         guard let result = try? await app.psqlRequest?.checkConnection(for: postgresDatabase) else {
-            return "ERROR: No connect to Postgres database"
+            return "ERROR: No connect to Postgres database for check database"
         }
         return result
     }
