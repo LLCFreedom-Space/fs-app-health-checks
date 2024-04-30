@@ -49,7 +49,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
-            observedValue: connectionDescription.contains("active") ? 1 : nil,
             status: connectionDescription.contains("active") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !connectionDescription.contains("active") ? connectionDescription : nil,

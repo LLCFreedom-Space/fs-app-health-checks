@@ -38,7 +38,6 @@ final class PostgresHealthChecksTests: XCTestCase {
         app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
         let result = await app.psqlHealthChecks?.connection()
         XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertEqual(result?.observedValue, 1)
         XCTAssertEqual(result?.status, .pass)
         XCTAssertNil(result?.affectedEndpoints)
         XCTAssertNil(result?.output)
@@ -82,7 +81,6 @@ final class PostgresHealthChecksTests: XCTestCase {
         let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
         let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
         XCTAssertEqual(psqlConnections?.componentType, .datastore)
-        XCTAssertEqual(psqlConnections?.observedValue, 1)
         XCTAssertEqual(psqlConnections?.status, .pass)
         XCTAssertNil(psqlConnections?.affectedEndpoints)
         XCTAssertNil(psqlConnections?.output)
