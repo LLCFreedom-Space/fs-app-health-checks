@@ -26,7 +26,6 @@ import Vapor
 
 /// Service that provides app health check functionality
 public struct HealthChecks {
-    
     /// Initializer for HealthChecks
     public init() {}
 
