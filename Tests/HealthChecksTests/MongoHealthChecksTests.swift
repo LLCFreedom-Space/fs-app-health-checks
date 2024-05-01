@@ -73,10 +73,10 @@ final class MongoHealthChecksTests: XCTestCase {
         defer { app.shutdown() }
         app.mongoId = UUID().uuidString
         app.mongoHealthChecks = MongoHealthChecksMock()
-        let mockResult = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
-        let mockMongoConnections = mockResult?["\(ComponentName.mongo):\(MeasurementType.connections)"]
+        let mock = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
+        let mockMongoConnections = mock?["\(ComponentName.mongo):\(MeasurementType.connections)"]
         XCTAssertEqual(mockMongoConnections, MongoHealthChecksMock.healthCheckItem)
-        let mockMongoResponseTimes = mockResult?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
+        let mockMongoResponseTimes = mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
         XCTAssertEqual(mockMongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
 
         app.mongoRequest = MongoRequestMock()
@@ -90,7 +90,7 @@ final class MongoHealthChecksTests: XCTestCase {
         XCTAssertNil(mongoConnections?.output)
         XCTAssertNil(mongoConnections?.links)
         XCTAssertNil(mongoConnections?.node)
-        let mongoResponseTimes = mockResult?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
+        let mongoResponseTimes = mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
         XCTAssertEqual(mongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
         XCTAssertEqual(mongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
         XCTAssertEqual(mongoResponseTimes?.componentType, .datastore)
