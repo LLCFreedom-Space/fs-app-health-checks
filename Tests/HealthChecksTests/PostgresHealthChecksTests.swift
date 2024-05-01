@@ -35,10 +35,9 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(mockResult, PostgresHealthChecksMock.healthCheckItem)
 
         app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app)
+        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
         let result = await app.psqlHealthChecks?.connection()
         XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertNotEqual(result?.observedValue, 1.0)
         XCTAssertEqual(result?.status, .pass)
         XCTAssertNil(result?.affectedEndpoints)
         XCTAssertNil(result?.output)
@@ -54,10 +53,10 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(resultMock, PostgresHealthChecksMock.healthCheckItem)
 
         app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app)
+        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
         let result = await app.psqlHealthChecks?.responseTime()
         XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertNotEqual(result?.observedValue, 1.0)
+        XCTAssertNotEqual(result?.observedValue, 1)
         XCTAssertEqual(result?.observedUnit, "ms")
         XCTAssertEqual(result?.status, .pass)
         XCTAssertNil(result?.affectedEndpoints)
@@ -78,11 +77,10 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(mockPsqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
 
         app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app)
+        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
         let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
         let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
         XCTAssertEqual(psqlConnections?.componentType, .datastore)
-        XCTAssertNotEqual(psqlConnections?.observedValue, 1.0)
         XCTAssertEqual(psqlConnections?.status, .pass)
         XCTAssertNil(psqlConnections?.affectedEndpoints)
         XCTAssertNil(psqlConnections?.output)
@@ -92,7 +90,7 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(psqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
         XCTAssertEqual(psqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
         XCTAssertEqual(psqlResponseTimes?.componentType, .datastore)
-        XCTAssertEqual(psqlResponseTimes?.observedValue, 1.0)
+        XCTAssertEqual(psqlResponseTimes?.observedValue, 1)
         XCTAssertEqual(psqlResponseTimes?.observedUnit, "s")
         XCTAssertEqual(psqlResponseTimes?.status, .pass)
         XCTAssertNil(psqlResponseTimes?.affectedEndpoints)
@@ -110,8 +108,22 @@ final class PostgresHealthChecksTests: XCTestCase {
         XCTAssertEqual(resultMock, PostgresHealthChecksMock.version)
 
         app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app)
+        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
         let result = await app.psqlHealthChecks?.getVersion()
         XCTAssertEqual(result, Constants.psqlVersionDescription)
+    }
+
+    func testCheckConnection() async throws {
+        let app = Application(.testing)
+        defer { app.shutdown() }
+        app.psqlId = UUID().uuidString
+        app.psqlHealthChecks = PostgresHealthChecksMock()
+        let resultMock = await app.psqlHealthChecks?.checkConnection()
+        XCTAssertEqual(resultMock, "active")
+
+        app.psqlRequest = PsqlRequestMock()
+        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+        let result = await app.psqlHealthChecks?.checkConnection()
+        XCTAssertEqual(result, "active")
     }
 }

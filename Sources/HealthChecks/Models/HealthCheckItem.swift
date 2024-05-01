@@ -86,7 +86,7 @@ public struct HealthCheckItem: Content {
         affectedEndpoints: [String]? = nil,
         time: String? = nil,
         output: String? = nil,
-        links: [String : String]? = nil,
+        links: [String: String]? = nil,
         node: Int? = nil
     ) {
         self.componentId = componentId
@@ -103,11 +103,12 @@ public struct HealthCheckItem: Content {
     
     /// Example of `HealthCheckItem`
     public static var example: HealthCheckItem {
-        HealthCheckItem(
+        let observedValue: Double = 1234
+        return HealthCheckItem(
             componentId: "6fd416e0-8920-410f-9c7b-c479000f7227",
             componentType: .component,
-            observedValue: 1234,
-            observedUnit: "s",
+            observedValue: observedValue,
+            observedUnit: "ms",
             status: .pass,
             affectedEndpoints: ["/users/{userId}"],
             time: "2018-01-17T03:36:48Z",

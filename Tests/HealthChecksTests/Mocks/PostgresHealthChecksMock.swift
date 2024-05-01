@@ -60,4 +60,8 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
         ]
         return result
     }
+
+    public func checkConnection() async -> String {
+        "active"
+    }
 }

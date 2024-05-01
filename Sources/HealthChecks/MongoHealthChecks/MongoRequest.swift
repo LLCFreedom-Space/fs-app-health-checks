@@ -36,11 +36,14 @@ public struct MongoRequest: MongoRequestSendable {
         self.app = app
     }
 
+    // WARNING: - This method create new connection every time, when you use it
     /// Get mongo connection
     /// - Parameter url: `String`
     /// - Returns: `String`
     public func getConnection(by url: String) async throws -> String {
         app.mongoCluster = try? await MongoCluster(connectingTo: ConnectionSettings(url))
-        return "\(app.mongoCluster?.connectionState ?? .disconnected)"
+        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
+        await app.mongoCluster?.disconnect()
+        return connection
     }
 }

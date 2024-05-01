@@ -33,34 +33,34 @@ public struct HealthCheck: Content {
     /// Public version of the service
     /// Example: `1`
     public var version: String?
-    
+
     /// Release id of the service
     /// Example: `1.0.0`
     public var releaseId: String?
-    
+
     /// Array of notes relevant to current state of health
     /// Example: `["All ok"]`
     public var notes: [String]?
-    
+
     /// Raw error output, in case of `fail` or `warn` states
     /// Example: `"Redis database not exist"`
     public var output: String?
-    
+
     /// Dictionary of array that provides all health check item
     public var checks: [String: [HealthCheckItem]]?
 
     /// Dictionary of links for show more information
     /// Example: `["about": "https://example.com/about/service"]`
     public var links: [String: String]?
-    
+
     /// Is a unique identifier of the service, in the application scope
     /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
     public var serviceId: UUID?
-    
+
     /// Is a human-friendly description of the service
     /// Example: `"This service use for get application health"`
     public var description: String?
-    
+
     /// Initializer for HealthCheck
     /// - Parameters:
     ///   - status: optional `HealthCheckStatus`
@@ -78,8 +78,8 @@ public struct HealthCheck: Content {
         releaseId: String? = nil,
         notes: [String]? = nil,
         output: String? = nil,
-        checks: [String : [HealthCheckItem]]? = nil,
-        links: [String : String]? = nil,
+        checks: [String: [HealthCheckItem]]? = nil,
+        links: [String: String]? = nil,
         serviceId: UUID? = nil,
         description: String? = nil
     ) {
@@ -97,6 +97,7 @@ public struct HealthCheck: Content {
 
 /// Example of `HealthCheck`
 extension HealthCheck {
+    /// Structure instance of `HealthCheck`
     public static var example: HealthCheck {
         HealthCheck(
             status: .pass,

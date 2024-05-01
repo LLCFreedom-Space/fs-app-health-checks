@@ -30,26 +30,28 @@ import FluentPostgresDriver
 public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
-    
+
+    /// Instance of url as `String` for mongo
+    public let postgresDatabase: String
+
     /// Initializer for PostgresHealthChecks
     /// - Parameter app: `Application`
-    public init(app: Application) {
+    /// - Parameter postgresDatabase: `String`
+    public init(app: Application, postgresDatabase: String) {
         self.app = app
+        self.postgresDatabase = postgresDatabase
     }
 
     /// Get  psql version
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSince1970
-        let versionDescription = await getVersion()
+        let connectionDescription = await checkConnection()
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
-            // TODO: need get active connection
-            //            observedValue: "",
-            status: versionDescription.contains("PostgreSQL") ? .pass : .fail,
+            status: connectionDescription.contains("active") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !versionDescription.contains("PostgreSQL") ? versionDescription : nil,
+            output: !connectionDescription.contains("active") ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -79,7 +81,16 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// - Returns: `String`
     public func getVersion() async -> String {
         guard let result = try? await app.psqlRequest?.getVersionDescription() else {
-            return "ERROR: No connect to Postgres database"
+            return "ERROR: No connect to Postgres database for get version"
+        }
+        return result
+    }
+
+    /// Check connection for database
+    /// - Returns: `String`
+    public func checkConnection() async -> String {
+        guard let result = try? await app.psqlRequest?.checkConnection(for: postgresDatabase) else {
+            return "ERROR: No connect to Postgres database for check database"
         }
         return result
     }
