@@ -45,16 +45,15 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Get  mongo connection
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSince1970
         let connectionDescription = await getConnection()
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
             // TODO: need get active connection
             //            observedValue: "",
-            status: connectionDescription.contains("connecting") ? .pass : .fail,
+            status: connectionDescription.contains("connecti") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecting") ? connectionDescription : nil,
+            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -71,9 +70,9 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
             observedUnit: "ms",
-            status: connectionDescription.contains("connecting") ? .pass : .fail,
+            status: connectionDescription.contains("connecti") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecting") ? connectionDescription : nil,
+            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
             links: nil,
             node: nil
         )

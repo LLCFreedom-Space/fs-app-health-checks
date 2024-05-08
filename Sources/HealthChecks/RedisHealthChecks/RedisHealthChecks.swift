@@ -39,7 +39,6 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Get  redis connection
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSince1970
         let response = await ping()
         let result = HealthCheckItem(
             componentId: app.redisId,
