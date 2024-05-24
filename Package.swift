@@ -24,7 +24,7 @@ let package = Package(
         //  Vapor provider for RedisKit + RedisNIO
         .package(url: "https://github.com/vapor/redis.git", from: "5.0.0-alpha.2.2"),
         // 🐈 Mongo driver based on Swift NIO.
-        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", exact: "7.6.4"),
+        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.6.4"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
