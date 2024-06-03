@@ -26,7 +26,7 @@ import Vapor
 import MongoCore
 import MongoClient
 
-public struct MongoRequest: MongoRequestSendable {
+public final class MongoRequest: MongoRequestSendable {
     /// Instance of app as `Application`
     public let app: Application
 
