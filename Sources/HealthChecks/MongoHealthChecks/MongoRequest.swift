@@ -42,8 +42,8 @@ public final class MongoRequest: MongoRequestSendable {
     /// - Returns: `String`
     public func getConnection(by url: String) async throws -> String {
         await app.mongoCluster?.disconnect()
-        app.mongoCluster = try? MongoCluster(lazyConnectingTo: ConnectionSettings(url))
-        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
+        let mongoCluster = try? MongoCluster(lazyConnectingTo: ConnectionSettings(url))
+        let connection = "\(mongoCluster?.connectionState ?? .disconnected)"
         await app.mongoCluster?.disconnect()
         return connection
     }
