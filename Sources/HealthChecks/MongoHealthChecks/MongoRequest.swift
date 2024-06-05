@@ -41,13 +41,14 @@ public final class MongoRequest: MongoRequestSendable {
     /// - Parameter url: `String`
     /// - Returns: `String`
     public func getConnection(by url: String) async throws -> String {
-        await app.mongoCluster?.disconnect()
-        app.mongoCluster = nil
-        app.mongoCluster = try? MongoCluster(lazyConnectingTo: ConnectionSettings(url))
-        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
-        await app.mongoCluster?.disconnect()
-        app.mongoCluster = nil
+       let connect = try await app.client.get(URI(string: url))
+//        await app.mongoCluster?.disconnect()
+//        app.mongoCluster = nil
+//        app.mongoCluster = try? MongoCluster(lazyConnectingTo: ConnectionSettings(url))
+//        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
+//        await app.mongoCluster?.disconnect()
+//        app.mongoCluster = nil
 
-        return connection
+        return "\(connect.status)"
     }
 }
