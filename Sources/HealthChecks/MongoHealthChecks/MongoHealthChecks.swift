@@ -55,9 +55,9 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             componentType: .datastore,
             // TODO: need get active connection
             //            observedValue: "",
-            status: connectionDescription.contains("connecti") ? .pass : .fail,
+            status: connectionDescription.contains("ok") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
+            output: !connectionDescription.contains("ok") ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -74,9 +74,9 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
             observedUnit: "ms",
-            status: connectionDescription.contains("connecti") ? .pass : .fail,
+            status: connectionDescription.contains("ok") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
+            output: !connectionDescription.contains("ok") ? connectionDescription : nil,
             links: nil,
             node: nil
         )
