@@ -40,7 +40,7 @@ public final class MongoRequest: MongoRequestSendable {
     /// Get mongo connection
     /// - Parameter url: `String`
     /// - Returns: `String`
-    public func getConnection(by host: String, and port: Int) async throws -> String {
+    public func getConnection(by host: String, and port: String) async throws -> String {
 
        let connect = try await app.client.get(URI(string: "http://\(host):\(port)" + "?compressors=disabled&gssapiServiceName=mongodb"))
 //        await app.mongoCluster?.disconnect()

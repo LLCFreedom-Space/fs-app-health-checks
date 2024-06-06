@@ -33,14 +33,14 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Instance of host as `String` for mongo
     public let host: String
 
-    /// Instance of port as `Int` for mongo
-    public let port: Int
+    /// Instance of port as `String` for mongo
+    public let port: String
 
     /// Initializer for MongoHealthChecks
     /// - Parameters:
     ///   - app: `Application`
     ///   - url: `String`
-    public init(app: Application, host: String, port: Int) {
+    public init(app: Application, host: String, port: String) {
         self.app = app
         self.host = host
         self.port = port
