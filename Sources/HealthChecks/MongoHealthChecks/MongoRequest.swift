@@ -38,18 +38,12 @@ public final class MongoRequest: MongoRequestSendable {
 
     // WARNING: - This method create new connection every time, when you use it
     /// Get mongo connection
-    /// - Parameter url: `String`
+    /// - Parameter host: `String`
+    /// - Parameter port: `String`
     /// - Returns: `String`
     public func getConnection(by host: String, and port: String) async throws -> String {
-
-       let connect = try await app.client.get(URI(string: "http://\(host):\(port)" + "?compressors=disabled&gssapiServiceName=mongodb"))
-//        await app.mongoCluster?.disconnect()
-//        app.mongoCluster = nil
-//        app.mongoCluster = try? MongoCluster(lazyConnectingTo: ConnectionSettings(url))
-//        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
-//        await app.mongoCluster?.disconnect()
-//        app.mongoCluster = nil
-
+        let uri = URI(string: "http://\(host):\(port)" + "?compressors=disabled&gssapiServiceName=mongodb")
+        let connect = try await app.client.get(uri)
         return "\(connect.status)"
     }
 }

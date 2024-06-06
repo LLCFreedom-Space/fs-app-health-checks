@@ -27,6 +27,8 @@ import Vapor
 /// Groups func for get mongo request
 public protocol MongoRequestSendable {
     /// Get connection description
+    /// - Parameter host: `String`
+    /// - Parameter port: `String`
     /// - Returns: `String`
     func getConnection(by host: String, and port: String) async throws -> String
 }
