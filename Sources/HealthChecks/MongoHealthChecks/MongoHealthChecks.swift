@@ -30,16 +30,20 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Instance of app as `Application`
     public let app: Application
 
-    /// Instance of url as `String` for mongo
-    public let url: String
-    
+    /// Instance of host as `String` for mongo
+    public let host: String
+
+    /// Instance of port as `Int` for mongo
+    public let port: Int
+
     /// Initializer for MongoHealthChecks
     /// - Parameters:
     ///   - app: `Application`
     ///   - url: `String`
-    public init(app: Application, url: String) {
+    public init(app: Application, host: String, port: Int) {
         self.app = app
-        self.url = url
+        self.host = host
+        self.port = port
     }
     
     /// Get  mongo connection
@@ -82,7 +86,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Get connection of mongo
     /// - Returns: `String`
     public func getConnection() async -> String {
-        guard let result = try? await app.mongoRequest?.getConnection(by: url) else {
+        guard let result = try? await app.mongoRequest?.getConnection(by: host, and: port) else {
            return "disconnected"
         }
         return result

@@ -28,5 +28,5 @@ import Vapor
 public protocol MongoRequestSendable {
     /// Get connection description
     /// - Returns: `String`
-    func getConnection(by url: String) async throws -> String
+    func getConnection(by host: String, and port: Int) async throws -> String
 }
