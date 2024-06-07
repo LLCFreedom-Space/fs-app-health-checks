@@ -42,7 +42,7 @@ public final class MongoRequest: MongoRequestSendable {
     /// - Parameter port: `String`
     /// - Returns: `String`
     public func getConnection(by host: String, and port: String) async throws -> String {
-        let uri = URI(string: "http://\(host):\(port)" + "?compressors=disabled&gssapiServiceName=mongodb")
+        let uri = URI(string: "https://\(host):\(port)" + "?compressors=disabled&gssapiServiceName=mongodb")
         let connect = try await app.client.get(uri)
         return "\(connect.status)"
     }
