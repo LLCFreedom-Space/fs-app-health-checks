@@ -42,15 +42,10 @@ public final class MongoRequest: MongoRequestSendable {
     /// - Parameter port: `String`
     /// - Returns: `String`
     public func getConnection(by host: String, and port: String) async throws -> String {
-        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
+        let connection = "\(app.healthCheckMongoCluster?.connectionState ?? .disconnected)"
+        if connection.contains("disconnected") {
+            app.logger.error("ERROR: MongoDB not connect")
+        }
         return connection
-    }
-}
-
-extension Application {
-    /// Initialize MongoDB
-    /// - Parameter connectionString: URI as `String`. Example: "mongodb://localhost/myapp
-    public func initializeMongoClusterLibrary(connectionString: String) async throws {
-        self.mongoCluster = try await MongoCluster(connectingTo: ConnectionSettings(connectionString))
     }
 }
