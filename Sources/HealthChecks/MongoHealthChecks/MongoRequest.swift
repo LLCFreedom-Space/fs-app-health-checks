@@ -42,8 +42,15 @@ public final class MongoRequest: MongoRequestSendable {
     /// - Parameter port: `String`
     /// - Returns: `String`
     public func getConnection(by host: String, and port: String) async throws -> String {
-        let uri = URI(string: "https://\(host):\(port)" + "?compressors=disabled&gssapiServiceName=mongodb")
-        let connect = try await app.client.get(uri)
-        return "\(connect.status)"
+        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
+        return connection
+    }
+}
+
+extension Application {
+    /// Initialize MongoDB
+    /// - Parameter connectionString: URI as `String`. Example: "mongodb://localhost/myapp
+    public func initializeMongoCluster(connectionString: String) async throws {
+        self.mongoCluster = try await MongoCluster(connectingTo: ConnectionSettings(connectionString))
     }
 }
