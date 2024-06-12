@@ -50,7 +50,7 @@ public final class MongoRequest: MongoRequestSendable {
 extension Application {
     /// Initialize MongoDB
     /// - Parameter connectionString: URI as `String`. Example: "mongodb://localhost/myapp
-    public func initializeMongoCluster(connectionString: String) async throws {
+    public func initializeMongoClusterLibrary(connectionString: String) async throws {
         self.mongoCluster = try await MongoCluster(connectingTo: ConnectionSettings(connectionString))
     }
 }
