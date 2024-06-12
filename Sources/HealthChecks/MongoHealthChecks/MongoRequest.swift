@@ -41,10 +41,10 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Parameter url: `String`
     /// - Returns: `String`
     public func getConnection(by url: String) async throws -> String {
-        await app.mongoCluster?.disconnect()
-        app.mongoCluster = try? MongoCluster(lazyConnectingTo: ConnectionSettings(url))
-        let connection = "\(app.mongoCluster?.connectionState ?? .disconnected)"
-        await app.mongoCluster?.disconnect()
-        return connection
+        let connectionState = "\(app.healthCheckMongoCluster?.connectionState ?? .disconnected)"
+        if connectionState.contains("disconnected") {
+            app.logger.error("ERROR: MongoCluster not connection")
+        }
+        return connectionState
     }
 }

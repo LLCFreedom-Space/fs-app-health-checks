@@ -234,8 +234,14 @@ extension Application {
     }
 
     /// Variable for `MongoDatabase`
-    public var mongoCluster: MongoCluster? {
+    public var healthCheckMongoCluster: MongoCluster? {
         get { storage[MongoClusterKey.self] }
         set { storage[MongoClusterKey.self] = newValue }
+    }
+
+    /// Initialize MongoDB
+    /// - Parameter connectionString: URI as `String`. Example: "mongodb://localhost/myapp
+    public func initializeHealthCheckMongoCluster(connectionString: String) async throws {
+        self.healthCheckMongoCluster = try await MongoCluster(connectingTo: ConnectionSettings(connectionString))
     }
 }
