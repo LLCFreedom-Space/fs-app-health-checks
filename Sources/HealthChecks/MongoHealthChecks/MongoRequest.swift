@@ -41,10 +41,25 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Parameter url: `String`
     /// - Returns: `String`
     public func getConnection(by url: String) async throws -> String {
-        let connectionState = "\(app.healthCheckMongoCluster?.connectionState ?? .disconnected)"
-        if connectionState.contains("disconnected") {
-            app.logger.error("ERROR: MongoCluster not connection")
+        guard let healthCheckMongoCluster = app.healthCheckMongoCluster else {
+            app.logger.error("❌ HealthCheckMongoCluster not installed in app")
+            return "disconnected"
         }
-        return connectionState
+        switch healthCheckMongoCluster.connectionState {
+        case .connecting:
+            app.logger.debug("✅ HealthCheckMongoCluster connection")
+            return "connecting"
+        case .connected(connectionCount: let connectionCount):
+            app.logger.debug("✅ HealthCheckMongoCluster connection and connectionCount: \(connectionCount)")
+            return "connecting"
+        case .disconnected:
+            app.logger.error("❌ HealthCheckMongoCluster is disconnected and try to reconnect")
+            try await healthCheckMongoCluster.reconnect()
+            return "disconnected"
+        case .closed:
+            app.logger.error("❌ HealthCheckMongoCluster is closed and try to reconnect")
+            try await healthCheckMongoCluster.reconnect()
+            return "closed"
+        }
     }
 }
