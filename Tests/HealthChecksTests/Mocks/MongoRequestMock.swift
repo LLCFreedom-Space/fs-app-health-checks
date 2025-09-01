@@ -26,7 +26,7 @@ import Vapor
 @testable import HealthChecks
 
 public struct MongoRequestMock: MongoRequestSendable {
-    public func getConnection(by url: String) async throws -> String {
+    public func getConnection(by url: String) async -> String {
         "connecting"
     }
 }

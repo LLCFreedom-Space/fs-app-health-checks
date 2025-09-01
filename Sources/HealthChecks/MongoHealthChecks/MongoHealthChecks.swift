@@ -82,10 +82,11 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Get connection of mongo
     /// - Returns: `String`
     public func getConnection() async -> String {
-        guard let result = try? await app.mongoRequest?.getConnection(by: url) else {
-           return "disconnected"
+        guard let mongoRequest = app.mongoRequest else {
+            app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
+            return "disconnected"
         }
-        return result
+        return await mongoRequest.getConnection(by: url)
     }
 
     /// Check with setup options
