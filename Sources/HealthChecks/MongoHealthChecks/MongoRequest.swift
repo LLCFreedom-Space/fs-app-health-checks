@@ -42,23 +42,23 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Returns: `String`
     public func getConnection(by url: String) async -> String {
         guard let healthCheckMongoCluster = app.healthCheckMongoCluster else {
-            app.logger.error("❌ HealthCheckMongoCluster not installed in app")
+            app.logger.error("❌ HealthCheckMongoCluster not installed in app. Check your configuration, need to set `app.healthCheckMongoCluster")
             return "disconnected"
         }
-        let dbName = healthCheckMongoCluster.settings.targetDatabase ?? "unknown"
+        let dbName = healthCheckMongoCluster.settings.targetDatabase ?? "unknown_database_name"
         switch healthCheckMongoCluster.connectionState {
         case .connecting:
-            app.logger.debug("✅ HealthCheckMongoCluster connection")
+            app.logger.debug("✅ HealthCheckMongoCluster connection.")
             return "connecting"
         case .connected(connectionCount: let connectionCount):
-            app.logger.debug("✅ HealthCheckMongoCluster connection and connectionCount: \(connectionCount)")
-            return "connecting"
+            app.logger.debug("✅ HealthCheckMongoCluster connection and connectionCount: \(connectionCount).")
+            return "connected"
         case .disconnected:
-            app.logger.error("❌ HealthCheckMongoCluster is disconnected and try to reconnect to: \(dbName)")
+            app.logger.error("❌ HealthCheckMongoCluster is disconnected and try to reconnect to: \(dbName).")
             await reconnect(mongoCluster: healthCheckMongoCluster)
             return "disconnected"
         case .closed:
-            app.logger.error("❌ HealthCheckMongoCluster is closed and try to reconnect to: \(dbName)")
+            app.logger.error("❌ HealthCheckMongoCluster is closed and try to reconnect to: \(dbName).")
             await reconnect(mongoCluster: healthCheckMongoCluster)
             return "closed"
         }
@@ -74,10 +74,10 @@ public struct MongoRequest: MongoRequestSendable {
     ///     visibility of the issue in logs.
     private func reconnect(mongoCluster: MongoCluster) async {
         do {
-            app.logger.info("🔄 MongoCluster.reconnect is called")
+            app.logger.info("🔄 MongoCluster.reconnect is called.")
             try await mongoCluster.reconnect()
         } catch {
-            app.logger.error("MongoCluster.reconnect is failed error: \(error), localized description: \(error.localizedDescription)")
+            app.logger.error("MongoCluster.reconnect is failed error: \(error), localized description: \(error.localizedDescription).")
         }
     }
 }
