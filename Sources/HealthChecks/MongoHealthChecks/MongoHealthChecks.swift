@@ -47,15 +47,11 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     public func connection() async -> HealthCheckItem {
         let connectionDescription = await getConnection()
         let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
-        var activeConnection: Double = 0
-        if connectionDescription.contains("connected") {
-            print(connectionDescription)
-//            activeConnection = connectionDescription.contains("connected")
-        }
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
-            observedValue: activeConnection,
+            // TODO: need get active connection
+            //            observedValue: "",
             status: connectionStatus ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: connectionStatus ? connectionDescription : nil,
