@@ -46,14 +46,19 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
         let connectionDescription = await getConnection()
+        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
+        var activeConnection: Double = 0
+        if connectionDescription.contains("connected") {
+            print(connectionDescription)
+//            activeConnection = connectionDescription.contains("connected")
+        }
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
-            // TODO: need get active connection
-            //            observedValue: "",
-            status: connectionDescription.contains("connecti") ? .pass : .fail,
+            observedValue: activeConnection,
+            status: connectionStatus ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
+            output: connectionStatus ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -65,14 +70,15 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     public func responseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSince1970
         let connectionDescription = await getConnection()
+        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
             observedUnit: "ms",
-            status: connectionDescription.contains("connecti") ? .pass : .fail,
+            status: connectionStatus ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
+            output: connectionStatus ? connectionDescription : nil,
             links: nil,
             node: nil
         )
