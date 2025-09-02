@@ -74,6 +74,7 @@ public struct MongoRequest: MongoRequestSendable {
     ///     visibility of the issue in logs.
     private func reconnect(mongoCluster: MongoCluster) async {
         do {
+            app.logger.info("⏳ MongoCluster.reconnect is called")
             try await mongoCluster.reconnect()
         } catch {
             app.logger.error("MongoCluster.reconnect is failed error: \(error), localized description: \(error.localizedDescription)")
