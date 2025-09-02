@@ -46,14 +46,15 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// - Returns: `HealthCheckItem`
     public func connection() async -> HealthCheckItem {
         let connectionDescription = await getConnection()
+        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
             // TODO: need get active connection
             //            observedValue: "",
-            status: connectionDescription.contains("connecti") ? .pass : .fail,
+            status: connectionStatus ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
+            output: connectionStatus ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -65,14 +66,15 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     public func responseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSince1970
         let connectionDescription = await getConnection()
+        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
             observedUnit: "ms",
-            status: connectionDescription.contains("connecti") ? .pass : .fail,
+            status: connectionStatus ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connecti") ? connectionDescription : nil,
+            output: connectionStatus ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -82,10 +84,11 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Get connection of mongo
     /// - Returns: `String`
     public func getConnection() async -> String {
-        guard let result = try? await app.mongoRequest?.getConnection(by: url) else {
-           return "disconnected"
+        guard let mongoRequest = app.mongoRequest else {
+            app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
+            return "disconnected"
         }
-        return result
+        return await mongoRequest.getConnection(by: url)
     }
 
     /// Check with setup options

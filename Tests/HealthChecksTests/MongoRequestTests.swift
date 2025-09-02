@@ -29,7 +29,7 @@ final class MongoRequestTests: XCTestCase {
     func testGetConnection() async throws {
         let app = Application(.testing)
         defer { app.shutdown() }
-        let result = try await MongoRequest(app: app).getConnection(by: "url")
+        let result = await MongoRequest(app: app).getConnection(by: "url")
         XCTAssertEqual(result, "disconnected")
     }
 }

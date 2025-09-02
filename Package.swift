@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         // 💧 A server-side Swift web framework.
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.115.0"),
         // 🖋 Swift ORM (queries, models, and relations) for NoSQL and SQL databases.
         .package(url: "https://github.com/vapor/fluent.git", from: "4.1.0"),
         // 🐘 Swift ORM (queries, models, relations, etc) built on PostgreSQL.
