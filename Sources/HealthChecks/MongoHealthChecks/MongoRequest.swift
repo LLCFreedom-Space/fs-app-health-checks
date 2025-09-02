@@ -56,11 +56,11 @@ public struct MongoRequest: MongoRequestSendable {
         case .disconnected:
             app.logger.error("❌ HealthCheckMongoCluster is disconnected and try to reconnect to: \(dbName).")
             await reconnect(mongoCluster: healthCheckMongoCluster)
-            return "disconnected"
+            return "\(healthCheckMongoCluster.connectionState)"
         case .closed:
             app.logger.error("❌ HealthCheckMongoCluster is closed and try to reconnect to: \(dbName).")
             await reconnect(mongoCluster: healthCheckMongoCluster)
-            return "closed"
+            return "\(healthCheckMongoCluster.connectionState)"
         }
     }
 
