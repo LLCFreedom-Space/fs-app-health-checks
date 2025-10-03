@@ -239,9 +239,36 @@ extension Application {
         set { storage[MongoClusterKey.self] = newValue }
     }
 
-    /// Initialize MongoDB
-    /// - Parameter connectionString: URI as `String`. Example: "mongodb://localhost/myapp
-    public func initializeHealthCheckMongoCluster(connectionString: String) async throws {
+    /// Connects to a cluster immediately, and awaits connection readiness.
+    ///
+    /// - Parameters:
+    ///     - settings: The details used to set up a connection to, and authenticate with MongoDB
+    ///     - allowFailure: If `true`, this method will always succeed - unless your settings are malformed.
+    ///     - eventLoopGroup: If provided, an existing ``EventLoopGroup`` can be reused. By default, a new one will be created
+    ///
+    /// ```swift
+    /// let cluster = try await MongoCluster(
+    ///     connectingTo: ConnectionSettings("mongodb://localhost")
+    /// )
+    /// ```
+    public func initializeMongoCluster(connectionString: String) async throws {
         self.healthCheckMongoCluster = try await MongoCluster(connectingTo: ConnectionSettings(connectionString))
+    }
+
+    /// Connects to a cluster lazily, which means you don't know if the connection was successful until you start querying. This is useful when you need a cluster synchronously to query asynchronously
+    ///
+    /// This initializer also does not need to be `await`ed, making it useful for setting up an application, even under unreliable network conditions.
+    ///
+    /// - Parameters:
+    ///     - settings: The details used to set up a connection to, and authenticate with MongoDB
+    ///     - eventLoopGroup: If provided, an existing ``EventLoopGroup`` can be reused. By default, a new one will be created
+    ///
+    /// ```swift
+    /// let cluster = try await MongoCluster(
+    ///     lazyConnectingTo: ConnectionSettings("mongodb://localhost")
+    /// )
+    /// ```
+    public func initializeLazyMongoCluster(connectionString: String) async throws {
+        self.healthCheckMongoCluster = try MongoCluster(lazyConnectingTo: ConnectionSettings(connectionString))
     }
 }
