@@ -1,4 +1,4 @@
-name: Deploy DocC macOS
+name: Deploy DocC
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macOS-13
+    runs-on: macos-14
 
     steps:
       - name: Checkout 🛎️
@@ -28,16 +28,17 @@ jobs:
         run: |
           swift package resolve
 
+          # Збираємо DocC для macOS
           xcodebuild docbuild \
             -scheme fs-app-health-checks \
             -derivedDataPath /tmp/docbuild-macos
-
           xcrun docc process-archive \
             transform-for-static-hosting \
             /tmp/docbuild-macos/Build/Products/Debug/fs_app_health_checks.doccarchive \
             --output-path docs \
             --hosting-base-path fs-app-health-checks
 
+          # Редірект на документацію
           echo '<meta http-equiv="refresh" content="0; URL=./documentation/healthchecks/">' > docs/index.html
 
       - name: Upload artifact 📜
