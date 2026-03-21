@@ -24,11 +24,11 @@ jobs:
     runs-on: macos-14
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build All DocC 🛠
         run: |
           swift package resolve;
-          xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS,OS=16';
+          xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS';
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/HealthChecks.doccarchive \
             --output-path docs \
@@ -36,10 +36,10 @@ jobs:
           echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html;
 
       - name: Upload artifact 📜
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           # Upload docs directory
           path: 'docs'
       - name: Deploy to GitHub Pages 🐙
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
