@@ -1,45 +1,50 @@
-name: Deploy DocC
+name: Deploy DocC macOS
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  deploy-macos:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-13
+    runs-on: macOS-13
+
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
-      - name: Build All DocC 🛠
+        uses: actions/checkout@v4
+
+      - name: Build macOS DocC 🛠
         run: |
-          swift package resolve;
-          xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=iOS,OS=16';
-          $(xcrun --find docc) process-archive \
-            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/HealthChecks.doccarchive \
+          swift package resolve
+
+          xcodebuild docbuild \
+            -scheme fs-app-health-checks \
+            -derivedDataPath /tmp/docbuild-macos
+
+          xcrun docc process-archive \
+            transform-for-static-hosting \
+            /tmp/docbuild-macos/Build/Products/Debug/fs_app_health_checks.doccarchive \
             --output-path docs \
-            --hosting-base-path fs-app-health-checks;
-          echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html;
+            --hosting-base-path fs-app-health-checks
+
+          echo '<meta http-equiv="refresh" content="0; URL=./documentation/healthchecks/">' > docs/index.html
 
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v1
         with:
-          # Upload docs directory
-          path: 'docs'
+          path: docs
+
       - name: Deploy to GitHub Pages 🐙
         id: deployment
         uses: actions/deploy-pages@v1
