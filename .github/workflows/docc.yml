@@ -24,7 +24,9 @@ jobs:
           xcodebuild docbuild \
             -scheme fs-app-health-checks \
             -derivedDataPath /tmp/docbuild \
-            -destination 'generic/platform=macOS'
+            -destination 'generic/platform=macOS'\
+            -skipPackagePluginValidation \
+            DOCC_EXCLUDE_DEPENDENCIES=YES
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting \
             /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
