@@ -18,40 +18,22 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
-      - name: Resolve Packages 📦
-        run: swift package resolve
-      - name: Determine Runner Architecture 🖥
-        id: arch
+
+      - name: Build Documentation 📚
         run: |
-          ARCH=$(uname -m)
-          echo "runner_arch=$ARCH" >> $GITHUB_OUTPUT
-
-      - name: Build DocC 🛠
+          swift package --allow-writing-to-package-directory \
+            generate-documentation --target HealthChecks \
+            --disable-indexing \
+            --transform-for-static-hosting \
+            --hosting-base-path fs-app-health-checks \
+            --output-path ./docs
+      - name: Add Redirect Index 🔗
         run: |
-          export DOCC_EXCLUDE_DEPENDENCIES=YES
-          echo "Building DocC for architecture: ${{ steps.arch.outputs.runner_arch }}"
-
-          xcodebuild docbuild \
-            -scheme fs-app-health-checks \
-            -derivedDataPath /tmp/docbuild \
-            -destination "platform=macOS,arch=${{ steps.arch.outputs.runner_arch }}" \
-            -skipPackagePluginValidation
-
-      - name: Transform DocC Archive for GitHub Pages 🔗
-        run: |
-          $(xcrun --find docc) process-archive \
-            transform-for-static-hosting \
-            /tmp/docbuild/Build/Products/Debug/fs-app-health-checks.doccarchive \
-            --output-path docs \
-            --hosting-base-path fs-app-health-checks
-
           echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html
-
       - name: Upload artifact 📜
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: docs
-
       - name: Deploy to GitHub Pages 🐙
         id: deployment
         uses: actions/deploy-pages@v4
