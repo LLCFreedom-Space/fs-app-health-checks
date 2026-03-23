@@ -26,7 +26,7 @@ jobs:
             -derivedDataPath /tmp/docbuild \
             -destination 'generic/platform=macOS'\
             -skipPackagePluginValidation \
-            DOCC_EXCLUDE_DEPENDENCIES=YES
+            -disable-concurrent-docc
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting \
             /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
