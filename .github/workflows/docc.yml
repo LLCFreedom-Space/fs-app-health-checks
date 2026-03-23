@@ -11,32 +11,47 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
+    runs-on: macos-14
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-14
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
+      - name: Resolve Packages 📦
+        run: swift package resolve
+      - name: Determine Runner Architecture 🖥
+        id: arch
+        run: |
+          ARCH=$(uname -m)
+          echo "runner_arch=$ARCH" >> $GITHUB_OUTPUT
+
       - name: Build DocC 🛠
         run: |
-          swift package resolve
+          export DOCC_EXCLUDE_DEPENDENCIES=YES
+          echo "Building DocC for architecture: ${{ steps.arch.outputs.runner_arch }}"
+
           xcodebuild docbuild \
             -scheme fs-app-health-checks \
             -derivedDataPath /tmp/docbuild \
-            -destination 'generic/platform=macOS'\
-            -skipPackagePluginValidation \
-            -disable-concurrent-docc
+            -destination "platform=macOS,arch=${{ steps.arch.outputs.runner_arch }}" \
+            -skipPackagePluginValidation
+
+      - name: Transform DocC Archive for GitHub Pages 🔗
+        run: |
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting \
-            /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
+            /tmp/docbuild/Build/Products/Debug/fs-app-health-checks.doccarchive \
             --output-path docs \
             --hosting-base-path fs-app-health-checks
+
           echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html
+
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v4
         with:
           path: docs
+
       - name: Deploy to GitHub Pages 🐙
         id: deployment
         uses: actions/deploy-pages@v4
