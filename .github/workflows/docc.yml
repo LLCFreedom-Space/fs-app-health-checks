@@ -1,4 +1,4 @@
-name: Deploy HealthChecks DocC
+name: Deploy DocC
 
 on:
   push:
@@ -9,55 +9,52 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   deploy:
-    runs-on: macos-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: macos-14
+
     steps:
-      - name: Checkout repository
+      - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Set up Swift
-        uses: fwal/setup-swift@v1
-        with:
-          swift-version: "5.9"
-
-      - name: Find or create DocC catalog
+      - name: Build DocC 🛠
         run: |
-          DOCS_DIR="Sources/HealthChecks/HealthChecks.docc"
-          if [ ! -d "$DOCS_DIR" ]; then
-            echo "📂 DocC catalog not found. Creating default catalog..."
-            mkdir -p "$DOCS_DIR"
-            cat > "$DOCS_DIR/Info.plist" <<EOF
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0">
-            <dict>
-              <key>CFBundleIdentifier</key>
-              <string>com.example.HealthChecks</string>
-              <key>CFBundleName</key>
-              <string>HealthChecks</string>
-              <key>CFBundleVersion</key>
-              <string>1.0</string>
-            </dict>
-            </plist>
-            EOF
-            echo "✅ Default DocC catalog created at $DOCS_DIR"
-          else
-            echo "📂 DocC catalog found at $DOCS_DIR"
-          fi
+          # Створюємо тимчасову папку для збірки, щоб уникнути проблем з правами
+          TMP_DOCS=$(mktemp -d)
+          echo "Using temporary docs folder: $TMP_DOCS"
 
-      - name: Build DocC archive
-        run: |
-          DOCS_DIR=$(find Sources/HealthChecks -name "*.docc" -type d | head -n 1)
-          ARCHIVE_OUT=".build/docs/HealthChecks.doccarchive"
-          mkdir -p "$(dirname "$ARCHIVE_OUT")"
-          echo "🔨 Building DocC archive from $DOCS_DIR..."
-          xcrun docc convert "$DOCS_DIR" --output "$ARCHIVE_OUT"
+          xcodebuild docbuild \
+            -scheme fs-app-health-checks \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath /tmp/docbuild \
+            DOCC_EXCLUDE_DEPENDENCIES=YES
 
-      - name: Deploy DocC to GitHub Pages
-        uses: actions/upload-pages-artifact@v4
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting \
+            /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
+            --output-path "$TMP_DOCS" \
+            --hosting-base-path fs-app-health-checks
+
+          # Копіюємо в docs для GitHub Pages
+          rm -rf docs
+          mkdir -p docs
+          cp -R "$TMP_DOCS"/* docs/
+
+          # Додаємо редірект на index.html
+          echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
+
+      - name: Upload artifact 📜
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: .build/docs/HealthChecks.doccarchive
+          path: docs
 
-      - name: Publish to GitHub Pages
-        uses: actions/deploy-pages@v1
+      - name: Deploy to GitHub Pages 🚀
+        id: deployment
+        uses: actions/deploy-pages@v4
