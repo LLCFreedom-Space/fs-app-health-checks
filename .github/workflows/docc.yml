@@ -37,6 +37,8 @@ jobs:
           xcodebuild docbuild \
             -scheme fs-app-health-checks \
             -destination 'generic/platform=macOS' \
+            SKIP_BUILDING_DEPENDENCIES=YES \
+            DOCC_INCLUDE_EXTENDED_TYPES=NO \
             OTHER_DOCC_FLAGS="--transform-for-static-hosting --hosting-base-path fs-app-health-checks" \
             DOCC_OUTPUT_DIR=./docs
 
