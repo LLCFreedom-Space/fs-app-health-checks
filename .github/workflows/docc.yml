@@ -1,4 +1,4 @@
-name: Deploy DocC
+name: Deploy HealthChecks DocC
 
 on:
   push:
@@ -24,34 +24,32 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Build DocC 🛠
+      - name: Build HealthChecks DocC 🛠
         run: |
-          # Створюємо тимчасову папку для збірки, щоб уникнути проблем з правами
           TMP_DOCS=$(mktemp -d)
           echo "Using temporary docs folder: $TMP_DOCS"
 
-          xcodebuild docbuild \
-            -scheme fs-app-health-checks \
-            -destination 'generic/platform=macOS' \
-            -derivedDataPath /tmp/docbuild \
-            DOCC_EXCLUDE_DEPENDENCIES=YES
+          # 🔹 Збираємо тільки HealthChecks без залежностей
+          xcrun docc convert Sources/HealthChecks/HealthChecks.docc \
+            --output .build/docs/HealthChecks.doccarchive
 
-          $(xcrun --find docc) process-archive \
+          # 🔹 Трансформація для статичного хостингу
+          xcrun docc process-archive \
             transform-for-static-hosting \
-            /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
+            .build/docs/HealthChecks.doccarchive \
             --output-path "$TMP_DOCS" \
             --hosting-base-path fs-app-health-checks
 
-          # Копіюємо в docs для GitHub Pages
+          # 🔹 Копіюємо готову документацію в docs
           rm -rf docs
           mkdir -p docs
           cp -R "$TMP_DOCS"/* docs/
 
-          # Додаємо редірект на index.html
+          # 🔹 Редірект на index.html
           echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
 
       - name: Upload artifact 📜
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v2
         with:
           path: docs
 
