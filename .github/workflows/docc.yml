@@ -34,7 +34,7 @@ jobs:
       - name: Show Schemes 🔍
         run: xcodebuild -list -quiet
 
-      # 4. Генерація symbol graphs тільки для HealthChecks
+      # 4. Генерація symbol graphs для HealthChecks
       - name: Generate symbol graphs for HealthChecks
         run: |
           echo "Generating symbol graphs for HealthChecks..."
@@ -44,35 +44,36 @@ jobs:
             -Xswiftc -emit-symbol-graph-dir \
             -Xswiftc .build/symbol-graphs
 
-      # 5. Build Documentation тільки для HealthChecks без залежностей
+      # 5. Мінімальна збірка HealthChecks для DocC
+      - name: Build HealthChecks Target 🔨
+        run: |
+          echo "Building HealthChecks target for DocC..."
+          swift build --target HealthChecks --quiet
+
+      # 6. Build Documentation для HealthChecks
       - name: Build Documentation for HealthChecks 📚
         run: |
-          if [ -d ".build/symbol-graphs" ]; then
-            echo "Building DocC documentation for HealthChecks..."
-            xcodebuild docbuild \
-              -scheme fs-app-health-checks \
-              -destination 'generic/platform=macOS' \
-              SKIP_BUILDING_DEPENDENCIES=YES \
-              OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/symbol-graphs --transform-for-static-hosting --hosting-base-path fs-app-health-checks" \
-              DOCC_OUTPUT_DIR=./docs \
-              -quiet
-          else
-            echo "Symbol graphs not found, skipping DocC build."
-          fi
+          echo "Generating DocC documentation..."
+          xcodebuild docbuild \
+            -scheme fs-app-health-checks \
+            -destination 'platform=macOS' \
+            OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/symbol-graphs --transform-for-static-hosting --hosting-base-path fs-app-health-checks" \
+            DOCC_OUTPUT_DIR=./docs \
+            -quiet
 
-      # 6. Додаємо redirect index для GitHub Pages
+      # 7. Додаємо redirect index для GitHub Pages
       - name: Add Redirect Index 🔗
         run: |
           mkdir -p docs
           echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
 
-      # 7. Завантаження артефакту
+      # 8. Завантаження артефакту
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
-      # 8. Деплой на GitHub Pages
+      # 9. Деплой на GitHub Pages
       - name: Deploy to GitHub Pages 🐙
         id: deployment
         uses: actions/deploy-pages@v4
