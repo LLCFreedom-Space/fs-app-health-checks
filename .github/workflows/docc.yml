@@ -31,7 +31,7 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode.app
 
       # 3. Build + symbol graphs
-      - name: Build & Generate Symbol Graphs
+      - name: Build & Generate Symbol Graphs 🔨
         run: |
           echo "Building and generating symbol graphs..."
           mkdir -p .build/symbol-graphs
@@ -42,38 +42,53 @@ jobs:
             -Xswiftc .build/symbol-graphs \
             --quiet
 
-      # 4. Run DocC directly
+      # 4. Generate DocC
       - name: Generate DocC 📚
         run: |
-          echo "Running docc convert..."
+          echo "🔍 Searching for DocC catalog..."
 
-          DOCC_CATALOG=$(find . -name "*.docc" | head -n 1)
+          DOCC_CATALOG=$(find Sources \
+            -type d \
+            -name "*.docc" \
+            -not -path "*/.build/*" \
+            -not -path "*/checkouts/*" \
+            | head -n 1)
 
           if [ -z "$DOCC_CATALOG" ]; then
-            echo "❌ No .docc catalog found"
+            echo "❌ No .docc catalog found in Sources/"
             exit 1
           fi
 
-          echo "Using catalog: $DOCC_CATALOG"
+          echo "✅ Using DocC catalog: $DOCC_CATALOG"
 
-          docc convert "$DOCC_CATALOG" \
+          echo "Running docc convert..."
+          xcrun docc convert "$DOCC_CATALOG" \
             --additional-symbol-graph-dir .build/symbol-graphs \
             --transform-for-static-hosting \
             --hosting-base-path fs-app-health-checks \
             --output-path ./docs
 
-      # 5. Redirect index
+      # 5. Перевірка що docs згенерились
+      - name: Verify Docs ✅
+        run: |
+          if [ ! -d "docs" ] || [ -z "$(ls -A docs)" ]; then
+            echo "❌ Docs generation failed or empty"
+            exit 1
+          fi
+          echo "✅ Docs generated successfully"
+
+      # 6. Redirect index
       - name: Add Redirect Index 🔗
         run: |
           echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
 
-      # 6. Upload artifact
+      # 7. Upload artifact
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
-      # 7. Deploy
+      # 8. Deploy
       - name: Deploy to GitHub Pages 🐙
         id: deployment
         uses: actions/deploy-pages@v4
