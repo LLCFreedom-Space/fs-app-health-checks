@@ -55,7 +55,7 @@ jobs:
           xcrun docc convert "$DOCS_DIR" --output "$ARCHIVE_OUT"
 
       - name: Deploy DocC to GitHub Pages
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v4
         with:
           path: .build/docs/HealthChecks.doccarchive
 
