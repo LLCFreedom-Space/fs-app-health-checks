@@ -36,7 +36,6 @@ jobs:
             -scheme fs-app-health-checks \
             -destination 'generic/platform=macOS' \
             -derivedDataPath /tmp/docbuild \
-            -disable-cmo \
             DOCC_EXCLUDE_DEPENDENCIES=YES
 
           $(xcrun --find docc) process-archive \
