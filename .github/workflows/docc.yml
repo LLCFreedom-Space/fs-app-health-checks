@@ -31,21 +31,22 @@ jobs:
       - name: Show Schemes 🔍
         run: xcodebuild -list
 
-      - name: Generate symbol graphs
+      - name: Generate symbol graphs for HealthChecks
         run: |
           swift build --target HealthChecks \
             -Xswiftc -emit-symbol-graph \
             -Xswiftc -emit-symbol-graph-dir \
-            -Xswiftc .build/symbol-graphs
+            -Xswiftc .build/symbol-graphs \
+            --skip-build-dependencies
 
-      - name: Build Documentation 📚
-        run: >
-          xcodebuild docbuild
-          -scheme fs-app-health-checks
-          -destination 'generic/platform=macOS'
-          SKIP_BUILDING_DEPENDENCIES=YES
-          OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/symbol-graphs --transform-for-static-hosting --hosting-base-path fs-app-health-checks"
-          DOCC_OUTPUT_DIR=./docs
+      - name: Build Documentation for HealthChecks 📚
+        run: |
+          xcodebuild docbuild \
+            -scheme fs-app-health-checks \
+            -destination 'generic/platform=macOS' \
+            SKIP_BUILDING_DEPENDENCIES=YES \
+            OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/symbol-graphs --transform-for-static-hosting --hosting-base-path fs-app-health-checks" \
+            DOCC_OUTPUT_DIR=./docs
 
       - name: Add Redirect Index 🔗
         run: |
