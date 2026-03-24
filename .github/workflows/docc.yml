@@ -1,4 +1,4 @@
-name: Deploy DocC
+name: Deploy HealthChecks DocC
 
 on:
   push:
@@ -9,48 +9,55 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-14
-
+    runs-on: macos-latest
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Build DocC for HealthChecks 🛠
-        run: |
-          TMP_DOCS=$(mktemp -d)
-          echo "Using temporary docs folder: $TMP_DOCS"
-
-          # Генеруємо документацію тільки для target HealthChecks через Swift DocC Plugin
-          swift package generate-documentation \
-            --target HealthChecks \
-            --disable-indexing \
-            --transform-for-static-hosting \
-            --hosting-base-path fs-app-health-checks \
-            --output-path "$TMP_DOCS/HealthChecks" \
-            --quiet
-
-          # Копіюємо в docs для GitHub Pages
-          rm -rf docs
-          mkdir -p docs
-          cp -R "$TMP_DOCS/HealthChecks"/* docs/
-
-          # Додаємо редірект на index.html
-          echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
-
-      - name: Upload artifact 📜
-        uses: actions/upload-pages-artifact@v3
+      - name: Set up Swift
+        uses: fwal/setup-swift@v1
         with:
-          path: docs
+          swift-version: "5.9"
 
-      - name: Deploy to GitHub Pages 🚀
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Find or create DocC catalog
+        run: |
+          DOCS_DIR="Sources/HealthChecks/HealthChecks.docc"
+          if [ ! -d "$DOCS_DIR" ]; then
+            echo "📂 DocC catalog not found. Creating default catalog..."
+            mkdir -p "$DOCS_DIR"
+            cat > "$DOCS_DIR/Info.plist" <<EOF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            <plist version="1.0">
+            <dict>
+              <key>CFBundleIdentifier</key>
+              <string>com.example.HealthChecks</string>
+              <key>CFBundleName</key>
+              <string>HealthChecks</string>
+              <key>CFBundleVersion</key>
+              <string>1.0</string>
+            </dict>
+            </plist>
+            EOF
+            echo "✅ Default DocC catalog created at $DOCS_DIR"
+          else
+            echo "📂 DocC catalog found at $DOCS_DIR"
+          fi
+
+      - name: Build DocC archive
+        run: |
+          DOCS_DIR=$(find Sources/HealthChecks -name "*.docc" -type d | head -n 1)
+          ARCHIVE_OUT=".build/docs/HealthChecks.doccarchive"
+          mkdir -p "$(dirname "$ARCHIVE_OUT")"
+          echo "🔨 Building DocC archive from $DOCS_DIR..."
+          xcrun docc convert "$DOCS_DIR" --output "$ARCHIVE_OUT"
+
+      - name: Deploy DocC to GitHub Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: .build/docs/HealthChecks.doccarchive
+
+      - name: Publish to GitHub Pages
+        uses: actions/deploy-pages@v1
