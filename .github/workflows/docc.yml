@@ -1,94 +1,51 @@
 name: Deploy DocC
 
 on:
+  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
   deploy:
-    runs-on: macos-14
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
+    runs-on: macos-14
     steps:
-      # 1. Checkout
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      # 2. Select Xcode
-      - name: Select Xcode 🧰
-        run: sudo xcode-select -s /Applications/Xcode.app
-
-      # 3. Build + symbol graphs
-      - name: Build & Generate Symbol Graphs 🔨
+      - name: Build All DocC 🛠
         run: |
-          echo "Building and generating symbol graphs..."
-          mkdir -p .build/symbol-graphs
+          swift package resolve;
+          # Змінено destination на macOS
+          xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=macOS';
+          
+          # Оновлено шлях з Debug-iphoneos на Debug
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
+            --output-path docs \
+            --hosting-base-path fs-app-health-checks;
+            
+          echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html;
 
-          swift build --target HealthChecks \
-            -Xswiftc -emit-symbol-graph \
-            -Xswiftc -emit-symbol-graph-dir \
-            -Xswiftc .build/symbol-graphs \
-            --quiet
-
-      # 4. Generate DocC
-      - name: Generate DocC 📚
-        run: |
-          echo "🔍 Searching for DocC catalog..."
-
-          DOCC_CATALOG=$(find Sources \
-            -type d \
-            -name "*.docc" \
-            -not -path "*/.build/*" \
-            -not -path "*/checkouts/*" \
-            | head -n 1)
-
-          if [ -z "$DOCC_CATALOG" ]; then
-            echo "❌ No .docc catalog found in Sources/"
-            exit 1
-          fi
-
-          echo "✅ Using DocC catalog: $DOCC_CATALOG"
-
-          echo "Running docc convert..."
-          xcrun docc convert "$DOCC_CATALOG" \
-            --additional-symbol-graph-dir .build/symbol-graphs \
-            --transform-for-static-hosting \
-            --hosting-base-path fs-app-health-checks \
-            --output-path ./docs
-
-      # 5. Перевірка що docs згенерились
-      - name: Verify Docs ✅
-        run: |
-          if [ ! -d "docs" ] || [ -z "$(ls -A docs)" ]; then
-            echo "❌ Docs generation failed or empty"
-            exit 1
-          fi
-          echo "✅ Docs generated successfully"
-
-      # 6. Redirect index
-      - name: Add Redirect Index 🔗
-        run: |
-          echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
-
-      # 7. Upload artifact
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          # Upload docs directory
+          path: 'docs'
 
-      # 8. Deploy
       - name: Deploy to GitHub Pages 🐙
         id: deployment
         uses: actions/deploy-pages@v4
