@@ -1,55 +1,53 @@
 name: Deploy DocC
 
 on:
-push:
-branches: ["main"]
+  push:
+    branches: ["main"]
 
 permissions:
-contents: read
-pages: write
-id-token: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-group: "pages"
-cancel-in-progress: true
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-deploy:
-environment:
-name: github-pages
-url: ${{ steps.deployment.outputs.page_url }}
-runs-on: macos-14
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: macos-14
 
-```
-steps:
-  - name: Checkout 🛎️
-    uses: actions/checkout@v4
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
 
-  - name: Build DocC 🛠
-    run: |
-      swift package resolve
+      - name: Build DocC 🛠
+        run: |
+          swift package resolve
 
-      xcodebuild docbuild \
-        -scheme fs-app-health-checks \
-        -destination 'generic/platform=macOS' \
-        -derivedDataPath /tmp/docbuild \
-        -disable-cmo \
-        DOCC_EXCLUDE_DEPENDENCIES=YES
+          xcodebuild docbuild \
+            -scheme fs-app-health-checks \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath /tmp/docbuild \
+            -disable-cmo \
+            DOCC_EXCLUDE_DEPENDENCIES=YES
 
-      $(xcrun --find docc) process-archive \
-        transform-for-static-hosting \
-        /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
-        --output-path docs \
-        --hosting-base-path fs-app-health-checks
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting \
+            /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
+            --output-path docs \
+            --hosting-base-path fs-app-health-checks
 
-      echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
+          echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
 
-  - name: Upload artifact 📜
-    uses: actions/upload-pages-artifact@v3
-    with:
-      path: docs
+      - name: Upload artifact 📜
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
 
-  - name: Deploy to GitHub Pages 🚀
-    id: deployment
-    uses: actions/deploy-pages@v4
-```
+      - name: Deploy to GitHub Pages 🚀
+        id: deployment
+        uses: actions/deploy-pages@v4
