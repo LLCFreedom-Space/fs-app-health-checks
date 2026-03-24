@@ -1,4 +1,4 @@
-name: Deploy HealthChecks DocC
+name: Deploy DocC
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -24,59 +24,33 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Ensure HealthChecks DocC exists 📂
-        run: |
-          DOCS_DIR="Sources/HealthChecks/HealthChecks.docc"
-          if [ ! -d "$DOCS_DIR" ]; then
-            echo "📂 DocC catalog not found. Creating default catalog..."
-            mkdir -p "$DOCS_DIR"
-
-            # Info.plist для DocC
-            cat > "$DOCS_DIR/Info.plist" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>CFBundleIdentifier</key>
-  <string>com.example.HealthChecks</string>
-  <key>CFBundleName</key>
-  <string>HealthChecks</string>
-  <key>CFBundleVersion</key>
-  <string>1.0</string>
-</dict>
-</plist>
-EOF
-
-            # Мінімальний Markdown файл
-            echo "# HealthChecks Documentation" > "$DOCS_DIR/index.md"
-
-            echo "✅ Default DocC catalog created at $DOCS_DIR"
-          else
-            echo "📂 DocC catalog found at $DOCS_DIR"
-          fi
-
-      - name: Build HealthChecks DocC 🛠
+      - name: Build DocC using Plugin 🛠
         run: |
           TMP_DOCS=$(mktemp -d)
           echo "Using temporary docs folder: $TMP_DOCS"
 
-          # Збираємо тільки HealthChecks без залежностей
-          xcrun docc convert Sources/HealthChecks/HealthChecks.docc \
-            --output .build/docs/HealthChecks.doccarchive
+          # Знаходимо всі targets з .docc каталогами
+          TARGETS=$(find Sources -name '*.docc' -exec dirname {} \; | awk -F/ '{print $(NF-1)}' | sort -u)
+          echo "Detected DocC targets: $TARGETS"
 
-          # Трансформація для статичного хостингу
-          xcrun docc process-archive \
-            transform-for-static-hosting \
-            .build/docs/HealthChecks.doccarchive \
-            --output-path "$TMP_DOCS" \
-            --hosting-base-path fs-app-health-checks
+          for target in $TARGETS; do
+            echo "📚 Building documentation for $target"
 
-          # Копіюємо готову документацію в docs
+            swift package generate-documentation \
+              --target "$target" \
+              --disable-indexing \
+              --transform-for-static-hosting \
+              --hosting-base-path fs-app-health-checks \
+              --output-path "$TMP_DOCS/$target" \
+              --quiet
+          done
+
+          # Копіюємо всі docc в docs/
           rm -rf docs
           mkdir -p docs
           cp -R "$TMP_DOCS"/* docs/
 
-          # Редірект на index.html
+          # Додаємо редірект на index.html
           echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
 
       - name: Upload artifact 📜
