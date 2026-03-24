@@ -28,17 +28,16 @@ jobs:
       - name: Select Xcode 🧰
         run: sudo xcode-select -s /Applications/Xcode.app
 
-      # (опціонально, але корисно для дебагу)
       - name: Show Schemes 🔍
         run: xcodebuild -list
 
       - name: Build Documentation 📚
-        run: |
-          xcodebuild docbuild \
-            -scheme fs-app-health-checks \
-            -destination 'generic/platform=macOS' \
-            OTHER_DOCC_FLAGS='--additional-symbol-graph-dir .build/debug --transform-for-static-hosting --hosting-base-path fs-app-health-checks' \          
-            DOCC_OUTPUT_DIR=./docs
+        run: >
+          xcodebuild docbuild
+          -scheme fs-app-health-checks
+          -destination 'generic/platform=macOS'
+          OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/debug --transform-for-static-hosting --hosting-base-path fs-app-health-checks"
+          DOCC_OUTPUT_DIR=./docs
 
       - name: Add Redirect Index 🔗
         run: |
