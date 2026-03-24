@@ -32,18 +32,19 @@ jobs:
 
       # 3. Показ схем для дебагу
       - name: Show Schemes 🔍
-        run: xcodebuild -list
+        run: xcodebuild -list -quiet
 
       # 4. Генерація symbol graphs тільки для HealthChecks
       - name: Generate symbol graphs for HealthChecks
         run: |
           echo "Generating symbol graphs for HealthChecks..."
-          swift build --target HealthChecks \
+          mkdir -p .build/symbol-graphs
+          swift build --target HealthChecks --quiet \
             -Xswiftc -emit-symbol-graph \
             -Xswiftc -emit-symbol-graph-dir \
             -Xswiftc .build/symbol-graphs
 
-      # 5. Build Documentation тільки для HealthChecks без збірки залежностей
+      # 5. Build Documentation тільки для HealthChecks без залежностей
       - name: Build Documentation for HealthChecks 📚
         run: |
           if [ -d ".build/symbol-graphs" ]; then
@@ -53,7 +54,8 @@ jobs:
               -destination 'generic/platform=macOS' \
               SKIP_BUILDING_DEPENDENCIES=YES \
               OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/symbol-graphs --transform-for-static-hosting --hosting-base-path fs-app-health-checks" \
-              DOCC_OUTPUT_DIR=./docs
+              DOCC_OUTPUT_DIR=./docs \
+              -quiet
           else
             echo "Symbol graphs not found, skipping DocC build."
           fi
