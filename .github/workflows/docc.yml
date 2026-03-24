@@ -28,6 +28,10 @@ jobs:
         run: |
           swift package resolve
 
+          # Створюємо тимчасову папку для збірки, щоб уникнути проблем з правами
+          TMP_DOCS=$(mktemp -d)
+          echo "Using temporary docs folder: $TMP_DOCS"
+
           xcodebuild docbuild \
             -scheme fs-app-health-checks \
             -destination 'generic/platform=macOS' \
@@ -38,9 +42,15 @@ jobs:
           $(xcrun --find docc) process-archive \
             transform-for-static-hosting \
             /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
-            --output-path docs \
+            --output-path "$TMP_DOCS" \
             --hosting-base-path fs-app-health-checks
 
+          # Копіюємо в docs для GitHub Pages
+          rm -rf docs
+          mkdir -p docs
+          cp -R "$TMP_DOCS"/* docs/
+
+          # Додаємо редірект на index.html
           echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
 
       - name: Upload artifact 📜
