@@ -24,28 +24,20 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Build DocC using Plugin 🛠
+      - name: Build DocC for HealthChecks 🛠
         run: |
           TMP_DOCS=$(mktemp -d)
           echo "Using temporary docs folder: $TMP_DOCS"
 
-          # Знаходимо всі targets з .docc каталогами
-          TARGETS=$(find Sources -name '*.docc' -exec dirname {} \; | awk -F/ '{print $(NF-1)}' | sort -u)
-          echo "Detected DocC targets: $TARGETS"
+          # Генеруємо документацію тільки для target HealthChecks через Swift DocC Plugin
+          swift package generate-documentation \
+            --target HealthChecks \
+            --disable-indexing \
+            --transform-for-static-hosting \
+            --hosting-base-path fs-app-health-checks \
+            --output-path "$TMP_DOCS"
 
-          for target in $TARGETS; do
-            echo "📚 Building documentation for $target"
-
-            swift package generate-documentation \
-              --target "$target" \
-              --disable-indexing \
-              --transform-for-static-hosting \
-              --hosting-base-path fs-app-health-checks \
-              --output-path "$TMP_DOCS/$target" \
-              --quiet
-          done
-
-          # Копіюємо всі docc в docs/
+          # Копіюємо в docs для GitHub Pages
           rm -rf docs
           mkdir -p docs
           cp -R "$TMP_DOCS"/* docs/
