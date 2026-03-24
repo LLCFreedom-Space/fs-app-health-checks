@@ -25,6 +25,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/redis.git", from: "5.0.0-alpha.2.2"),
         // 🐈 Mongo driver based on Swift NIO.
         .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.6.4"),
+        .package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

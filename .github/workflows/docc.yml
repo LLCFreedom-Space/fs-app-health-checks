@@ -15,41 +15,41 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: macos-14
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: macos-14
 
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Select Xcode 🧰
-        run: sudo xcode-select -s /Applications/Xcode.app
-
-      - name: Show Schemes 🔍
-        run: xcodebuild -list
-
-      - name: Generate symbol graphs
+      - name: Build DocC 🛠
         run: |
-          swift build --target HealthChecks \
-            -Xswiftc -emit-symbol-graph \
-            -Xswiftc -emit-symbol-graph-dir \
-            -Xswiftc .build/symbol-graphs
+          swift package resolve
 
-      - name: Build Documentation 📚
-        run: >
-          xcodebuild docbuild
-          -scheme fs-app-health-checks
-          -destination 'generic/platform=macOS'
-          SKIP_BUILDING_DEPENDENCIES=YES
-          OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/symbol-graphs --transform-for-static-hosting --hosting-base-path fs-app-health-checks"
-          DOCC_OUTPUT_DIR=./docs
+          # Створюємо тимчасову папку для збірки, щоб уникнути проблем з правами
+          TMP_DOCS=$(mktemp -d)
+          echo "Using temporary docs folder: $TMP_DOCS"
 
-      - name: Add Redirect Index 🔗
-        run: |
+          xcodebuild docbuild \
+            -scheme fs-app-health-checks \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath /tmp/docbuild \
+            DOCC_EXCLUDE_DEPENDENCIES=YES
+
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting \
+            /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
+            --output-path "$TMP_DOCS" \
+            --hosting-base-path fs-app-health-checks
+
+          # Копіюємо в docs для GitHub Pages
+          rm -rf docs
           mkdir -p docs
+          cp -R "$TMP_DOCS"/* docs/
+
+          # Додаємо редірект на index.html
           echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
 
       - name: Upload artifact 📜
@@ -57,6 +57,6 @@ jobs:
         with:
           path: docs
 
-      - name: Deploy to GitHub Pages 🐙
+      - name: Deploy to GitHub Pages 🚀
         id: deployment
         uses: actions/deploy-pages@v4
