@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -24,28 +24,24 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Build DocC 🛠
+      - name: Build DocC for HealthChecks 🛠
         run: |
-          # Створюємо тимчасову папку для збірки, щоб уникнути проблем з правами
           TMP_DOCS=$(mktemp -d)
           echo "Using temporary docs folder: $TMP_DOCS"
 
-          xcodebuild docbuild \
-            -scheme fs-app-health-checks \
-            -destination 'generic/platform=macOS' \
-            -derivedDataPath /tmp/docbuild \
-            DOCC_EXCLUDE_DEPENDENCIES=YES
-
-          $(xcrun --find docc) process-archive \
-            transform-for-static-hosting \
-            /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
-            --output-path "$TMP_DOCS" \
-            --hosting-base-path fs-app-health-checks
+          # Генеруємо документацію тільки для target HealthChecks через Swift DocC Plugin
+          swift package generate-documentation \
+            --target HealthChecks \
+            --disable-indexing \
+            --transform-for-static-hosting \
+            --hosting-base-path fs-app-health-checks \
+            --output-path "$TMP_DOCS/HealthChecks" \
+            --quiet
 
           # Копіюємо в docs для GitHub Pages
           rm -rf docs
           mkdir -p docs
-          cp -R "$TMP_DOCS"/* docs/
+          cp -R "$TMP_DOCS/HealthChecks"/* docs/
 
           # Додаємо редірект на index.html
           echo "<script>window.location.href += '/documentation/healthchecks'</script>" > docs/index.html
