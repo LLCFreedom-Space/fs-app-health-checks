@@ -26,8 +26,6 @@ jobs:
 
       - name: Build DocC 🛠
         run: |
-          swift package resolve
-
           # Створюємо тимчасову папку для збірки, щоб уникнути проблем з правами
           TMP_DOCS=$(mktemp -d)
           echo "Using temporary docs folder: $TMP_DOCS"
