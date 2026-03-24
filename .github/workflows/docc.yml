@@ -37,7 +37,7 @@ jobs:
           xcodebuild docbuild \
             -scheme fs-app-health-checks \
             -destination 'generic/platform=macOS' \
-            OTHER_DOCC_FLAGS="--additional-symbol-graph-dir .build/debug --transform-for-static-hosting --hosting-base-path fs-app-health-checks" \          
+            OTHER_DOCC_FLAGS='--additional-symbol-graph-dir .build/debug --transform-for-static-hosting --hosting-base-path fs-app-health-checks' \          
             DOCC_OUTPUT_DIR=./docs
 
       - name: Add Redirect Index 🔗
