@@ -1,17 +1,14 @@
 name: Deploy DocC
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -22,30 +19,57 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: macos-14
+
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Build All DocC 🛠
+      - name: Install dependencies
+        run: swift package resolve
+
+      - name: Auto-detect targets and build DocC 🛠
         run: |
-          swift package resolve;
-          # Змінено destination на macOS
-          xcodebuild docbuild -scheme fs-app-health-checks -derivedDataPath /tmp/docbuild -destination 'generic/platform=macOS';
-          
-          # Оновлено шлях з Debug-iphoneos на Debug
-          $(xcrun --find docc) process-archive \
-            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug/HealthChecks.doccarchive \
-            --output-path docs \
-            --hosting-base-path fs-app-health-checks;
-            
-          echo "<script>window.location.href += \"/documentation/healthchecks\"</script>" > docs/index.html;
+          # папка для фінальної документації
+          OUTPUT_DIR=docs
+          rm -rf $OUTPUT_DIR
+          mkdir -p $OUTPUT_DIR
+
+          # витягаємо всі targets з пакета
+          TARGETS=$(swift package dump-package | jq -r '.targets[].name')
+
+          echo "Detected targets: $TARGETS"
+
+          # будуємо DocC для кожного таргету
+          for TARGET in $TARGETS
+          do
+            echo "📚 Building docs for $TARGET"
+
+            # шлях для output конкретного target
+            TARGET_DOCS="$OUTPUT_DIR/$TARGET"
+
+            mkdir -p "$TARGET_DOCS"
+
+            swift package generate-documentation \
+              --target "$TARGET" \
+              --disable-indexing \
+              --transform-for-static-hosting \
+              --hosting-base-path fs-app-health-checks \
+              --output-path "$TARGET_DOCS"
+          done
+
+          # головна сторінка з лінками на всі targets
+          echo "<h1>Documentation</h1><ul>" > $OUTPUT_DIR/index.html
+          for TARGET in $TARGETS
+          do
+            echo "<li><a href='./$TARGET/documentation/${TARGET,,}'>${TARGET}</a></li>" >> $OUTPUT_DIR/index.html
+          done
+          echo "</ul>" >> $OUTPUT_DIR/index.html
 
       - name: Upload artifact 📜
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload docs directory
-          path: 'docs'
+          path: docs
 
-      - name: Deploy to GitHub Pages 🐙
+      - name: Deploy to GitHub Pages 🚀
         id: deployment
         uses: actions/deploy-pages@v4
