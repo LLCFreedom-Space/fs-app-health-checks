@@ -24,13 +24,20 @@
 
 import Vapor
 
-/// Groups func for get psql request
-public protocol PsqlRequestSendable {
-    /// Get version description
-    /// - Returns: `String`
+/// Protocol defining PostgreSQL request operations.
+///
+/// Conforming types provide methods to retrieve PostgreSQL version information
+/// and check the active connection status of a specific database in an asynchronous and concurrent-safe context.
+public protocol PsqlRequestSendable: Sendable {
+    /// Retrieves the PostgreSQL version description.
+    ///
+    /// - Returns: A `String` containing the PostgreSQL version.
+    /// - Throws: Any error encountered while performing the database query.
     func getVersionDescription() async throws -> String
-
-    /// Check connection for database
-    /// - Returns: `String`
+    /// Checks the connection state for a specific PostgreSQL database.
+    ///
+    /// - Parameter databaseName: The name of the PostgreSQL database to check.
+    /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
+    /// - Throws: Any error encountered while performing the database query.
     func checkConnection(for databaseName: String) async throws -> String
 }

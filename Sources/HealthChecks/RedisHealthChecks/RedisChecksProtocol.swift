@@ -24,17 +24,21 @@
 
 import Vapor
 
-/// Groups func for get redis health check
+/// Protocol defining Redis health check operations.
+///
+/// Conforming types provide methods to check Redis connection status, measure response time,
+/// and retrieve a ping response in an asynchronous and concurrent-safe context.
 public protocol RedisChecksProtocol {
-    /// Get  redis connection
-    /// - Returns: `HealthCheckItem`
+    /// Retrieves the Redis connection status.
+    ///
+    /// - Returns: A `HealthCheckItem` representing the current connection state of Redis.
     func connection() async -> HealthCheckItem
-
-    /// Get response time from redis
-    /// - Returns: `HealthCheckItem`
+    /// Measures the Redis response time.
+    ///
+    /// - Returns: A `HealthCheckItem` containing the observed response time and status.
     func responseTime() async -> HealthCheckItem
-
-    /// Get ping from redis
-    /// - Returns: `String`
+    /// Sends a ping to Redis and returns the response.
+    ///
+    /// - Returns: A `String` representing the Redis ping response.
     func ping() async -> String
 }

@@ -16,26 +16,24 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  HealthCheckStatus.swift
+//  Application+Formatting.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 29.01.2024.
+//  Created by Mykola Buhaiov on 27.03.2026.
 //
 
 import Vapor
 
-/// Represents the status of a health check for a service or component.
-public enum HealthCheckStatus: String {
-    /// Unhealthy state — the service or component has failed health checks.
-    case fail
-    /// Healthy state with warnings — the service or component is operational but has some concerns.
-    case warm
-    /// Fully healthy — the service or component is operational without any concerns.
-    case pass
+extension Application {
+    // MARK: - Formatting
+
+    /// ISO 8601-like formatter (`yyyy-MM-dd'T'HH:mm:ss.SSS`)
+    ///
+    /// - Warning: `DateFormatter` is not thread-safe.
+    /// - Performance: Creates new instance each call.
+    public var dateTimeISOFormat: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = Constants.dateFormat
+        return formatter
+    }
 }
-
-// MARK: - Protocol Conformances
-
-extension HealthCheckStatus: Content {}
-
-extension HealthCheckStatus: CaseIterable {}

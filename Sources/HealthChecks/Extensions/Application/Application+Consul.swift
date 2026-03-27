@@ -16,23 +16,35 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MockClient.swift
-//  
+//  Application+Consul.swift
+//  fs-app-health-checks
 //
-//  Created by Mykhailo Bondarenko on 23.02.2024.
+//  Created by Mykola Buhaiov on 27.03.2026.
 //
 
 import Vapor
 
-public struct MockClient: Client {
-    public var eventLoop: EventLoop
-    public var clientResponse: ClientResponse
+extension Application {
+    // MARK: - Consul
 
-    public func send(_ request: ClientRequest) -> EventLoopFuture<ClientResponse> {
-        self.eventLoop.makeSucceededFuture(self.clientResponse)
+    /// Storage key for Consul configuration.
+    private struct ConsulConfigKey: StorageKey {
+        typealias Value = ConsulConfig
     }
-    
-    public func delegating(to eventLoop: EventLoop) -> Client {
-        self
+
+    /// Consul configuration for the application.
+    ///
+    /// - Thread-Safety: Should be **immutable** or conform to `Sendable`.
+    /// - Example:
+    ///   ```swift
+    ///   application.consulConfig = ConsulConfig(
+    ///       host: "127.0.0.1",
+    ///       port: 8500,
+    ///       token: "secret-token"
+    ///   )
+    ///   ```
+    public var consulConfig: ConsulConfig? {
+        get { storage[ConsulConfigKey.self] }
+        set { storage[ConsulConfigKey.self] = newValue }
     }
 }

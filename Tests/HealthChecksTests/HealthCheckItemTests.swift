@@ -22,44 +22,52 @@
 //  Created by Mykola Buhaiov on 06.02.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-/// Unit tests for the `HealthCheckItem` equatable conformance.
-final class HealthCheckItemTests: XCTestCase {
-    /// Tests the equality of two `HealthCheckItem` instances.
-    func testHealthCheckItemEquatable() {
-        // Create the first `HealthCheckItem` instance with specific values.
-        let firstHealthCheckItem = HealthCheckItem(
-            componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
-            componentType: .datastore,
-            observedValue: 1,
-            observedUnit: "s",
-            status: .pass,
-            affectedEndpoints: nil,
-            time: "2024-02-01T11:11:59.364",
-            output: "Ok",
-            links: nil,
-            node: nil
-        )
-        // Create the second `HealthCheckItem` instance with the same values as the first one.
-        var secondHealthCheckItem = HealthCheckItem(
-            componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
-            componentType: .datastore,
-            observedValue: 1,
-            observedUnit: "s",
-            status: .pass,
-            affectedEndpoints: nil,
-            time: "2024-02-01T11:11:59.364",
-            output: "Ok",
-            links: nil,
-            node: nil
-        )
-        // Assert that the two instances are equal.
-        XCTAssertEqual(firstHealthCheckItem, secondHealthCheckItem)
-        // Modify a property in the second instance.
-        secondHealthCheckItem.observedValue = 4
-        // Assert that the two instances are not equal after the modification.
-        XCTAssertNotEqual(firstHealthCheckItem, secondHealthCheckItem)
+@Suite("Health check item tests")
+struct HealthCheckItemTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
+        }
+        try await app.asyncShutdown()
+    }
+
+    @Test("Health check item equatable")
+    func healthCheckItemEquatable() async throws {
+        try await withApp { app in
+            let firstHealthCheckItem = HealthCheckItem(
+                componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
+                componentType: .datastore,
+                observedValue: 1,
+                observedUnit: "s",
+                status: .pass,
+                affectedEndpoints: nil,
+                time: "2024-02-01T11:11:59.364",
+                output: "Ok",
+                links: nil,
+                node: nil
+            )
+            var secondHealthCheckItem = HealthCheckItem(
+                componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
+                componentType: .datastore,
+                observedValue: 1,
+                observedUnit: "s",
+                status: .pass,
+                affectedEndpoints: nil,
+                time: "2024-02-01T11:11:59.364",
+                output: "Ok",
+                links: nil,
+                node: nil
+            )
+            #expect(firstHealthCheckItem == secondHealthCheckItem)
+            secondHealthCheckItem.observedValue = 4
+            #expect(firstHealthCheckItem != secondHealthCheckItem)
+        }
     }
 }

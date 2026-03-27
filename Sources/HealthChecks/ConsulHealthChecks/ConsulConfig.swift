@@ -24,41 +24,75 @@
 
 import Vapor
 
-/// Represents configuration details for connecting to a Consul server.
-public struct ConsulConfig {
+/// Configuration object for connecting to a Consul service.
+///
+/// `ConsulConfig` contains all necessary parameters required to establish
+/// a connection with a Consul server, including optional authentication credentials.
+///
+/// - Overview:
+/// This structure is used to configure how your application communicates
+/// with Consul for service discovery, health checks, or key-value storage.
+///
+/// - Concurrency:
+/// Conforms to `Sendable`, making it safe to use across concurrent contexts.
+public struct ConsulConfig: Sendable {
     /// A unique identifier for this Consul configuration within your application.
-    /// This ID is not related to Consul itself and can be used for internal reference.
-    /// Example: "43119325-63f5-4e14-9175-84e0e296c527"
+    ///
+    /// This identifier is intended for internal use only and is not related
+    /// to any identifier within Consul itself.
+    ///
+    /// - Example: `"43119325-63f5-4e14-9175-84e0e296c527"`
     public var id: String
-
     /// The URL of the Consul server to connect to.
-    /// Example: "http://127.0.0.1:8500", "https://xmpl-consul.example.com"
+    ///
+    /// This should include the protocol (`http` or `https`) and the host.
+    ///
+    /// - Examples:
+    ///   - `"http://127.0.0.1:8500"`
+    ///   - `"https://xmpl-consul.example.com"`
     public var url: String
-
     /// The username for authenticating with Consul (optional).
-    /// Example: "username"
+    ///
+    /// Provide this value if your Consul instance requires basic authentication.
+    ///
+    /// - Example: `"username"`
     public var username: String?
-
     /// The password for authenticating with Consul (optional).
-    /// Example: "password"
+    ///
+    /// Used together with `username` when authentication is required.
+    ///
+    /// - Example: `"password"`
     public var password: String?
-    
-    /// Initializes a `ConsulConfig` with the specified details.
+    /// The token for authenticating with Consul (optional).
+    ///
+    /// Used together with `username` when authentication is required.
+    ///
+    /// - Example: `"token"`
+    public var token: String?
+
+    /// Creates a new `ConsulConfig` instance.
     ///
     /// - Parameters:
-    ///   - id: The unique identifier for this configuration.
+    ///   - id: A unique identifier for this configuration (application-level).
     ///   - url: The URL of the Consul server.
-    ///   - username: The username for authentication (optional).
-    ///   - password: The password for authentication (optional).
+    ///   - username: Optional username for authentication.
+    ///   - password: Optional password for authentication.
+    ///   - token: Optional token for authentication.
+    ///
+    /// - Note:
+    /// If authentication is not required, both `username` and `password` or only `token`
+    /// can be left as `nil`.
     public init(
         id: String,
         url: String,
         username: String? = nil,
-        password: String? = nil
+        password: String? = nil,
+        token: String? = nil
     ) {
         self.id = id
         self.url = url
         self.username = username
         self.password = password
+        self.token = token
     }
 }

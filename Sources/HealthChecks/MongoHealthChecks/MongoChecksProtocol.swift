@@ -25,17 +25,28 @@
 import Vapor
 import MongoClient
 
-/// Groups func for get mongo health check
+/// Protocol defining health check operations for MongoDB connections.
+///
+/// `MongoChecksProtocol` groups functions related to monitoring MongoDB
+/// connectivity and performance. Implementers of this protocol can provide
+/// concrete logic to measure connection status, response time, and connection state.
+///
+/// - Note:
+/// All methods are asynchronous to accommodate network or I/O operations.
 public protocol MongoChecksProtocol {
-    /// Get mongo connection
-    /// - Returns: `HealthCheckItem`
+    /// Retrieves the current status of the MongoDB connection.
+    ///
+    /// - Returns: A `HealthCheckItem` representing the health of the MongoDB connection,
+    ///   including status and any relevant metadata.
     func connection() async -> HealthCheckItem
-
-    /// Get mongo response time
-    /// - Returns: `HealthCheckItem`
+    /// Measures the response time of the MongoDB service.
+    ///
+    /// - Returns: A `HealthCheckItem` containing the observed response time
+    ///   in milliseconds and the corresponding health status.
     func responseTime() async -> HealthCheckItem
-
-    /// Get mongo connection
-    /// - Returns: `String`
+    /// Retrieves a string representation of the MongoDB connection state.
+    ///
+    /// - Returns: A `String` describing the current connection state
+    ///   (e.g., `"connected"`, `"connecting"`, `"disconnected"`, `"closed"`).
     func getConnection() async -> String
 }

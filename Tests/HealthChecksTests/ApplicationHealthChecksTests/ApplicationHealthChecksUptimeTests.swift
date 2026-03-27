@@ -22,38 +22,47 @@
 //  Created by Mykhailo Bondarenko on 07.03.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-/// Unit tests for the uptime functionality in ApplicationHealthChecks.
-final class ApplicationHealthChecksUptimeTests: XCTestCase {
-    /// Tests the correctness of the uptime method.
-    func testUptime() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.applicationHealthChecks = ApplicationHealthChecksMock()
-        let response = app.applicationHealthChecks?.uptime()
-        XCTAssertEqual(response, ApplicationHealthChecksMock.healthCheckItem)
-    }
-    
-    /// Tests if the uptime method returns a valid item.
-    func testUptimeReturnsValidItem() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        
-        let healthChecks = ApplicationHealthChecks(app: app)
-        let item = healthChecks.uptime()
-        
-        XCTAssertNotNil(item)
-        XCTAssertEqual(item.componentType, .system)
-        XCTAssertEqual(item.observedUnit, "s")
-        XCTAssertEqual(item.status, .pass)
-        
-        // Assert time is within a reasonable range of actual uptime
-        let expectedUptime = Date().timeIntervalSince1970 - app.launchTime
-        guard let value = item.observedValue else {
-            return XCTFail("no have observed value")
+@Suite("Application health checks uptime tests")
+struct ApplicationHealthChecksUptimeTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
         }
-        XCTAssertTrue(abs(value - expectedUptime) < 1.0)
+        try await app.asyncShutdown()
+    }
+
+    @Test("Uptime")
+    func uptime() async throws {
+        try await withApp { app in
+            app.applicationHealthChecks = ApplicationHealthChecksMock()
+            let response = app.applicationHealthChecks?.uptime()
+            #expect(response == ApplicationHealthChecksMock.healthCheckItem)
+        }
+    }
+
+    @Test("Uptime returns valid item")
+    func uptimeReturnsValidItem() async throws {
+        try await withApp { app in
+            let healthChecks = ApplicationHealthChecks(app: app)
+            let item = healthChecks.uptime()
+            #expect(item.componentType == .system)
+            #expect(item.observedUnit == "s")
+            #expect(item.status == .pass)
+
+            // Assert time is within a reasonable range of actual uptime
+            let expectedUptime = Date().timeIntervalSince1970 - app.launchTime
+            guard let value = item.observedValue else {
+                Issue.record("No have observed value")
+                return
+            }
+            #expect(abs(value - expectedUptime) < 1.0)
+        }
     }
 }

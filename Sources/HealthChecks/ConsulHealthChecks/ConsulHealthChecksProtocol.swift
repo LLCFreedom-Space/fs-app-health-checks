@@ -24,5 +24,18 @@
 
 import Vapor
 
-/// Protocol defining an interface for performing Consul health checks.
-public protocol ConsulHealthChecksProtocol: ChecksProtocol {}
+/// A protocol defining health check capabilities for a Consul service.
+///
+/// `ConsulHealthChecksProtocol` provides a standard interface for implementing
+/// health checks specific to a Consul instance. It extends `ChecksProtocol`
+/// to inherit basic check functionality and conforms to `Sendable` for
+/// safe usage in concurrent contexts.
+///
+/// - Conforms to:
+///   - `ChecksProtocol` — provides base health check behavior.
+///   - `Sendable` — ensures thread-safe usage in Swift Concurrency.
+///
+/// - Purpose:
+/// Types conforming to this protocol should implement methods to check
+/// the availability, response time, and connection status of a Consul service.
+public protocol ConsulHealthChecksProtocol: ChecksProtocol, Sendable {}

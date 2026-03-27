@@ -22,108 +22,125 @@
 //  Created by Mykola Buhaiov on 09.03.2023.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-final class PostgresHealthChecksTests: XCTestCase {
-    func testConnection() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let mockResult = await app.psqlHealthChecks?.connection()
-        XCTAssertEqual(mockResult, PostgresHealthChecksMock.healthCheckItem)
-
-        app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
-        let result = await app.psqlHealthChecks?.connection()
-        XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertEqual(result?.status, .pass)
-        XCTAssertNil(result?.affectedEndpoints)
-        XCTAssertNil(result?.output)
-        XCTAssertNil(result?.links)
-        XCTAssertNil(result?.node)
+@Suite("Postgres health checks tests")
+struct PostgresHealthChecksTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
+        }
+        try await app.asyncShutdown()
     }
 
-    func testResponseTime() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let resultMock = await app.psqlHealthChecks?.responseTime()
-        XCTAssertEqual(resultMock, PostgresHealthChecksMock.healthCheckItem)
+    @Test("Connection")
+    func connection() async throws {
+        try await withApp { app in
+            app.psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+            app.psqlHealthChecks = PostgresHealthChecksMock()
+            let mockResult = await app.psqlHealthChecks?.connection()
+            #expect(mockResult == PostgresHealthChecksMock.healthCheckItem)
 
-        app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
-        let result = await app.psqlHealthChecks?.responseTime()
-        XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertNotEqual(result?.observedValue, 1)
-        XCTAssertEqual(result?.observedUnit, "ms")
-        XCTAssertEqual(result?.status, .pass)
-        XCTAssertNil(result?.affectedEndpoints)
-        XCTAssertNil(result?.output)
-        XCTAssertNil(result?.links)
-        XCTAssertNil(result?.node)
+            app.psqlRequest = PsqlRequestMock()
+            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            let result = await app.psqlHealthChecks?.connection()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.status == .pass)
+            #expect(result?.affectedEndpoints == nil)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
     }
 
-    func testHealthCheck() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlId = UUID().uuidString
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let mockResult = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-        let mockPsqlConnections = mockResult?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
-        XCTAssertEqual(mockPsqlConnections, PostgresHealthChecksMock.healthCheckItem)
-        let mockPsqlResponseTimes = mockResult?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(mockPsqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
+    @Test("Response time")
+    func responseTime() async throws {
+        try await withApp { app in
+            app.psqlHealthChecks = PostgresHealthChecksMock()
+            let resultMock = await app.psqlHealthChecks?.responseTime()
+            #expect(resultMock == PostgresHealthChecksMock.healthCheckItem)
 
-        app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
-        let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-        let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
-        XCTAssertEqual(psqlConnections?.componentType, .datastore)
-        XCTAssertEqual(psqlConnections?.status, .pass)
-        XCTAssertNil(psqlConnections?.affectedEndpoints)
-        XCTAssertNil(psqlConnections?.output)
-        XCTAssertNil(psqlConnections?.links)
-        XCTAssertNil(psqlConnections?.node)
-        let psqlResponseTimes = mockResult?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(psqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(psqlResponseTimes, PostgresHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(psqlResponseTimes?.componentType, .datastore)
-        XCTAssertEqual(psqlResponseTimes?.observedValue, 1)
-        XCTAssertEqual(psqlResponseTimes?.observedUnit, "s")
-        XCTAssertEqual(psqlResponseTimes?.status, .pass)
-        XCTAssertNil(psqlResponseTimes?.affectedEndpoints)
-        XCTAssertEqual(psqlResponseTimes?.output, "Ok")
-        XCTAssertNil(psqlResponseTimes?.links)
-        XCTAssertNil(psqlResponseTimes?.node)
+            app.psqlRequest = PsqlRequestMock()
+            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            let result = await app.psqlHealthChecks?.responseTime()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue != 1)
+            #expect(result?.observedUnit == "ms")
+            #expect(result?.status == .pass)
+            #expect(result?.affectedEndpoints == nil)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
     }
 
-    func testGetVersion() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlId = UUID().uuidString
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let resultMock = await app.psqlHealthChecks?.getVersion()
-        XCTAssertEqual(resultMock, PostgresHealthChecksMock.version)
+    @Test("Health check")
+    func healthCheck() async throws {
+        try await withApp { app in
+            app.psqlId = UUID().uuidString
+            app.psqlHealthChecks = PostgresHealthChecksMock()
+            let mockResult = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+            let mockPsqlConnections = mockResult?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
+            #expect(mockPsqlConnections == PostgresHealthChecksMock.healthCheckItem)
+            let mockPsqlResponseTimes = mockResult?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
+            #expect(mockPsqlResponseTimes == PostgresHealthChecksMock.healthCheckItem)
 
-        app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
-        let result = await app.psqlHealthChecks?.getVersion()
-        XCTAssertEqual(result, Constants.psqlVersionDescription)
+            app.psqlRequest = PsqlRequestMock()
+            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+            let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
+            #expect(psqlConnections?.componentType == .datastore)
+            #expect(psqlConnections?.status == .pass)
+            #expect(psqlConnections?.affectedEndpoints == nil)
+            #expect(psqlConnections?.output == nil)
+            #expect(psqlConnections?.links == nil)
+            #expect(psqlConnections?.node == nil)
+            let psqlResponseTimes = mockResult?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
+            #expect(psqlResponseTimes == PostgresHealthChecksMock.healthCheckItem)
+            #expect(psqlResponseTimes == PostgresHealthChecksMock.healthCheckItem)
+            #expect(psqlResponseTimes?.componentType == .datastore)
+            #expect(psqlResponseTimes?.observedValue == 1)
+            #expect(psqlResponseTimes?.observedUnit == "s")
+            #expect(psqlResponseTimes?.status == .pass)
+            #expect(psqlResponseTimes?.affectedEndpoints == nil)
+            #expect(psqlResponseTimes?.output == "Ok")
+            #expect(psqlResponseTimes?.links == nil)
+            #expect(psqlResponseTimes?.node == nil)
+        }
     }
 
-    func testCheckConnection() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.psqlId = UUID().uuidString
-        app.psqlHealthChecks = PostgresHealthChecksMock()
-        let resultMock = await app.psqlHealthChecks?.checkConnection()
-        XCTAssertEqual(resultMock, "active")
+    @Test("Get version")
+    func getVersion() async throws {
+        try await withApp { app in
+            app.psqlId = UUID().uuidString
+            app.psqlHealthChecks = PostgresHealthChecksMock()
+            let resultMock = await app.psqlHealthChecks?.getVersion()
+            #expect(resultMock == PostgresHealthChecksMock.version)
 
-        app.psqlRequest = PsqlRequestMock()
-        app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
-        let result = await app.psqlHealthChecks?.checkConnection()
-        XCTAssertEqual(result, "active")
+            app.psqlRequest = PsqlRequestMock()
+            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            let result = await app.psqlHealthChecks?.getVersion()
+            #expect(result == Constants.psqlVersionDescription)
+        }
+    }
+
+    @Test("Check connection")
+    func checkConnection() async throws {
+        try await withApp { app in
+            app.psqlId = UUID().uuidString
+            app.psqlHealthChecks = PostgresHealthChecksMock()
+            let resultMock = await app.psqlHealthChecks?.checkConnection()
+            #expect(resultMock == "active")
+
+            app.psqlRequest = PsqlRequestMock()
+            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            let result = await app.psqlHealthChecks?.checkConnection()
+            #expect(result == "active")
+        }
     }
 }

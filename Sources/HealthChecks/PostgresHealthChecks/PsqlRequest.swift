@@ -26,21 +26,27 @@ import Vapor
 import Fluent
 import FluentPostgresDriver
 
+/// Concrete implementation of `PsqlRequestSendable` for interacting with PostgreSQL.
+///
+/// Provides methods to retrieve the database version and check active connections in an asynchronous context.
 public struct PsqlRequest: PsqlRequestSendable {
-    /// Instance of app as `Application`
+    /// Instance of the application.
     public let app: Application
-    
-    /// Initializer for PsqlRequest
-    /// - Parameter app: `Application`
+    /// Initializes a new `PsqlRequest` instance.
+    ///
+    /// - Parameter app: The `Application` instance.
     public init(app: Application) {
         self.app = app
     }
 
-    // WARNING: - This method create new connection every time, when you use it
-    /// Get version description
-    /// - Returns: `String`
+    /// Retrieves the PostgreSQL version description.
+    ///
+    /// - Returns: A `String` containing the PostgreSQL version, or an error message if the connection fails.
+    /// - Throws: Any error encountered during database query execution.
     public func getVersionDescription() async throws -> String {
-        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT version()").get()
+        let rows = try? await (app.db(.psql) as? PostgresDatabase)?
+            .simpleQuery("SELECT version()")
+            .get()
         let row = rows?.first?.makeRandomAccess()
         var connectionDescription = "ERROR: No connect to Postgres database and not get version"
         if let result = (row?[data: "version"].string) {
@@ -49,11 +55,15 @@ public struct PsqlRequest: PsqlRequestSendable {
         return connectionDescription
     }
 
-    // WARNING: - This method create new connection every time, when you use it
-    /// Check for exist connection
-    /// - Returns: `String`
+    /// Checks the connection state for a specific PostgreSQL database.
+    ///
+    /// - Parameter databaseName: Name of the PostgreSQL database.
+    /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
+    /// - Throws: Any error encountered during database query execution.
     public func checkConnection(for databaseName: String) async throws -> String {
-        let rows = try? await (app.db(.psql) as? PostgresDatabase)?.simpleQuery("SELECT * FROM pg_stat_activity WHERE datname = '\(databaseName)' and state = 'active';").get()
+        let rows = try? await (app.db(.psql) as? PostgresDatabase)?
+            .simpleQuery("SELECT * FROM pg_stat_activity WHERE datname = '\(databaseName)' and state = 'active';")
+            .get()
         let row = rows?.first?.makeRandomAccess()
         var connectionDescription = "ERROR: No connect to Postgres database and not check state connection"
         if let result = (row?[data: "state"].string) {

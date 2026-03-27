@@ -24,5 +24,21 @@
 
 import Vapor
 
-/// Protocol for checking application health.
-public protocol ApplicationHealthChecksProtocol: ApplicationChecksProtocol, ChecksProtocol {}
+/// A protocol defining comprehensive application health checks.
+///
+/// `ApplicationHealthChecksProtocol` combines multiple protocols to provide
+/// a unified interface for performing health checks at the application level.
+/// It includes system-level checks (from `ApplicationChecksProtocol`) as well as
+/// general check functionality (from `ChecksProtocol`) and is safe for use
+/// in concurrent contexts (`Sendable`).
+///
+/// - Conforms to:
+///   - `ApplicationChecksProtocol` — provides system-level checks such as uptime.
+///   - `ChecksProtocol` — provides base check functionality for custom components.
+///   - `Sendable` — ensures the protocol can be used safely in concurrent Swift code.
+///
+/// - Purpose:
+/// Implement this protocol for services or components that perform
+/// application-wide health monitoring, including uptime, external services,
+/// and other critical checks.
+public protocol ApplicationHealthChecksProtocol: ApplicationChecksProtocol, ChecksProtocol, Sendable {}
