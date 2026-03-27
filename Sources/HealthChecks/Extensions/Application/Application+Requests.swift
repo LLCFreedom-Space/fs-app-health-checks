@@ -32,12 +32,6 @@ extension Application {
         public typealias Value = PsqlRequestSendable
     }
     /// PostgreSQL request context for the current request.
-    ///
-    /// - Thread-Safety: Should be **Sendable**.
-    /// - Example:
-    ///   ```swift
-    ///   application.psqlRequest = MyPsqlRequest()
-    ///   ```
     public var psqlRequest: PsqlRequestSendable? {
         get { storage[PsqlRequestKey.self] }
         set { storage[PsqlRequestKey.self] = newValue }
@@ -48,8 +42,6 @@ extension Application {
         public typealias Value = RedisRequestSendable
     }
     /// Redis request context for the current request.
-    ///
-    /// - Thread-Safety: Should be **Sendable**.
     public var redisRequest: RedisRequestSendable? {
         get { storage[RedisRequestKey.self] }
         set { storage[RedisRequestKey.self] = newValue }
@@ -60,8 +52,6 @@ extension Application {
         public typealias Value = MongoRequestSendable
     }
     /// MongoDB request context for the current request.
-    ///
-    /// - Thread-Safety: Should be **Sendable**.
     public var mongoRequest: MongoRequestSendable? {
         get { storage[MongoRequestSendableKey.self] }
         set { storage[MongoRequestSendableKey.self] = newValue }

@@ -37,24 +37,13 @@ extension Application {
         /// Stored value type.
         public typealias Value = MongoCluster
     }
-
     /// Shared MongoDB cluster instance.
     ///
     /// This property provides access to a shared ``MongoCluster`` stored in the application.
     ///
     /// - Note: Typically initialized during application bootstrap (`configure.swift`).
     /// - Important: The cluster should be initialized only once and reused.
-    /// - Thread-Safety: ``MongoCluster`` is designed to be shared across concurrent contexts,
     ///   but lifecycle management (initialization/shutdown) must be controlled.
-    ///
-    /// ## Example
-    /// ```swift
-    /// if let cluster = app.healthCheckMongoCluster {
-    ///     let db = cluster["my_database"]
-    ///     let collection = db["users"]
-    ///     let users = try await collection.find().drain()
-    /// }
-    /// ```
     public var healthCheckMongoCluster: MongoCluster? {
         get { storage[MongoClusterKey.self] }
         set { storage[MongoClusterKey.self] = newValue }
@@ -73,27 +62,6 @@ extension Application {
     ///
     /// - Thread-Safety:
     ///   Should be called once during bootstrap before the application starts handling requests.
-    ///
-    /// ## Example (configure.swift)
-    /// ```swift
-    /// try await app.initializeMongoCluster(
-    ///     connectionString: "mongodb://localhost:27017"
-    /// )
-    /// ```
-    ///
-    /// ## Example (usage in route)
-    /// ```swift
-    /// app.get("users") { req async throws -> [User] in
-    ///     guard let cluster = req.application.healthCheckMongoCluster else {
-    ///         throw Abort(.internalServerError, reason: "Mongo cluster not initialized")
-    ///     }
-    ///
-    ///     let db = cluster["my_database"]
-    ///     let collection = db["users"]
-    ///
-    ///     return try await collection.find().decode(User.self).drain()
-    /// }
-    /// ```
     public func initializeMongoCluster(connectionString: String) async throws {
         self.healthCheckMongoCluster = try await MongoCluster(connectingTo: ConnectionSettings(connectionString))
     }
@@ -113,23 +81,6 @@ extension Application {
     ///
     /// - Thread-Safety:
     ///   Safe to store globally, but first access may trigger connection concurrently.
-    ///
-    /// ## Example (configure.swift)
-    /// ```swift
-    /// try await app.initializeLazyMongoCluster(
-    ///     connectionString: "mongodb://localhost:27017"
-    /// )
-    /// ```
-    ///
-    /// ## Example (first usage triggers connection)
-    /// ```swift
-    /// let cluster = req.application.healthCheckMongoCluster!
-    /// let db = cluster["my_database"]
-    /// let collection = db["users"]
-    ///
-    /// // Connection happens here if not already established
-    /// let users = try await collection.find().drain()
-    /// ```
     public func initializeLazyMongoCluster(connectionString: String) async throws {
         self.healthCheckMongoCluster = try MongoCluster(lazyConnectingTo: ConnectionSettings(connectionString))
     }

@@ -31,14 +31,7 @@ extension Application {
     public struct PostgresHealthChecksKey: StorageKey {
         public typealias Value = PostgresHealthChecksProtocol
     }
-
     /// PostgreSQL health checks handler.
-    ///
-    /// - Thread-Safety: Should be **immutable** or `Sendable`.
-    /// - Example:
-    ///   ```swift
-    ///   application.psqlHealthChecks = MyPostgresHealthChecks()
-    ///   ```
     public var psqlHealthChecks: PostgresHealthChecksProtocol? {
         get { storage[PostgresHealthChecksKey.self] }
         set { storage[PostgresHealthChecksKey.self] = newValue }
@@ -48,10 +41,7 @@ extension Application {
     public struct ConsulHealthChecksKey: StorageKey {
         public typealias Value = ConsulHealthChecksProtocol
     }
-
     /// Consul health checks handler.
-    ///
-    /// - Thread-Safety: Should be **immutable** or `Sendable`.
     public var consulHealthChecks: ConsulHealthChecksProtocol? {
         get { storage[ConsulHealthChecksKey.self] }
         set { storage[ConsulHealthChecksKey.self] = newValue }
@@ -61,14 +51,7 @@ extension Application {
     public struct ApplicationHealthChecksKey: StorageKey {
         public typealias Value = ApplicationHealthChecksProtocol
     }
-
     /// Aggregated application health checks handler.
-    ///
-    /// - Thread-Safety: Should be **immutable** or `Sendable`.
-    /// - Example:
-    ///   ```swift
-    ///   application.applicationHealthChecks = MyAppHealthChecks()
-    ///   ```
     public var applicationHealthChecks: ApplicationHealthChecksProtocol? {
         get { storage[ApplicationHealthChecksKey.self] }
         set { storage[ApplicationHealthChecksKey.self] = newValue }
@@ -78,10 +61,7 @@ extension Application {
     public struct RedisHealthChecksKey: StorageKey {
         public typealias Value = RedisHealthChecksProtocol
     }
-
     /// Redis health checks handler.
-    ///
-    /// - Thread-Safety: Should be **immutable** or `Sendable`.
     public var redisHealthChecks: RedisHealthChecksProtocol? {
         get { storage[RedisHealthChecksKey.self] }
         set { storage[RedisHealthChecksKey.self] = newValue }
@@ -91,10 +71,7 @@ extension Application {
     public struct MongoHealthChecksKey: StorageKey {
         public typealias Value = MongoHealthChecksProtocol
     }
-
     /// MongoDB health checks handler.
-    ///
-    /// - Thread-Safety: Should be **immutable** or `Sendable`.
     public var mongoHealthChecks: MongoHealthChecksProtocol? {
         get { storage[MongoHealthChecksKey.self] }
         set { storage[MongoHealthChecksKey.self] = newValue }

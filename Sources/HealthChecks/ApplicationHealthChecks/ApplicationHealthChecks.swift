@@ -40,7 +40,6 @@ import Vapor
 public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// The instance of the Vapor application.
     public let app: Application
-    
     /// Initializes a new `ApplicationHealthChecks` instance.
     ///
     /// - Parameter app: The Vapor `Application` instance.

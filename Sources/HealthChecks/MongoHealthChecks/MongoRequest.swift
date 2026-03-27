@@ -23,7 +23,6 @@
 //
 
 import Vapor
-import MongoCore
 import MongoClient
 
 public struct MongoRequest: MongoRequestSendable {

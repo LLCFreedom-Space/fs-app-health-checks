@@ -31,11 +31,7 @@ extension Application {
     private struct ServiceIdKey: StorageKey {
         typealias Value = UUID
     }
-
     /// Unique identifier of the current service instance.
-    ///
-    /// - Thread-Safety: Access is **not synchronized**, use with care in multi-threaded contexts.
-    /// - Example: `serviceId = UUID()`
     public var serviceId: UUID? {
         get { storage[ServiceIdKey.self] }
         set { storage[ServiceIdKey.self] = newValue }
@@ -45,10 +41,7 @@ extension Application {
     private struct ReleaseIdKey: StorageKey {
         typealias Value = String
     }
-
     /// Identifier of the current application release.
-    ///
-    /// - Example: `releaseId = "1.0.0"`
     public var releaseId: String? {
         get { storage[ReleaseIdKey.self] }
         set { storage[ReleaseIdKey.self] = newValue }
@@ -58,41 +51,31 @@ extension Application {
     private struct PsqlIdKey: StorageKey {
         typealias Value = String
     }
-
     /// Unique identifier for the PostgreSQL database instance.
-    ///
-    /// - Example: `psqlId = "db-prod-001"`
     public var psqlId: String? {
         get { storage[PsqlIdKey.self] }
         set { storage[PsqlIdKey.self] = newValue }
     }
-
     /// Storage key for Redis identifier.
     private struct RedisIdKey: StorageKey {
         typealias Value = String
     }
 
     /// Unique identifier for the Redis instance.
-    ///
-    /// - Example: `redisId = "redis-main-01"`
     public var redisId: String? {
         get { storage[RedisIdKey.self] }
         set { storage[RedisIdKey.self] = newValue }
     }
-
     /// Storage key for MongoDB identifier.
     private struct MongoIdKey: StorageKey {
         typealias Value = String
     }
 
     /// Unique identifier for the MongoDB instance.
-    ///
-    /// - Example: `mongoId = "mongo-cluster-01"`
     public var mongoId: String? {
         get { storage[MongoIdKey.self] }
         set { storage[MongoIdKey.self] = newValue }
     }
-
     /// Storage key for application launch time.
     private struct LaunchTimeKey: StorageKey {
         typealias Value = Double
@@ -101,8 +84,6 @@ extension Application {
     /// UNIX timestamp representing the application launch time.
     ///
     /// - Default: Current timestamp if not previously set.
-    /// - Thread-Safety: Access is **not synchronized**.
-    /// - Example: `launchTime = Date().timeIntervalSince1970`
     public var launchTime: Double {
         get { storage[LaunchTimeKey.self] ?? Date().timeIntervalSince1970 }
         set { storage[LaunchTimeKey.self] = newValue }

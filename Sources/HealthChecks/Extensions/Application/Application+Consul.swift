@@ -31,18 +31,9 @@ extension Application {
     private struct ConsulConfigKey: StorageKey {
         typealias Value = ConsulConfig
     }
-
     /// Consul configuration for the application.
     ///
     /// - Thread-Safety: Should be **immutable** or conform to `Sendable`.
-    /// - Example:
-    ///   ```swift
-    ///   application.consulConfig = ConsulConfig(
-    ///       host: "127.0.0.1",
-    ///       port: "8500",
-    ///       token: "secret-token"
-    ///   )
-    ///   ```
     public var consulConfig: ConsulConfig? {
         get { storage[ConsulConfigKey.self] }
         set { storage[ConsulConfigKey.self] = newValue }
