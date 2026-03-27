@@ -77,7 +77,7 @@ struct ApplicationHealthChecksCheckTests {
         try await withApp { app in
             let healthChecks = ApplicationHealthChecks(app: app)
             let checks = await healthChecks.check(for: [.connections])
-            #expect(checks.count == 0)  // Expect empty result, as .memory is not supported
+            #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported
         }
     }
 }

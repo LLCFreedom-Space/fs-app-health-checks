@@ -40,7 +40,7 @@ struct HealthChecksTests {
 
     @Test("Get public version")
     func getPublicVersion() async throws {
-        try await withApp { app in
+        try await withApp { _ in
             let releaseId = "1.0.0"
             let version = HealthChecks().getPublicVersion(from: releaseId)
             #expect(version == "1")

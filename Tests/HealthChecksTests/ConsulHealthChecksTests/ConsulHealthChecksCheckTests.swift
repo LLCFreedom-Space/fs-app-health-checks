@@ -80,7 +80,7 @@ struct ConsulHealthChecksCheckTests {
                 Issue.record("No have observed value")
                 return
             }
-            #expect(observedValue > 0)
+            #expect(observedValue > .zero)
             #expect(responseTimeCheck.output == nil)
             guard let connectionsCheck = check["\(ComponentName.consul):\(MeasurementType.connections)"] else {
                 Issue.record("No have key for connections")
@@ -97,7 +97,7 @@ struct ConsulHealthChecksCheckTests {
         try await withApp { app in
             let healthChecks = ConsulHealthChecks(app: app)
             let checks = await healthChecks.check(for: [.uptime])
-            #expect(checks.count == 0)  // Expect empty result, as .memory is not supported
+            #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported
         }
     }
 }

@@ -40,7 +40,7 @@ struct HealthCheckItemTests {
 
     @Test("Health check item equatable")
     func healthCheckItemEquatable() async throws {
-        try await withApp { app in
+        try await withApp { _ in
             let firstHealthCheckItem = HealthCheckItem(
                 componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
                 componentType: .datastore,

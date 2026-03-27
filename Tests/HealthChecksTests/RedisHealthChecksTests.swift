@@ -110,7 +110,7 @@ struct RedisHealthChecksTests {
             #expect(redisResponseTimes?.componentType == .datastore)
             #expect(redisResponseTimes?.observedValue == 1.0)
             #expect(redisResponseTimes?.observedUnit == "s")
-            #expect(redisResponseTimes?.status ==  .pass)
+            #expect(redisResponseTimes?.status == .pass)
             #expect(redisResponseTimes?.affectedEndpoints == nil)
             #expect(redisResponseTimes?.output == "Ok")
             #expect(redisResponseTimes?.links == nil)

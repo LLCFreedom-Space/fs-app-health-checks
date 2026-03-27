@@ -39,7 +39,7 @@ extension Application {
     ///   ```swift
     ///   application.consulConfig = ConsulConfig(
     ///       host: "127.0.0.1",
-    ///       port: 8500,
+    ///       port: "8500",
     ///       token: "secret-token"
     ///   )
     ///   ```

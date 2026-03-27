@@ -58,7 +58,7 @@ struct ConsulHealthChecksResponseTimeTests {
                 Issue.record("No have observed value")
                 return
             }
-            #expect(observedValue > 0)
+            #expect(observedValue > .zero)
             #expect(result.output == nil)
         }
     }
@@ -75,7 +75,7 @@ struct ConsulHealthChecksResponseTimeTests {
                 Issue.record("No have observed value")
                 return
             }
-            #expect(observedValue == 0)
+            #expect(observedValue == .zero)
             #expect(result.output != nil)
         }
     }

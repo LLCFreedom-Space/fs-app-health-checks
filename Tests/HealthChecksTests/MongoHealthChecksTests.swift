@@ -87,7 +87,13 @@ struct MongoHealthChecksTests {
         try await withApp { app in
             app.mongoId = UUID().uuidString
             app.mongoHealthChecks = MongoHealthChecksMock()
-            let mock = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
+            let mock = await app.mongoHealthChecks?.check(
+                for: [
+                    MeasurementType.responseTime,
+                    MeasurementType.connections,
+                    MeasurementType.utilization
+                ]
+            )
             let mockMongoConnections = mock?["\(ComponentName.mongo):\(MeasurementType.connections)"]
             #expect(mockMongoConnections == MongoHealthChecksMock.healthCheckItem)
             let mockMongoResponseTimes = mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
@@ -95,7 +101,13 @@ struct MongoHealthChecksTests {
 
             app.mongoRequest = MongoRequestMock()
             app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
-            let result = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
+            let result = await app.mongoHealthChecks?.check(
+                for: [
+                    MeasurementType.responseTime,
+                    MeasurementType.connections,
+                    MeasurementType.utilization
+                ]
+            )
             let mongoConnections = result?["\(ComponentName.mongo):\(MeasurementType.connections)"]
             #expect(mongoConnections?.componentType == .datastore)
             #expect(mongoConnections?.observedValue != 1.0)
