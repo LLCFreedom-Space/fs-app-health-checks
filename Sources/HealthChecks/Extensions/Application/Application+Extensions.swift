@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  Application+Extension.swift
+//  Application+Extensions.swift
 //  fs-app-health-checks
 //
 //  Created by Mykola Buhaiov on 27.03.2026.
