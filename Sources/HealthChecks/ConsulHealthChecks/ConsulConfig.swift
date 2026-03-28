@@ -37,37 +37,14 @@ import Vapor
 /// Conforms to `Sendable`, making it safe to use across concurrent contexts.
 public struct ConsulConfig: Sendable {
     /// A unique identifier for this Consul configuration within your application.
-    ///
-    /// This identifier is intended for internal use only and is not related
-    /// to any identifier within Consul itself.
-    ///
-    /// - Example: `"43119325-63f5-4e14-9175-84e0e296c527"`
     public var id: String
     /// The URL of the Consul server to connect to.
-    ///
-    /// This should include the protocol (`http` or `https`) and the host.
-    ///
-    /// - Examples:
-    ///   - `"http://127.0.0.1:8500"`
-    ///   - `"https://xmpl-consul.example.com"`
     public var url: String
     /// The username for authenticating with Consul (optional).
-    ///
-    /// Provide this value if your Consul instance requires basic authentication.
-    ///
-    /// - Example: `"username"`
     public var username: String?
     /// The password for authenticating with Consul (optional).
-    ///
-    /// Used together with `username` when authentication is required.
-    ///
-    /// - Example: `"password"`
     public var password: String?
     /// The token for authenticating with Consul (optional).
-    ///
-    /// Used together with `username` when authentication is required.
-    ///
-    /// - Example: `"token"`
     public var token: String?
 
     /// Creates a new `ConsulConfig` instance.

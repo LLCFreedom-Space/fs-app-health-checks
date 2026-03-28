@@ -25,25 +25,19 @@
 import Vapor
 
 /// Protocol defining PostgreSQL health check capabilities.
-///
-/// Conforming types are expected to provide methods for checking PostgreSQL connections,
-/// measuring response times, and retrieving version information in an asynchronous context.
 public protocol PostgresChecksProtocol {
     /// Retrieves the PostgreSQL connection status.
     ///
     /// - Returns: A `HealthCheckItem` representing the connection state.
     func connection() async -> HealthCheckItem
-
     /// Measures the PostgreSQL response time.
     ///
     /// - Returns: A `HealthCheckItem` containing the response time metric.
     func responseTime() async -> HealthCheckItem
-
     /// Retrieves the PostgreSQL version string.
     ///
     /// - Returns: A `String` representing the PostgreSQL version.
     func getVersion() async -> String
-
     /// Checks the connection for the PostgreSQL database.
     ///
     /// - Returns: A `String` describing the database connection status, e.g., `"connected"` or `"disconnected"`.

@@ -26,15 +26,10 @@ import Vapor
 import Redis
 
 /// A protocol for sending requests to a Redis server and receiving responses.
-///
-/// `RedisRequestSendable` defines a standard interface for performing
-/// simple Redis operations in a concurrency-safe way (`Sendable`).
 public protocol RedisRequestSendable: Sendable {
     /// Sends a ping request to the Redis server and returns the response.
     ///
     /// - Returns: A `String` representing the Redis server response,
     ///   typically `"PONG"` if the server is reachable.
-    ///
-    /// - Throws: An error if the request fails or the Redis server is unreachable.
     func getPong() async throws -> String
 }

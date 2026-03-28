@@ -25,9 +25,6 @@
 import Vapor
 
 /// A collection of constant values used throughout the application.
-///
-/// `Constants` provides default configuration values such as date formats
-/// and default URLs/paths for external services like Consul.
 public enum Constants {
     /// Default date format used for timestamps in health checks and logs.
     static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"

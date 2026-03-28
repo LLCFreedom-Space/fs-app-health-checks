@@ -25,18 +25,6 @@
 import Vapor
 
 /// Provides health check functionality for the application.
-///
-/// `ApplicationHealthChecks` implements `ApplicationHealthChecksProtocol`
-/// and offers system-level health checks, such as uptime monitoring.
-/// It serves as the central point for gathering application health metrics
-/// in a Vapor-based project.
-///
-/// - Properties:
-///   - `app`: The `Application` instance used to access configuration, logging, and runtime data.
-///
-/// - Usage:
-/// Initialize with a Vapor `Application` instance and call the methods
-/// defined in `ApplicationHealthChecksProtocol` to perform health checks.
 public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// The instance of the Vapor application.
     public let app: Application
@@ -53,13 +41,7 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// the time interval (in seconds) since the app was launched.
     /// It returns the result formatted as a `HealthCheckItem`.
     ///
-    /// - Returns: A `HealthCheckItem` containing:
-    ///   - `componentType`: `.system`
-    ///   - `observedValue`: The uptime in seconds
-    ///   - `observedUnit`: `"s"` (seconds)
-    ///   - `status`: `.pass` (always assumed healthy)
-    ///   - `time`: The current timestamp in ISO 8601 format
-    ///
+    /// - Returns: `HealthCheckItem`
     /// - Note:
     /// The uptime is derived from `app.launchTime`, so it is important
     /// that this value is correctly set during application startup.
@@ -86,13 +68,6 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// - Returns: A dictionary where:
     ///   - Key: `String` representation of the `MeasurementType`
     ///   - Value: Corresponding `HealthCheckItem` result
-    ///
-    /// - Behavior:
-    ///   - Duplicate measurement types are ignored
-    ///   - Unsupported or unhandled types are skipped
-    ///   - Currently supports:
-    ///     - `.uptime` → returns application uptime
-    ///
     /// - Note:
     /// An empty key is temporarily used during initialization and removed before returning the final result.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {

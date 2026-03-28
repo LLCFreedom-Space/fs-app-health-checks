@@ -28,40 +28,22 @@ import Vapor
 /// Represents the health status of a service, including version, release, notes, checks, and related metadata.
 public struct HealthCheck: Content {
     /// Indicates whether the service status is acceptable or not.
-    ///
-    /// - Example: `.pass`, `.warm`, `.fail`
     public var status: HealthCheckStatus?
     /// Public version of the service.
-    ///
-    /// - Example: `"1"`
     public var version: String?
     /// Release identifier of the service.
-    ///
-    /// - Example: `"1.0.0"`
     public var releaseId: String?
     /// Array of notes relevant to the current state of health.
-    ///
-    /// - Example: `["All ok"]`
     public var notes: [String]?
     /// Raw error output, in case of `fail` or `warn` states.
-    ///  
-    /// - Example: `"Redis database not exist"`
     public var output: String?
     /// Dictionary of arrays that provides all health check items.
-    ///  
-    /// - Example: `["component": [HealthCheckItem.example]]`
     public var checks: [String: [HealthCheckItem]]?
     /// Dictionary of links for more information.
-    ///
-    /// - Example: `["about": "https://example.com/about/service"]`
     public var links: [String: String]?
     /// Unique identifier of the service, within the application scope.
-    ///
-    /// - Example: `43119325-63f5-4e14-9175-84e0e296c527`
     public var serviceId: UUID?
     /// Human-friendly description of the service.
-    ///
-    /// - Example: `"This service is used to get application health"`
     public var description: String?
     
     /// Initializes a new `HealthCheck`.

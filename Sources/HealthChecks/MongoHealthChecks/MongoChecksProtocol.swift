@@ -26,13 +26,6 @@ import Vapor
 import MongoClient
 
 /// Protocol defining health check operations for MongoDB connections.
-///
-/// `MongoChecksProtocol` groups functions related to monitoring MongoDB
-/// connectivity and performance. Implementers of this protocol can provide
-/// concrete logic to measure connection status, response time, and connection state.
-///
-/// - Note:
-/// All methods are asynchronous to accommodate network or I/O operations.
 public protocol MongoChecksProtocol {
     /// Retrieves the current status of the MongoDB connection.
     ///

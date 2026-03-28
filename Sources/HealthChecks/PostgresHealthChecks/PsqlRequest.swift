@@ -27,8 +27,6 @@ import Fluent
 import FluentPostgresDriver
 
 /// Concrete implementation of `PsqlRequestSendable` for interacting with PostgreSQL.
-///
-/// Provides methods to retrieve the database version and check active connections in an asynchronous context.
 public struct PsqlRequest: PsqlRequestSendable {
     /// Instance of the application.
     public let app: Application
@@ -42,7 +40,6 @@ public struct PsqlRequest: PsqlRequestSendable {
     /// Retrieves the PostgreSQL version description.
     ///
     /// - Returns: A `String` containing the PostgreSQL version, or an error message if the connection fails.
-    /// - Throws: Any error encountered during database query execution.
     public func getVersionDescription() async throws -> String {
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?
             .simpleQuery("SELECT version()")
@@ -59,7 +56,6 @@ public struct PsqlRequest: PsqlRequestSendable {
     ///
     /// - Parameter databaseName: Name of the PostgreSQL database.
     /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
-    /// - Throws: Any error encountered during database query execution.
     public func checkConnection(for databaseName: String) async throws -> String {
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?
             .simpleQuery("SELECT * FROM pg_stat_activity WHERE datname = '\(databaseName)' and state = 'active';")

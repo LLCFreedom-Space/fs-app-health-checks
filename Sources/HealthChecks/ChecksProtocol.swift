@@ -25,13 +25,6 @@
 import Vapor
 
 /// Protocol defining generic health check functionality for application components.
-///
-/// `ChecksProtocol` provides a standard interface for performing health checks
-/// across various components or services. It allows implementers to define
-/// custom checks and return structured results for monitoring purposes.
-///
-/// - Note:
-/// All methods are asynchronous to support network calls, database checks, or other I/O operations.
 public protocol ChecksProtocol {
     /// Performs health checks for the specified measurement types.
     ///

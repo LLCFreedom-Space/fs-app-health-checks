@@ -46,14 +46,14 @@ extension HealthCheckItem: Equatable {
     /// - Returns: `true` if all properties are equal; otherwise `false`.
     public static func == (lhs: HealthCheckItem, rhs: HealthCheckItem) -> Bool {
         return lhs.componentId == rhs.componentId &&
-               lhs.componentType == rhs.componentType &&
-               lhs.observedValue == rhs.observedValue &&
-               lhs.observedUnit == rhs.observedUnit &&
-               lhs.status == rhs.status &&
-               lhs.affectedEndpoints == rhs.affectedEndpoints &&
-               lhs.time == rhs.time &&
-               lhs.output == rhs.output &&
-               lhs.links == rhs.links &&
-               lhs.node == rhs.node
+        lhs.componentType == rhs.componentType &&
+        lhs.observedValue == rhs.observedValue &&
+        lhs.observedUnit == rhs.observedUnit &&
+        lhs.status == rhs.status &&
+        lhs.affectedEndpoints == rhs.affectedEndpoints &&
+        lhs.time == rhs.time &&
+        lhs.output == rhs.output &&
+        lhs.links == rhs.links &&
+        lhs.node == rhs.node
     }
 }

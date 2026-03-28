@@ -138,6 +138,20 @@ dependencies: [
 }
 ```
 
+## 📊 MongoDB Connection Strategies Comparison
+
+| Feature / Behavior        | **Eager Connection**                              | **Lazy Connection**                               | **Hybrid Approach (Recommended)**                          |
+|--------------------------|--------------------------------------------------|--------------------------------------------------|----------------------------------------------------------|
+| **Connection timing**     | At application startup                           | On first database operation                      | Lazy + background warm-up after startup                  |
+| **Initialization type**  | Asynchronous (`async/await`)                     | Synchronous                                      | Mixed (`lazy` + async warm-up task)                      |
+| **Failure behavior**     | Fails fast on startup                            | Fails later at runtime                           | Does not block startup, but surfaces errors early        |
+| **Startup impact**       | Slower (waits for DB)                            | Fast                                             | Fast startup with controlled background initialization   |
+| **Reliability at start** | High (connection guaranteed)                     | Low (not verified yet)                           | Medium → High (verified shortly after startup)           |
+| **First request latency**| None                                             | Possible delay                                   | Usually none (connection warmed up in background)        |
+| **Error visibility**     | Immediate                                        | Delayed                                          | Early but non-blocking                                   |
+| **Best use cases**       | Critical systems, strict environments            | Dev / staging, optional dependencies             | Production-grade distributed systems                     |
+| **Resilience pattern**   | Fail-fast                                        | Lazy-init                                        | Lazy-init + retry + warm-up + health checks              |
+
 ## Links
 
 LLC Freedom Space – [@LLCFreedomSpace](https://twitter.com/llcfreedomspace) – [support@freedomspace.company](mailto:support@freedomspace.company)

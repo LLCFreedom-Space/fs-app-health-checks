@@ -25,29 +25,12 @@
 import Vapor
 
 /// Protocol for performing application-level health checks.
-///
-/// `ApplicationChecksProtocol` defines the contract for basic system-level
-/// health checks, such as monitoring application uptime. Implementers can
-/// extend this protocol to include more detailed or platform-specific checks.
-///
-/// - Note:
-/// This protocol focuses on runtime and system metrics that reflect the
-/// application's overall health and availability.
 public protocol ApplicationChecksProtocol {
     /// Retrieves the uptime of the application as a health check item.
     ///
     /// This method provides a basic indication of the application's system-level health
     /// by reporting how long the application has been running since startup.
     ///
-    /// - Returns: A `HealthCheckItem` containing:
-    ///   - `componentType`: Typically `.system`
-    ///   - `observedValue`: Uptime in seconds
-    ///   - `observedUnit`: `"s"` (seconds)
-    ///   - `status`: Health status (usually `.pass`)
-    ///   - `time`: Timestamp of when the measurement was taken
-    ///
-    /// - Important:
-    /// The uptime calculation depends on a correctly initialized
-    /// application launch time.
+    /// - Returns: `HealthCheckItem`
     func uptime() -> HealthCheckItem
 }

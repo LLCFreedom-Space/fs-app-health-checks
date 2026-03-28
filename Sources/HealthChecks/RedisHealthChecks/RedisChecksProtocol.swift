@@ -25,9 +25,6 @@
 import Vapor
 
 /// Protocol defining Redis health check operations.
-///
-/// Conforming types provide methods to check Redis connection status, measure response time,
-/// and retrieve a ping response in an asynchronous and concurrent-safe context.
 public protocol RedisChecksProtocol {
     /// Retrieves the Redis connection status.
     ///

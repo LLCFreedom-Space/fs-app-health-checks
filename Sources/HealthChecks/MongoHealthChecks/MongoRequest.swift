@@ -25,6 +25,7 @@
 import Vapor
 import MongoClient
 
+/// Concrete implementation of `MongoRequestSendable` for interacting with MongoDB.
 public struct MongoRequest: MongoRequestSendable {
     /// Instance of app as `Application`
     public let app: Application

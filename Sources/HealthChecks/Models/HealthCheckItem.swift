@@ -27,42 +27,24 @@ import Vapor
 /// Represents the health check data of a specific sub-component or dependency within a service.
 public struct HealthCheckItem: Content {
     /// Unique identifier of an instance of a specific sub-component or dependency.
-    ///
-    /// - Example: `"43119325-63f5-4e14-9175-84e0e296c527"`
     public var componentId: String?
     /// Type of the component.
-    ///
-    /// - Example: `.component`, `.datastore`, `.system`
     public var componentType: ComponentType?
     /// Observed numeric value for the component (could be any valid measurement).
-    ///
-    /// - Example: `100`
     public var observedValue: Double?
     /// Unit of the observed value (important to know whether in seconds, minutes, etc.).
-    ///
-    /// - Example: `"ms"`
     public var observedUnit: String?
     /// Status of this health check.
     public var status: HealthCheckStatus?
     /// ISO8601 timestamp at which the observed value was recorded.
-    ///
-    /// - Example: `"2024-01-17T03:36:48Z"`
     public var time: String?
     /// Array of affected endpoints.
-    ///
-    /// - Example: `["http://example.com/pass/endpoints"]`
     public var affectedEndpoints: [String]?
     /// Raw error output in case of `fail` or `warn` states.
-    ///
-    /// - Example: `"Redis database not exist"`
     public var output: String?
     /// Dictionary of links with more information about this health check item.
-    ///
-    /// - Example: `["about": "http://api.example.com/about/authz"]`
     public var links: [String: String]?
     /// Node number of the component instance.
-    ///
-    /// - Example: `1`
     public var node: Int?
 
     /// Initializes a new `HealthCheckItem`.

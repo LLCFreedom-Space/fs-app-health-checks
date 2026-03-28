@@ -26,10 +26,6 @@ import Vapor
 import Redis
 
 /// Service that provides redis health check functionality
-/// Concrete implementation of `RedisHealthChecksProtocol` for performing Redis health checks.
-///
-/// Provides methods to retrieve Redis connection status, measure response time,
-/// and get a ping response in an asynchronous context.
 public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Instance of the application.
     public let app: Application

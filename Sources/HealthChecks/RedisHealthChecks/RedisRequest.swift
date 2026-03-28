@@ -32,10 +32,6 @@ import Redis
 ///
 /// - Properties:
 ///   - `app`: The Vapor `Application` instance used to access the Redis client.
-///
-/// - Note:
-/// This implementation uses the application's Redis configuration
-/// and client to execute commands.
 public struct RedisRequest: RedisRequestSendable {
     /// Instance of the Vapor application.
     public let app: Application
@@ -50,7 +46,6 @@ public struct RedisRequest: RedisRequestSendable {
     ///
     /// - Returns: A `String` response from Redis, typically `"PONG"` if successful.
     ///
-    /// - Throws: An error if the request fails or the Redis server is unavailable.
     public func getPong() async throws -> String {
         try await app.redis.ping().get()
     }
