@@ -199,6 +199,8 @@ extension Application {
     }
 
     /// Initializes MongoDB cluster with eager connection.
+    ///
+    /// - Parameter connectionString: MongoDB connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
     public func initializeMongoCluster(connectionString: String) async throws {
@@ -208,6 +210,8 @@ extension Application {
     }
 
     /// Initializes MongoDB cluster with lazy connection.
+    ///
+    /// - Parameter connectionString: MongoDB connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
     public func initializeLazyMongoCluster(connectionString: String) throws {
