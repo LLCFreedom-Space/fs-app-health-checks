@@ -22,97 +22,113 @@
 //  Created by Mykola Buhaiov on 21.02.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-final class RedisHealthChecksTests: XCTestCase {
-    func testConnection() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.redisId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-        app.redisHealthChecks = RedisHealthChecksMock()
-        let mockResult = await app.redisHealthChecks?.connection()
-        XCTAssertEqual(mockResult, RedisHealthChecksMock.healthCheckItem)
-
-        app.redisRequest = RedisRequestMock()
-        app.redisHealthChecks = RedisHealthChecks(app: app)
-        let result = await app.redisHealthChecks?.connection()
-        XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertNotEqual(result?.observedValue, 1.0)
-        XCTAssertEqual(result?.status, .pass)
-        XCTAssertNil(result?.affectedEndpoints)
-        XCTAssertNil(result?.output)
-        XCTAssertNil(result?.links)
-        XCTAssertNil(result?.node)
+@Suite("Redis health checks tests")
+struct RedisHealthChecksTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
+        }
+        try await app.asyncShutdown()
     }
-    
-    func testResponseTime() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let redisId = UUID().uuidString
-        app.redisId = redisId
-        app.redisHealthChecks = RedisHealthChecksMock()
-        let mockResult = await app.redisHealthChecks?.responseTime()
-        XCTAssertEqual(mockResult, RedisHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(app.redisId, redisId)
 
-        app.redisRequest = RedisRequestMock()
-        app.redisHealthChecks = RedisHealthChecks(app: app)
-        let result = await app.redisHealthChecks?.responseTime()
-        XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertNotEqual(result?.observedValue, 1.0)
-        XCTAssertEqual(result?.observedUnit, "ms")
-        XCTAssertEqual(result?.status, .pass)
-        XCTAssertNil(result?.affectedEndpoints)
-        XCTAssertNil(result?.output)
-        XCTAssertNil(result?.links)
-        XCTAssertNil(result?.node)
+    @Test("Connection")
+    func connection() async throws {
+        try await withApp { app in
+            app.redisId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+            app.redisHealthChecks = RedisHealthChecksMock()
+            let mockResult = await app.redisHealthChecks?.connection()
+            #expect(mockResult == RedisHealthChecksMock.healthCheckItem)
+
+            app.redisRequest = RedisRequestMock()
+            app.redisHealthChecks = RedisHealthChecks(app: app)
+            let result = await app.redisHealthChecks?.connection()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue != 1.0)
+            #expect(result?.status == .pass)
+            #expect(result?.affectedEndpoints == nil)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
     }
-    
-    func testHealthCheck() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.redisHealthChecks = RedisHealthChecksMock()
-        let mockResult = await app.redisHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-        let mockRedisConnections = mockResult?["\(ComponentName.redis):\(MeasurementType.connections)"]
-        XCTAssertEqual(mockRedisConnections, RedisHealthChecksMock.healthCheckItem)
-        let mockRedisResponseTimes = mockResult?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(mockRedisResponseTimes, RedisHealthChecksMock.healthCheckItem)
 
-        app.redisRequest = RedisRequestMock()
-        app.redisHealthChecks = RedisHealthChecks(app: app)
-        let result = await app.redisHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-        let redisConnections = result?["\(ComponentName.redis):\(MeasurementType.connections)"]
-        XCTAssertEqual(redisConnections?.componentType, .datastore)
-        XCTAssertNotEqual(redisConnections?.observedValue, 1.0)
-        XCTAssertEqual(redisConnections?.status, .pass)
-        XCTAssertNil(redisConnections?.affectedEndpoints)
-        XCTAssertNil(redisConnections?.output)
-        XCTAssertNil(redisConnections?.links)
-        XCTAssertNil(redisConnections?.node)
-        let redisResponseTimes = mockResult?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(redisResponseTimes, PostgresHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(redisResponseTimes, PostgresHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(redisResponseTimes?.componentType, .datastore)
-        XCTAssertEqual(redisResponseTimes?.observedValue, 1.0)
-        XCTAssertEqual(redisResponseTimes?.observedUnit, "s")
-        XCTAssertEqual(redisResponseTimes?.status, .pass)
-        XCTAssertNil(redisResponseTimes?.affectedEndpoints)
-        XCTAssertEqual(redisResponseTimes?.output, "Ok")
-        XCTAssertNil(redisResponseTimes?.links)
-        XCTAssertNil(redisResponseTimes?.node)
+    @Test("Response time")
+    func responseTime() async throws {
+        try await withApp { app in
+            let redisId = UUID().uuidString
+            app.redisId = redisId
+            app.redisHealthChecks = RedisHealthChecksMock()
+            let mockResult = await app.redisHealthChecks?.responseTime()
+            #expect(mockResult == RedisHealthChecksMock.healthCheckItem)
+            #expect(app.redisId == redisId)
+
+            app.redisRequest = RedisRequestMock()
+            app.redisHealthChecks = RedisHealthChecks(app: app)
+            let result = await app.redisHealthChecks?.responseTime()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue != 1.0)
+            #expect(result?.observedUnit == "ms")
+            #expect(result?.status == .pass)
+            #expect(result?.affectedEndpoints == nil)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
     }
-    
-    func testPing() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.redisHealthChecks = RedisHealthChecksMock()
-        let mockResult = await app.redisHealthChecks?.ping()
-        XCTAssertEqual(mockResult, "PONG")
 
-        app.redisRequest = RedisRequestMock()
-        app.redisHealthChecks = RedisHealthChecks(app: app)
-        let result = await app.redisHealthChecks?.ping()
-        XCTAssertEqual(result, "PONG")
+    @Test("Health check")
+    func healthCheck() async throws {
+        try await withApp { app in
+            app.redisHealthChecks = RedisHealthChecksMock()
+            let mockResult = await app.redisHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+            let mockRedisConnections = mockResult?["\(ComponentName.redis):\(MeasurementType.connections)"]
+            #expect(mockRedisConnections == RedisHealthChecksMock.healthCheckItem)
+            let mockRedisResponseTimes = mockResult?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
+            #expect(mockRedisResponseTimes == RedisHealthChecksMock.healthCheckItem)
+
+            app.redisRequest = RedisRequestMock()
+            app.redisHealthChecks = RedisHealthChecks(app: app)
+            let result = await app.redisHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+            let redisConnections = result?["\(ComponentName.redis):\(MeasurementType.connections)"]
+            #expect(redisConnections?.componentType == .datastore)
+            #expect(redisConnections?.observedValue != 1.0)
+            #expect(redisConnections?.status == .pass)
+            #expect(redisConnections?.affectedEndpoints == nil)
+            #expect(redisConnections?.output == nil)
+            #expect(redisConnections?.links == nil)
+            #expect(redisConnections?.node == nil)
+            let redisResponseTimes = mockResult?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
+            #expect(redisResponseTimes == PostgresHealthChecksMock.healthCheckItem)
+            #expect(redisResponseTimes == PostgresHealthChecksMock.healthCheckItem)
+            #expect(redisResponseTimes?.componentType == .datastore)
+            #expect(redisResponseTimes?.observedValue == 1.0)
+            #expect(redisResponseTimes?.observedUnit == "s")
+            #expect(redisResponseTimes?.status == .pass)
+            #expect(redisResponseTimes?.affectedEndpoints == nil)
+            #expect(redisResponseTimes?.output == "Ok")
+            #expect(redisResponseTimes?.links == nil)
+            #expect(redisResponseTimes?.node == nil)
+        }
+    }
+
+    @Test("Ping")
+    func ping() async throws {
+        try await withApp { app in
+            app.redisHealthChecks = RedisHealthChecksMock()
+            let mockResult = await app.redisHealthChecks?.ping()
+            #expect(mockResult == "PONG")
+
+            app.redisRequest = RedisRequestMock()
+            app.redisHealthChecks = RedisHealthChecks(app: app)
+            let result = await app.redisHealthChecks?.ping()
+            #expect(result == "PONG")
+        }
     }
 }

@@ -24,15 +24,17 @@
 
 import Vapor
 
-/// Indicates whether the service status is acceptable or not
+/// Represents the status of a health check for a service or component.
 public enum HealthCheckStatus: String {
-    /// Unhealthy
+    /// Unhealthy state — the service or component has failed health checks.
     case fail
-    /// Healthy, with some concerns
+    /// Healthy state with warnings — the service or component is operational but has some concerns.
     case warm
-    /// Healthy, without concerns
+    /// Fully healthy — the service or component is operational without any concerns.
     case pass
 }
+
+// MARK: - Protocol Conformances
 
 extension HealthCheckStatus: Content {}
 

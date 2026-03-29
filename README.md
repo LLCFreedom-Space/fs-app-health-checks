@@ -12,16 +12,52 @@
 
 This repository offers a wide collection of health checks features for widely used services and platforms.
 
-## Health Checks Library for Swift
+# Health Checks Library for Swift
 
 The Health Checks Library for Swift is a simple and easy-to-use way to implement health checks for your server-side Swift applications. It is designed specifically for the Vapor framework and also conforms to the RFC [Health Check Response Format for HTTP APIs](https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-06#section-4.6-1).
 
-Features
+## ✨ Features
 
-* A set of pre-defined health checks that cover common server-side functionality, such as database connectivity, HTTP connectivity, and memory usage.
-* The ability to create custom health checks to monitor your application's specific needs.
-* A simple API that makes it easy to implement health checks in your Vapor application.
-* Conforms to the RFC [Health Check Response Format for HTTP APIs](https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-06#section-4.6-1).
+### ✅ Aggregated Application Health Checks
+- Aggregates the status of all components into a single `HealthCheck` structure.
+- Provides a complete overview of the service status in one request.
+- Convenient JSON representation for APIs and dashboards.
+
+### 🛢️ PostgreSQL, MongoDB, Redis Monitoring
+- Automatic connection and status checks for databases.
+- Measures response time.
+- Structured results using `HealthCheckItem`.
+- Easy integration with the `Application` object.
+
+### ⚙️ Custom Component Support
+- Add custom services or components.
+- Supports component types: `component`, `datastore`, `system`.
+- Track custom metrics and statuses.
+
+### ⏱️ Response Time & Performance Metrics
+- Measures request latency in milliseconds.
+- Tracks component performance.
+- Supports measurement types: `responseTime`, `uptime`, `connections`, `utilization`.
+
+### 🧾 Human-Readable & Machine-Readable Output
+- JSON format for APIs.
+- Fields `notes`, `output`, `links` for detailed information.
+- Contains `serviceId`, `releaseId`, `version`.
+
+### 🔒 Asynchronous and Concurrency-Safe
+- Fully `Sendable` and asynchronous (`async/await`) design.
+- Safe for parallel requests.
+
+### 🛠️ Extensible and Modular
+- Easily add new protocols for other components.
+- Compatible with `Consul`, Kafka, gRPC, etc.
+- Can create custom `HealthCheckItem` for additional metrics.
+
+## 🚀 Future Enhancements
+
+- **Kafka Producer**: Integrate Kafka producers to monitor message publishing.
+- **Kafka Consumer**: Add support for Kafka consumers to monitor message consumption and processing.
+- **gRPC**: Add health checks and metrics for gRPC services.
 
 ## Installation
 
@@ -31,9 +67,90 @@ Once you have your Swift package set up, adding App Health Checks as a dependenc
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/LLCFreedom-Space/fs-app-health-checks.git", from: "1.0.0")
+    .package(url: "https://github.com/LLCFreedom-Space/fs-app-health-checks.git", from: "x.x.x")
 ]
 ```
+
+## List of checks
+
+- **Application** – Basic application health status.
+- **ConsulHealthChecks** – Checks the status of your Consul services.
+- **MongoHealthChecks** – Checks MongoDB connectivity and status.
+- **PostgresHealthChecks** – Checks PostgreSQL connectivity and status.
+- **RedisHealthChecks** – Checks Redis connectivity and status.
+
+## Example of result
+```swift
+{
+  "status": "pass",
+  "version": "1",
+  "releaseId": "1.0.0",
+  "serviceId": "43119325-63f5-4e14-9175-84e0e296c527",
+  "notes": ["All services operational"],
+  "checks": {
+    "system": [
+      {
+        "componentId": "system-uptime",
+        "componentType": "system",
+        "observedValue": 12345,
+        "observedUnit": "s",
+        "status": "pass",
+        "time": "2026-03-25T17:36:48Z"
+      }
+    ],
+    "datastore": [
+      {
+        "componentId": "mongo-db-1",
+        "componentType": "datastore",
+        "observedValue": 12.5,
+        "observedUnit": "ms",
+        "status": "pass",
+        "time": "2026-03-25T17:36:48Z"
+      },
+      {
+        "componentId": "redis-db-1",
+        "componentType": "datastore",
+        "observedValue": 2.1,
+        "observedUnit": "ms",
+        "status": "pass",
+        "time": "2026-03-25T17:36:48Z"
+      },
+      {
+        "componentId": "postgres-db-1",
+        "componentType": "datastore",
+        "observedValue": 15.0,
+        "observedUnit": "ms",
+        "status": "pass",
+        "time": "2026-03-25T17:36:48Z"
+      }
+    ],
+    "component": [
+      {
+        "componentId": "consul-service-1",
+        "componentType": "component",
+        "observedValue": 15.3,
+        "observedUnit": "ms",
+        "status": "pass",
+        "time": "2026-03-25T17:36:48Z"
+      }
+    ]
+  }
+}
+```
+
+## 📊 MongoDB Connection Strategies Comparison
+
+| Feature / Behavior        | **Eager Connection**                              | **Lazy Connection**                               | **Hybrid Approach (Recommended)**                          |
+|--------------------------|--------------------------------------------------|--------------------------------------------------|----------------------------------------------------------|
+| **Connection timing**     | At application startup                           | On first database operation                      | Lazy + background warm-up after startup                  |
+| **Initialization type**  | Asynchronous (`async/await`)                     | Synchronous                                      | Mixed (`lazy` + async warm-up task)                      |
+| **Failure behavior**     | Fails fast on startup                            | Fails later at runtime                           | Does not block startup, but surfaces errors early        |
+| **Startup impact**       | Slower (waits for DB)                            | Fast                                             | Fast startup with controlled background initialization   |
+| **Reliability at start** | High (connection guaranteed)                     | Low (not verified yet)                           | Medium → High (verified shortly after startup)           |
+| **First request latency**| None                                             | Possible delay                                   | Usually none (connection warmed up in background)        |
+| **Error visibility**     | Immediate                                        | Delayed                                          | Early but non-blocking                                   |
+| **Best use cases**       | Critical systems, strict environments            | Dev / staging, optional dependencies             | Production-grade distributed systems                     |
+| **Resilience pattern**   | Fail-fast                                        | Lazy-init                                        | Lazy-init + retry + warm-up + health checks              |
 
 ## Links
 

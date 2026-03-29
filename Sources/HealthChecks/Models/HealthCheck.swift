@@ -25,53 +25,39 @@
 import Vapor
 
 /// A generic `HealthCheck` data that can be sent in response.
+/// Represents the health status of a service, including version, release, notes, checks, and related metadata.
 public struct HealthCheck: Content {
-    /// Indicates whether the service status is acceptable or not
-    /// Example: one of the enumeration:`pass` or `warm` or `fail`
+    /// Indicates whether the service status is acceptable or not.
     public var status: HealthCheckStatus?
-
-    /// Public version of the service
-    /// Example: `1`
+    /// Public version of the service.
     public var version: String?
-
-    /// Release id of the service
-    /// Example: `1.0.0`
+    /// Release identifier of the service.
     public var releaseId: String?
-
-    /// Array of notes relevant to current state of health
-    /// Example: `["All ok"]`
+    /// Array of notes relevant to the current state of health.
     public var notes: [String]?
-
-    /// Raw error output, in case of `fail` or `warn` states
-    /// Example: `"Redis database not exist"`
+    /// Raw error output, in case of `fail` or `warn` states.
     public var output: String?
-
-    /// Dictionary of array that provides all health check item
+    /// Dictionary of arrays that provides all health check items.
     public var checks: [String: [HealthCheckItem]]?
-
-    /// Dictionary of links for show more information
-    /// Example: `["about": "https://example.com/about/service"]`
+    /// Dictionary of links for more information.
     public var links: [String: String]?
-
-    /// Is a unique identifier of the service, in the application scope
-    /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
+    /// Unique identifier of the service, within the application scope.
     public var serviceId: UUID?
-
-    /// Is a human-friendly description of the service
-    /// Example: `"This service use for get application health"`
+    /// Human-friendly description of the service.
     public var description: String?
-
-    /// Initializer for HealthCheck
+    
+    /// Initializes a new `HealthCheck`.
+    ///
     /// - Parameters:
-    ///   - status: optional `HealthCheckStatus`
-    ///   - version: optional `String`
-    ///   - releaseId: optional `String`
-    ///   - notes: optional `[String]`
-    ///   - output: optional `String`
-    ///   - checks: optional `[String : [HealthCheckItem]]`
-    ///   - links: optional `[String : String]`
-    ///   - serviceId: optional `UUID`
-    ///   - description: optional `String`
+    ///   - status: Optional health status of the service.
+    ///   - version: Optional public version string.
+    ///   - releaseId: Optional release identifier.
+    ///   - notes: Optional array of notes.
+    ///   - output: Optional raw error output.
+    ///   - checks: Optional dictionary of health check items.
+    ///   - links: Optional dictionary of links.
+    ///   - serviceId: Optional service UUID.
+    ///   - description: Optional human-friendly description.
     public init(
         status: HealthCheckStatus? = nil,
         version: String? = nil,
@@ -95,20 +81,20 @@ public struct HealthCheck: Content {
     }
 }
 
-/// Example of `HealthCheck`
 extension HealthCheck {
-    /// Structure instance of `HealthCheck`
+    // MARK: - Example
+    /// Example instance of `HealthCheck` for testing or documentation purposes.
     public static var example: HealthCheck {
         HealthCheck(
             status: .pass,
             version: "1",
             releaseId: "1.0.0",
-            notes: [""],
+            notes: ["All systems operational"],
             output: "",
             checks: ["component": [HealthCheckItem.example]],
             links: ["about": "http://api.example.com/about/authz"],
             serviceId: UUID(),
-            description: "health of authz service"
+            description: "Health of authz service"
         )
     }
 }

@@ -22,62 +22,73 @@
 //  Created by Mykhailo Bondarenko on 08.03.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-/// Unit tests for status-related functionality in ConsulHealthChecks.
-final class ConsulHealthChecksStatusTests: XCTestCase {
-    /// Tests the creation of HealthCheckItem based on successful status response.
-    func testCheckStatusSuccess() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulConfig = ConsulConfig(
-            id: String(UUID()),
-            url: "consul-url"
-        )
-        let clientResponse = ClientResponse(status: .ok)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+@Suite("Consul health checks status tests")
+struct ConsulHealthChecksStatusTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
         }
-        let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
-        let result = healthChecks.status(response)
-        
-        XCTAssertEqual(result.status, .pass)
-        XCTAssertNil(result.observedValue)
-        XCTAssertNil(result.output)
+        try await app.asyncShutdown()
     }
-    
-    /// Tests the creation of HealthCheckItem based on unsuccessful status response.
-    func testCheckStatusFail() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let clientResponse = ClientResponse(status: .badRequest)
-        let healthChecks = ConsulHealthChecks(app: app)
-        let result = healthChecks.status(clientResponse)
-        
-        XCTAssertEqual(result.status, .fail)
-        XCTAssertNil(result.observedValue)
-        XCTAssertNotNil(result.output)
-    }
-    
-    /// Tests the retrieval of status from ConsulHealthChecks.
-    func testGetStatusSuccessWithAuth() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulConfig = ConsulConfig(
-            id: String(UUID()),
-            url: "https://example.com/status",
-            username: "user",
-            password: "password"
-        )
-        let clientResponse = ClientResponse(status: .ok)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+
+    @Test("Check status success")
+    func checkStatusSuccess() async throws {
+        try await withApp { app in
+            app.consulConfig = ConsulConfig(
+                id: String(UUID()),
+                url: "consul-url"
+            )
+            let clientResponse = ClientResponse(status: .ok)
+            app.clients.use { app in
+                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+            }
+            let healthChecks = ConsulHealthChecks(app: app)
+            let response = await healthChecks.getStatus()
+            let result = healthChecks.status(response)
+
+            #expect(result.status == .pass)
+            #expect(result.observedValue == nil)
+            #expect(result.output == nil)
         }
-        let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
-        
-        XCTAssertEqual(response.status, .ok)
+    }
+
+    @Test("Check status fail")
+    func checkStatusFail() async throws {
+        try await withApp { app in
+            let clientResponse = ClientResponse(status: .badRequest)
+            let healthChecks = ConsulHealthChecks(app: app)
+            let result = healthChecks.status(clientResponse)
+
+            #expect(result.status == .fail)
+            #expect(result.observedValue == nil)
+            #expect(result.output != nil)
+        }
+    }
+
+    @Test("Get status success with auth")
+    func getStatusSuccessWithAuth() async throws {
+        try await withApp { app in
+            app.consulConfig = ConsulConfig(
+                id: String(UUID()),
+                url: "https://example.com/status",
+                username: "user",
+                password: "password"
+            )
+            let clientResponse = ClientResponse(status: .ok)
+            app.clients.use { app in
+                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+            }
+            let healthChecks = ConsulHealthChecks(app: app)
+            let response = await healthChecks.getStatus()
+
+            #expect(response.status == .ok)
+        }
     }
 }

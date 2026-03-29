@@ -24,26 +24,26 @@
 
 import Vapor
 
-/// Equatable protocol implementation for `HealthCheckItem` struct.
+/// Conformance of `HealthCheckItem` to the `Equatable` protocol.
 ///
-/// Two `HealthCheckItem` structs are considered equal if they have the same:
-///
-/// - componentId
-/// - componentType
-/// - observedValue
-/// - observedUnit
-/// - status
-/// - affectedEndpoints
-/// - time
-/// - output
-/// - links
-/// - node
+/// Two `HealthCheckItem` instances are considered equal if all of the following properties are equal:
+/// - `componentId`
+/// - `componentType`
+/// - `observedValue`
+/// - `observedUnit`
+/// - `status`
+/// - `affectedEndpoints`
+/// - `time`
+/// - `output`
+/// - `links`
+/// - `node`
 extension HealthCheckItem: Equatable {
-    /// Conform `HealthCheckItem` to `Equatable` protocol
+    /// Compares two `HealthCheckItem` instances for equality.
+    ///
     /// - Parameters:
-    ///   - lhs: `HealthCheckItem`
-    ///   - rhs: `HealthCheckItem`
-    /// - Returns: `Bool`
+    ///   - lhs: The left-hand side `HealthCheckItem`.
+    ///   - rhs: The right-hand side `HealthCheckItem`.
+    /// - Returns: `true` if all properties are equal; otherwise `false`.
     public static func == (lhs: HealthCheckItem, rhs: HealthCheckItem) -> Bool {
         return lhs.componentId == rhs.componentId &&
         lhs.componentType == rhs.componentType &&

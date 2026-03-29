@@ -24,5 +24,5 @@
 
 import Vapor
 
-/// Protocol for checking application health.
-public protocol ApplicationHealthChecksProtocol: ApplicationChecksProtocol, ChecksProtocol {}
+/// A protocol defining comprehensive application health checks.
+public protocol ApplicationHealthChecksProtocol: ApplicationChecksProtocol, ChecksProtocol, Sendable {}

@@ -24,16 +24,18 @@
 
 import Vapor
 
-/// Human-readable type for the component.
+/// Represents the type or role of a component within an application or system.
 public enum ComponentType: String {
-    /// A part that combines with other parts to form something bigger
+    /// A part that combines with other parts to form something bigger.
     case component
-    /// A datastore is a repository for storing, managing and distributing data sets on an enterprise level
+    /// A datastore is a repository for storing, managing, and distributing data sets on an enterprise level.
     case datastore
-    /// A set of connected things or devices that operate together
+    /// A set of connected things or devices that operate together as a single system.
     case system
 }
 
+// MARK: - Protocol Conformances
+
 extension ComponentType: Content {}
 
-extension ComponentType: CaseIterable {}
+extension ComponentType: CaseIterable {}   
