@@ -64,6 +64,8 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
             observedUnit: "ms",
+            // TODO: need get active connection
+            //            observedValue: "",
             status: response.lowercased().contains("pong") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !response.lowercased().contains("pong") ? response : nil,

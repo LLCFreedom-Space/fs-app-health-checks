@@ -72,6 +72,8 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
             observedUnit: "ms",
+            // TODO: need get active connection
+            //            observedValue: "",
             status: connectionStatus ? .fail : .pass,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: connectionStatus ? connectionDescription : nil,
