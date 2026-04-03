@@ -33,7 +33,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Name of the PostgreSQL database to check.
     public let postgresDatabase: String
     /// Initializes a new `PostgresHealthChecks` instance.
-    ///
     /// - Parameters:
     ///   - app: The `Application` instance.
     ///   - postgresDatabase: Name of the PostgreSQL database.
@@ -43,7 +42,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     }
 
     /// Checks the PostgreSQL connection status.
-    ///
     /// - Returns: A `HealthCheckItem` representing the connection state.
     public func connection() async -> HealthCheckItem {
         let connectionDescription = await checkConnection()
@@ -60,7 +58,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     }
 
     /// Measures the PostgreSQL response time.
-    ///
     /// - Returns: A `HealthCheckItem` containing the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
         let startTime = Date().timeIntervalSince1970
@@ -80,7 +77,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     }
 
     /// Retrieves the PostgreSQL version.
-    ///
     /// - Returns: A `String` describing the PostgreSQL version.
     public func getVersion() async -> String {
         guard let result = try? await app.psqlRequest?.getVersionDescription() else {
@@ -90,7 +86,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     }
 
     /// Checks the connection for the PostgreSQL database.
-    ///
     /// - Returns: A `String` describing the connection status.
     public func checkConnection() async -> String {
         guard let result = try? await app.psqlRequest?.checkConnection(for: postgresDatabase) else {
@@ -100,7 +95,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     }
 
     /// Performs health checks for the given measurement types.
-    ///
     /// - Parameter options: Array of `MeasurementType` specifying which metrics to check.
     /// - Returns: Dictionary mapping `"<ComponentName>:<MeasurementType>"` to `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {

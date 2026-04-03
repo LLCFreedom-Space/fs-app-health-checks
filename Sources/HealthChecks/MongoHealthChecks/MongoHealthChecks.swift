@@ -32,7 +32,6 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Connection URL for the MongoDB instance.
     public let url: String
     /// Initializes a new `MongoHealthChecks` instance.
-    ///
     /// - Parameters:
     ///   - app: The `Application` instance.
     ///   - url: Connection URL string for MongoDB.
@@ -42,7 +41,6 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     }
 
     /// Checks the MongoDB connection status.
-    ///
     /// - Returns: A `HealthCheckItem` representing the connection state.
     public func connection() async -> HealthCheckItem {
         let connectionDescription = await getConnection()
@@ -61,7 +59,6 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     }
 
     /// Measures the MongoDB response time.
-    ///
     /// - Returns: A `HealthCheckItem` with the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
         let startTime = Date().timeIntervalSince1970
@@ -84,7 +81,6 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     }
 
     /// Retrieves the MongoDB connection description.
-    ///
     /// - Returns: A `String` describing the connection status.
     public func getConnection() async -> String {
         guard let mongoRequest = app.mongoRequest else {
@@ -95,7 +91,6 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     }
 
     /// Performs health checks for the given measurement types.
-    ///
     /// - Parameter options: Array of `MeasurementType` specifying which metrics to check.
     /// - Returns: Dictionary mapping `"<ComponentName>:<MeasurementType>"` to `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {

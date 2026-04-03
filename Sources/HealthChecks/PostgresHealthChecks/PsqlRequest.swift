@@ -31,14 +31,12 @@ public struct PsqlRequest: PsqlRequestSendable {
     /// Instance of the application.
     public let app: Application
     /// Initializes a new `PsqlRequest` instance.
-    ///
     /// - Parameter app: The `Application` instance.
     public init(app: Application) {
         self.app = app
     }
 
     /// Retrieves the PostgreSQL version description.
-    ///
     /// - Returns: A `String` containing the PostgreSQL version, or an error message if the connection fails.
     public func getVersionDescription() async throws -> String {
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?
@@ -53,7 +51,6 @@ public struct PsqlRequest: PsqlRequestSendable {
     }
 
     /// Checks the connection state for a specific PostgreSQL database.
-    ///
     /// - Parameter databaseName: Name of the PostgreSQL database.
     /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
     public func checkConnection(for databaseName: String) async throws -> String {

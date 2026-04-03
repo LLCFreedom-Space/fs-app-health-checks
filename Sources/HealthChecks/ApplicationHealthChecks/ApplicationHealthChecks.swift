@@ -36,15 +36,10 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     }
 
     /// Provides the application uptime as a health check item.
-    ///
     /// This method calculates the uptime of the application by measuring
     /// the time interval (in seconds) since the app was launched.
     /// It returns the result formatted as a `HealthCheckItem`.
-    ///
     /// - Returns: `HealthCheckItem`
-    /// - Note:
-    /// The uptime is derived from `app.launchTime`, so it is important
-    /// that this value is correctly set during application startup.
     public func uptime() -> HealthCheckItem {
         let uptime = Date().timeIntervalSince1970 - app.launchTime
         return HealthCheckItem(
@@ -57,19 +52,14 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     }
     
     /// Executes selected health check measurements and returns their results.
-    ///
     /// This method iterates over the provided `MeasurementType` options,
     /// removes duplicates, and runs the corresponding health checks.
     /// Each result is stored in a dictionary keyed by the measurement type name.
-    ///
     /// - Parameter options: An array of `MeasurementType` values specifying
     ///   which health checks should be performed.
-    ///
     /// - Returns: A dictionary where:
     ///   - Key: `String` representation of the `MeasurementType`
     ///   - Value: Corresponding `HealthCheckItem` result
-    /// - Note:
-    /// An empty key is temporarily used during initialization and removed before returning the final result.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))

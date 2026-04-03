@@ -28,18 +28,12 @@ import MongoClient
 /// Protocol defining health check operations for MongoDB connections.
 public protocol MongoChecksProtocol {
     /// Retrieves the current status of the MongoDB connection.
-    ///
-    /// - Returns: A `HealthCheckItem` representing the health of the MongoDB connection,
-    ///   including status and any relevant metadata.
+    /// - Returns: A `HealthCheckItem` representing the health of the MongoDB connection.
     func connection() async -> HealthCheckItem
     /// Measures the response time of the MongoDB service.
-    ///
-    /// - Returns: A `HealthCheckItem` containing the observed response time
-    ///   in milliseconds and the corresponding health status.
+    /// - Returns: A `HealthCheckItem` containing the observed response time.
     func responseTime() async -> HealthCheckItem
     /// Retrieves a string representation of the MongoDB connection state.
-    ///
-    /// - Returns: A `String` describing the current connection state
-    ///   (e.g., `"connected"`, `"connecting"`, `"disconnected"`, `"closed"`).
+    /// - Returns: A `String` describing the current connection state.
     func getConnection() async -> String
 }

@@ -191,7 +191,6 @@ extension Application {
         typealias Value = MongoCluster
     }
     /// Shared MongoDB cluster instance.
-    ///
     /// - Important: Should be initialized once during application bootstrap.
     public var healthCheckMongoCluster: MongoCluster? {
         get { storage[MongoClusterKey.self] }
@@ -199,7 +198,6 @@ extension Application {
     }
 
     /// Initializes MongoDB cluster with eager connection.
-    ///
     /// - Parameter connectionString: MongoDB connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
@@ -210,7 +208,6 @@ extension Application {
     }
 
     /// Initializes MongoDB cluster with lazy connection.
-    ///
     /// - Parameter connectionString: MongoDB connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
@@ -223,7 +220,6 @@ extension Application {
 
 extension Application {
     /// ISO 8601-like date formatter (`yyyy-MM-dd'T'HH:mm:ss.SSS`).
-    ///
     /// - Warning: `DateFormatter` is not thread-safe.
     /// - Note: Creates a new instance on each access.
     public var dateTimeISOFormat: DateFormatter {

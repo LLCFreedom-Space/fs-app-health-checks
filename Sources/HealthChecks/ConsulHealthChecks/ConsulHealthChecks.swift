@@ -29,7 +29,6 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// The instance of the Vapor application.
     public let app: Application
     /// Initializes a new `ConsulHealthChecks` instance.
-    ///
     /// - Parameter app: The Vapor `Application` instance.
     public init(app: Application) {
         self.app = app
@@ -60,10 +59,8 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     }
 
     /// Retrieves the current status of the Consul service.
-    ///
     /// This method performs an HTTP GET request to the Consul status endpoint.
     /// It applies basic authentication if `username` and `password` are configured.
-    ///
     /// - Returns: `ClientResponse`
     func getStatus() async -> ClientResponse {
         guard let url = app.consulConfig?.url else {
@@ -91,7 +88,6 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     }
 
     /// Generates a `HealthCheckItem` based on the connection status of the Consul service.
-    ///
     /// - Parameter response: The `ClientResponse` from the Consul status request.
     /// - Returns: `HealthCheckItem`
     func status(_ response: ClientResponse) -> HealthCheckItem {
@@ -107,7 +103,6 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     }
 
     /// Generates a `HealthCheckItem` representing the response time of the Consul service.
-    ///
     /// - Parameters:
     ///   - response: The `ClientResponse` from the Consul status request.
     ///   - start: The start time used to calculate response duration.

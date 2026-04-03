@@ -30,7 +30,6 @@ public struct HealthChecks {
     public init() {}
 
     /// Extracts the major version from a full server version string.
-    ///
     /// - Parameter serverVersion: The full version string of the server (e.g., `"1.2.3"`).
     /// - Returns: The major version as a `String` (e.g., `"1"`), or `nil`
     public func getPublicVersion(from version: String?) -> String? {
@@ -46,7 +45,6 @@ public struct HealthChecks {
     }
 
     /// Generates a `HealthCheck` object representing the application's health status.
-    ///
     /// - Parameter app: The `Application` instance.
     /// - Returns: `HealthCheck`
     public func getHealth(from app: Application) -> HealthCheck {

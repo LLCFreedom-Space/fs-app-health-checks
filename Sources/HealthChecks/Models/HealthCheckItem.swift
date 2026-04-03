@@ -48,7 +48,6 @@ public struct HealthCheckItem: Content {
     public var node: Int?
 
     /// Initializes a new `HealthCheckItem`.
-    ///
     /// - Parameters:
     ///   - componentId: Optional unique identifier of the component.
     ///   - componentType: Optional type of the component.

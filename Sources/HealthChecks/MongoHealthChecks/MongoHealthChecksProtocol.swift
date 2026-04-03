@@ -25,12 +25,4 @@
 import Vapor
 
 /// Protocol defining MongoDB health check capabilities.
-///
-/// Conforms to:
-/// - `MongoChecksProtocol` – base MongoDB-specific check definitions.
-/// - `ChecksProtocol` – general health check definitions.
-/// - `Sendable` – ensures safe usage in concurrent contexts.
-///
-/// Types conforming to this protocol are expected to provide health check implementations
-/// for MongoDB connections and metrics, suitable for use in asynchronous and concurrent environments.
 public protocol MongoHealthChecksProtocol: MongoChecksProtocol, ChecksProtocol, Sendable {}

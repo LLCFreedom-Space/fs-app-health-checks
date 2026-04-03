@@ -25,7 +25,6 @@
 import Vapor
 
 /// Conformance of `HealthCheckItem` to the `Equatable` protocol.
-///
 /// Two `HealthCheckItem` instances are considered equal if all of the following properties are equal:
 /// - `componentId`
 /// - `componentType`
@@ -39,7 +38,6 @@ import Vapor
 /// - `node`
 extension HealthCheckItem: Equatable {
     /// Compares two `HealthCheckItem` instances for equality.
-    ///
     /// - Parameters:
     ///   - lhs: The left-hand side `HealthCheckItem`.
     ///   - rhs: The right-hand side `HealthCheckItem`.

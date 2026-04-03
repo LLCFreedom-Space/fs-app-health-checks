@@ -25,16 +25,8 @@
 import Vapor
 
 /// Configuration object for connecting to a Consul service.
-///
 /// `ConsulConfig` contains all necessary parameters required to establish
 /// a connection with a Consul server, including optional authentication credentials.
-///
-/// - Overview:
-/// This structure is used to configure how your application communicates
-/// with Consul for service discovery, health checks, or key-value storage.
-///
-/// - Concurrency:
-/// Conforms to `Sendable`, making it safe to use across concurrent contexts.
 public struct ConsulConfig: Sendable {
     /// A unique identifier for this Consul configuration within your application.
     public var id: String
@@ -48,17 +40,12 @@ public struct ConsulConfig: Sendable {
     public var token: String?
 
     /// Creates a new `ConsulConfig` instance.
-    ///
     /// - Parameters:
     ///   - id: A unique identifier for this configuration (application-level).
     ///   - url: The URL of the Consul server.
     ///   - username: Optional username for authentication.
     ///   - password: Optional password for authentication.
     ///   - token: Optional token for authentication.
-    ///
-    /// - Note:
-    /// If authentication is not required, both `username` and `password` or only `token`
-    /// can be left as `nil`.
     public init(
         id: String,
         url: String,

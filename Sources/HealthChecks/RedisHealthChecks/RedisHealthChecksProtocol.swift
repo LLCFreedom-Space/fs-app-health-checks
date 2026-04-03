@@ -25,12 +25,4 @@
 import Vapor
 
 /// Protocol defining Redis health check functionality.
-///
-/// Conforming types provide methods to check Redis connection, measure response time,
-/// and perform other health checks in an asynchronous and concurrent-safe context.
-///
-/// Inherits from:
-/// - `RedisChecksProtocol` — basic Redis check operations
-/// - `ChecksProtocol` — common health check operations
-/// - `Sendable` — supports safe concurrency
 public protocol RedisHealthChecksProtocol: RedisChecksProtocol, ChecksProtocol, Sendable {}

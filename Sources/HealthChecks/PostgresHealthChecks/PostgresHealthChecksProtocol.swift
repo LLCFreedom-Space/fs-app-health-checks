@@ -25,12 +25,4 @@
 import Vapor
 
 /// Protocol defining PostgreSQL health check capabilities.
-///
-/// Conforms to:
-/// - `PostgresChecksProtocol` – provides PostgreSQL-specific check methods (connection, response time, version).
-/// - `ChecksProtocol` – general health check functionality.
-/// - `Sendable` – ensures safe usage in concurrent contexts.
-///
-/// Types conforming to this protocol are expected to implement PostgreSQL health checks
-/// suitable for asynchronous and concurrent usage within the application.
 public protocol PostgresHealthChecksProtocol: PostgresChecksProtocol, ChecksProtocol, Sendable {}

@@ -26,26 +26,21 @@ import Vapor
 import Redis
 
 /// A concrete implementation of `RedisRequestSendable` for interacting with Redis.
-///
 /// `RedisRequest` provides a simple way to perform Redis operations,
 /// such as sending a ping request to verify connectivity.
-///
 /// - Properties:
 ///   - `app`: The Vapor `Application` instance used to access the Redis client.
 public struct RedisRequest: RedisRequestSendable {
     /// Instance of the Vapor application.
     public let app: Application
     /// Initializes a new `RedisRequest` instance.
-    ///
     /// - Parameter app: The Vapor `Application` instance.
     public init(app: Application) {
         self.app = app
     }
 
     /// Sends a ping request to the Redis server and returns the response.
-    ///
     /// - Returns: A `String` response from Redis, typically `"PONG"` if successful.
-    ///
     public func getPong() async throws -> String {
         try await app.redis.ping().get()
     }

@@ -47,7 +47,6 @@ public struct HealthCheck: Content {
     public var description: String?
     
     /// Initializes a new `HealthCheck`.
-    ///
     /// - Parameters:
     ///   - status: Optional health status of the service.
     ///   - version: Optional public version string.

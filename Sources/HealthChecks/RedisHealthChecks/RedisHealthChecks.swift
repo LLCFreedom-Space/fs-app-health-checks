@@ -30,14 +30,12 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Instance of the application.
     public let app: Application
     /// Initializes a new `RedisHealthChecks` instance.
-    ///
     /// - Parameter app: The `Application` instance.
     public init(app: Application) {
         self.app = app
     }
 
     /// Retrieves the Redis connection status.
-    ///
     /// - Returns: A `HealthCheckItem` representing the current connection state.
     public func connection() async -> HealthCheckItem {
         let response = await ping()
@@ -54,7 +52,6 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     }
 
     /// Measures the Redis response time.
-    ///
     /// - Returns: A `HealthCheckItem` containing the observed response time in milliseconds and status.
     public func responseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSince1970
@@ -76,7 +73,6 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     }
 
     /// Sends a ping to Redis and returns the response.
-    ///
     /// - Returns: A `String` representing the Redis ping response or an error message if not connected.
     public func ping() async -> String {
         let result = try? await app.redisRequest?.getPong()
@@ -88,7 +84,6 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     }
 
     /// Performs health checks based on the provided measurement types.
-    ///
     /// - Parameter options: An array of `MeasurementType` specifying which checks to perform.
     /// - Returns: A dictionary mapping a string key to the resulting `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
