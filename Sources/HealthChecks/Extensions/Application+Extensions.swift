@@ -17,9 +17,9 @@
 
 //
 //  Application+Extensions.swift
-//  fs-app-health-checks
 //
-//  Created by Mykola Buhaiov on 27.03.2026.
+//
+//  Created by Mykola Buhaiov on 31.01.2024.
 //
 
 import Vapor
