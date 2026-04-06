@@ -35,9 +35,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     }
 
     /// Performs health checks for the specified measurement types.
-    ///
-    /// - Parameter options: An array of `MeasurementType` values specifying
-    ///   which health checks to perform (e.g., response time, connections).
+    /// - Parameter options: An array of `MeasurementType` values specifying.
     /// - Returns: `[String: HealthCheckItem]`
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
@@ -59,8 +57,6 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     }
 
     /// Retrieves the current status of the Consul service.
-    /// This method performs an HTTP GET request to the Consul status endpoint.
-    /// It applies basic authentication if `username` and `password` are configured.
     /// - Returns: `ClientResponse`
     func getStatus() async -> ClientResponse {
         guard let url = app.consulConfig?.url else {

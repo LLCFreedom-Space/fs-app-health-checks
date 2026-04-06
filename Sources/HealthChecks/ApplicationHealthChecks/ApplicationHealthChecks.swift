@@ -29,16 +29,12 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// The instance of the Vapor application.
     public let app: Application
     /// Initializes a new `ApplicationHealthChecks` instance.
-    ///
     /// - Parameter app: The Vapor `Application` instance.
     public init(app: Application) {
         self.app = app
     }
 
     /// Provides the application uptime as a health check item.
-    /// This method calculates the uptime of the application by measuring
-    /// the time interval (in seconds) since the app was launched.
-    /// It returns the result formatted as a `HealthCheckItem`.
     /// - Returns: `HealthCheckItem`
     public func uptime() -> HealthCheckItem {
         let uptime = Date().timeIntervalSince1970 - app.launchTime
@@ -52,11 +48,7 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     }
     
     /// Executes selected health check measurements and returns their results.
-    /// This method iterates over the provided `MeasurementType` options,
-    /// removes duplicates, and runs the corresponding health checks.
-    /// Each result is stored in a dictionary keyed by the measurement type name.
-    /// - Parameter options: An array of `MeasurementType` values specifying
-    ///   which health checks should be performed.
+    /// - Parameter options: An array of `MeasurementType` values specifying.
     /// - Returns: A dictionary where:
     ///   - Key: `String` representation of the `MeasurementType`
     ///   - Value: Corresponding `HealthCheckItem` result

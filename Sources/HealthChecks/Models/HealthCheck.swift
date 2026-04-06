@@ -25,7 +25,6 @@
 import Vapor
 
 /// A generic `HealthCheck` data that can be sent in response.
-/// Represents the health status of a service, including version, release, notes, checks, and related metadata.
 public struct HealthCheck: Content {
     /// Indicates whether the service status is acceptable or not.
     public var status: HealthCheckStatus?

@@ -25,8 +25,6 @@
 import Vapor
 
 /// Configuration object for connecting to a Consul service.
-/// `ConsulConfig` contains all necessary parameters required to establish
-/// a connection with a Consul server, including optional authentication credentials.
 public struct ConsulConfig: Sendable {
     /// A unique identifier for this Consul configuration within your application.
     public var id: String

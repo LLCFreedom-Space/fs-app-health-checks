@@ -16,49 +16,6 @@ This repository offers a wide collection of health checks features for widely us
 
 The Health Checks Library for Swift is a simple and easy-to-use way to implement health checks for your server-side Swift applications. It is designed specifically for the Vapor framework and also conforms to the RFC [Health Check Response Format for HTTP APIs](https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-06#section-4.6-1).
 
-## ✨ Features
-
-### ✅ Aggregated Application Health Checks
-- Aggregates the status of all components into a single `HealthCheck` structure.
-- Provides a complete overview of the service status in one request.
-- Convenient JSON representation for APIs and dashboards.
-
-### 🛢️ PostgreSQL, MongoDB, Redis Monitoring
-- Automatic connection and status checks for databases.
-- Measures response time.
-- Structured results using `HealthCheckItem`.
-- Easy integration with the `Application` object.
-
-### ⚙️ Custom Component Support
-- Add custom services or components.
-- Supports component types: `component`, `datastore`, `system`.
-- Track custom metrics and statuses.
-
-### ⏱️ Response Time & Performance Metrics
-- Measures request latency in milliseconds.
-- Tracks component performance.
-- Supports measurement types: `responseTime`, `uptime`, `connections`, `utilization`.
-
-### 🧾 Human-Readable & Machine-Readable Output
-- JSON format for APIs.
-- Fields `notes`, `output`, `links` for detailed information.
-- Contains `serviceId`, `releaseId`, `version`.
-
-### 🔒 Asynchronous and Concurrency-Safe
-- Fully `Sendable` and asynchronous (`async/await`) design.
-- Safe for parallel requests.
-
-### 🛠️ Extensible and Modular
-- Easily add new protocols for other components.
-- Compatible with `Consul`, Kafka, gRPC, etc.
-- Can create custom `HealthCheckItem` for additional metrics.
-
-## 🚀 Future Enhancements
-
-- **Kafka Producer**: Integrate Kafka producers to monitor message publishing.
-- **Kafka Consumer**: Add support for Kafka consumers to monitor message consumption and processing.
-- **gRPC**: Add health checks and metrics for gRPC services.
-
 ## Installation
 
 App Health Checks is available with Swift Package Manager.

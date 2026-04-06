@@ -36,11 +36,6 @@ public struct MongoRequest: MongoRequestSendable {
     }
 
     /// Returns the current connection state of the Mongo cluster.
-    /// This method checks the `HealthCheckMongoCluster` registered in the application
-    /// and returns a string representation of its current connection state.
-    /// If the cluster is not configured, it logs an error and returns `"disconnected"`.
-    /// In case the connection is `.disconnected` or `.closed`, the method will attempt
-    /// to reconnect automatically.
     /// - Parameter url: The Mongo connection URL (currently not used in logic, but reserved for future use).
     /// - Returns: A string describing the current connection state:
     ///   - `"connecting"` — when the connection is in progress
@@ -72,9 +67,6 @@ public struct MongoRequest: MongoRequestSendable {
     }
 
     /// Attempts to reconnect the provided Mongo cluster.
-    /// This method triggers a manual reconnection of the given `MongoCluster`.
-    /// It logs the reconnection attempt and captures any errors that occur
-    /// during the process.
     /// - Parameter mongoCluster: The `MongoCluster` instance to reconnect.
     private func reconnect(mongoCluster: MongoCluster) async {
         do {
