@@ -13,8 +13,15 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        swift: [5.9, 6.0]
+        include:
+          - swift: 5.9
+            os: ubuntu-22.04
+          - swift: 6.0
+            os: ubuntu-latest
+          - swift: 6.0
+            os: macos-latest
+          - swift: 5.9
+            os: macos-latest  # якщо хочеш тестувати 5.9 і на macOS
 
     steps:
       - name: Checkout code
