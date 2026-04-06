@@ -2,32 +2,36 @@ name: Code Coverage
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   coverage:
-    name: Coverage - Swift ${{ matrix.swift }}
-    runs-on: ubuntu-latest
+    name: Coverage - ${{ matrix.os }} / Swift ${{ matrix.swift }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        swift: [5.9, 6.0]  # можна додавати потрібні версії
+        os: [ubuntu-latest, macos-latest]
+        swift: [5.9, 6.0]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Swift
-        uses: fwal/setup-swift@v2
+        uses: swift-actions/setup-swift@v1
         with:
           swift-version: ${{ matrix.swift }}
 
       - name: Resolve dependencies
         run: swift package resolve
 
-      - name: Run tests with coverage and warnings as errors
+      - name: Build library
+        run: swift build
+
+      - name: Run tests with coverage
         run: swift test --enable-code-coverage
 
       - name: Upload coverage to Codecov
