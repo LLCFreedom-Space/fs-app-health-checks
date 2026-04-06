@@ -24,21 +24,18 @@
 
 import Vapor
 
-/// Groups func for get psql health check
+/// Protocol defining PostgreSQL health check capabilities.
 public protocol PostgresChecksProtocol {
-    /// Get Postgres connection
-    /// - Returns: `HealthCheckItem`
+    /// Retrieves the PostgreSQL connection status.
+    /// - Returns: A `HealthCheckItem` representing the connection state.
     func connection() async -> HealthCheckItem
-    
-    /// Get psql response time
-    /// - Returns: `HealthCheckItem`
+    /// Measures the PostgreSQL response time.
+    /// - Returns: A `HealthCheckItem` containing the response time metric.
     func responseTime() async -> HealthCheckItem
-    
-    /// Get psql version
-    /// - Returns: `String`
+    /// Retrieves the PostgreSQL version string.
+    /// - Returns: A `String` representing the PostgreSQL version.
     func getVersion() async -> String
-
-    /// Check connection for database
-    /// - Returns: `String`
+    /// Checks the connection for the PostgreSQL database.
+    /// - Returns: A `String` describing the database connection status, e.g., `"connected"` or `"disconnected"`.
     func checkConnection() async -> String
 }

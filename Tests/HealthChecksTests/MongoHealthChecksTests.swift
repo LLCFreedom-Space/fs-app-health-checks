@@ -22,97 +22,125 @@
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-final class MongoHealthChecksTests: XCTestCase {
-    func testConnection() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-        app.mongoId = mongoId
-        app.mongoHealthChecks = MongoHealthChecksMock()
-        let mockResult = await app.mongoHealthChecks?.connection()
-        XCTAssertEqual(mockResult, MongoHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(app.mongoId, mongoId)
-
-        app.mongoRequest = MongoRequestMock()
-        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
-        let result = await app.mongoHealthChecks?.connection()
-        XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertNotEqual(result?.observedValue, 1.0)
-        XCTAssertEqual(result?.status, .pass)
-        XCTAssertNil(result?.affectedEndpoints)
-        XCTAssertNil(result?.output)
-        XCTAssertNil(result?.links)
-        XCTAssertNil(result?.node)
+@Suite("Mongo health checks tests")
+struct MongoHealthChecksTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
+        }
+        try await app.asyncShutdown()
     }
 
-    func testResponseTime() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.mongoHealthChecks = MongoHealthChecksMock()
-        let resultMock = await app.mongoHealthChecks?.responseTime()
-        XCTAssertEqual(resultMock, MongoHealthChecksMock.healthCheckItem)
+    @Test("Connection")
+    func connection() async throws {
+        try await withApp { app in
+            let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+            app.mongoId = mongoId
+            app.mongoHealthChecks = MongoHealthChecksMock()
+            let mockResult = await app.mongoHealthChecks?.connection()
+            #expect(mockResult == MongoHealthChecksMock.healthCheckItem)
+            #expect(app.mongoId == mongoId)
 
-        app.mongoRequest = MongoRequestMock()
-        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
-        let result = await app.mongoHealthChecks?.responseTime()
-        XCTAssertEqual(result?.componentType, .datastore)
-        XCTAssertNotEqual(result?.observedValue, 1.0)
-        XCTAssertEqual(result?.observedUnit, "ms")
-        XCTAssertEqual(result?.status, .pass)
-        XCTAssertNil(result?.affectedEndpoints)
-        XCTAssertNil(result?.output)
-        XCTAssertNil(result?.links)
-        XCTAssertNil(result?.node)
+            app.mongoRequest = MongoRequestMock()
+            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            let result = await app.mongoHealthChecks?.connection()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue != 1.0)
+            #expect(result?.status == .pass)
+            #expect(result?.affectedEndpoints == nil)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
     }
 
-    func testHealthCheck() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.mongoId = UUID().uuidString
-        app.mongoHealthChecks = MongoHealthChecksMock()
-        let mock = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
-        let mockMongoConnections = mock?["\(ComponentName.mongo):\(MeasurementType.connections)"]
-        XCTAssertEqual(mockMongoConnections, MongoHealthChecksMock.healthCheckItem)
-        let mockMongoResponseTimes = mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(mockMongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
+    @Test("Response time")
+    func responseTime() async throws {
+        try await withApp { app in
+            app.mongoHealthChecks = MongoHealthChecksMock()
+            let resultMock = await app.mongoHealthChecks?.responseTime()
+            #expect(resultMock == MongoHealthChecksMock.healthCheckItem)
 
-        app.mongoRequest = MongoRequestMock()
-        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
-        let result = await app.mongoHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections, MeasurementType.utilization])
-        let mongoConnections = result?["\(ComponentName.mongo):\(MeasurementType.connections)"]
-        XCTAssertEqual(mongoConnections?.componentType, .datastore)
-        XCTAssertNotEqual(mongoConnections?.observedValue, 1.0)
-        XCTAssertEqual(mongoConnections?.status, .pass)
-        XCTAssertNil(mongoConnections?.affectedEndpoints)
-        XCTAssertNil(mongoConnections?.output)
-        XCTAssertNil(mongoConnections?.links)
-        XCTAssertNil(mongoConnections?.node)
-        let mongoResponseTimes = mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
-        XCTAssertEqual(mongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(mongoResponseTimes, MongoHealthChecksMock.healthCheckItem)
-        XCTAssertEqual(mongoResponseTimes?.componentType, .datastore)
-        XCTAssertEqual(mongoResponseTimes?.observedValue, 1.0)
-        XCTAssertEqual(mongoResponseTimes?.observedUnit, "s")
-        XCTAssertEqual(mongoResponseTimes?.status, .pass)
-        XCTAssertNil(mongoResponseTimes?.affectedEndpoints)
-        XCTAssertEqual(mongoResponseTimes?.output, "Ok")
-        XCTAssertNil(mongoResponseTimes?.links)
-        XCTAssertNil(mongoResponseTimes?.node)
+            app.mongoRequest = MongoRequestMock()
+            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            let result = await app.mongoHealthChecks?.responseTime()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue != 1.0)
+            #expect(result?.observedUnit == "ms")
+            #expect(result?.status == .pass)
+            #expect(result?.affectedEndpoints == nil)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
     }
 
-    func testGetConnection() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.mongoHealthChecks = MongoHealthChecksMock()
-        let resultMock = await app.mongoHealthChecks?.getConnection()
-        XCTAssertEqual(resultMock, "connecting")
+    @Test("Health check")
+    func healthCheck() async throws {
+        try await withApp { app in
+            app.mongoId = UUID().uuidString
+            app.mongoHealthChecks = MongoHealthChecksMock()
+            let mock = await app.mongoHealthChecks?.check(
+                for: [
+                    MeasurementType.responseTime,
+                    MeasurementType.connections,
+                    MeasurementType.utilization
+                ]
+            )
+            let mockMongoConnections = mock?["\(ComponentName.mongo):\(MeasurementType.connections)"]
+            #expect(mockMongoConnections == MongoHealthChecksMock.healthCheckItem)
+            let mockMongoResponseTimes = mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
+            #expect(mockMongoResponseTimes == MongoHealthChecksMock.healthCheckItem)
 
-        app.mongoRequest = MongoRequestMock()
-        app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
-        let result = await app.mongoHealthChecks?.getConnection()
-        XCTAssertEqual(result, "connecting")
+            app.mongoRequest = MongoRequestMock()
+            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            let result = await app.mongoHealthChecks?.check(
+                for: [
+                    MeasurementType.responseTime,
+                    MeasurementType.connections,
+                    MeasurementType.utilization
+                ]
+            )
+            let mongoConnections = result?["\(ComponentName.mongo):\(MeasurementType.connections)"]
+            #expect(mongoConnections?.componentType == .datastore)
+            #expect(mongoConnections?.observedValue != 1.0)
+            #expect(mongoConnections?.status == .pass)
+            #expect(mongoConnections?.affectedEndpoints == nil)
+            #expect(mongoConnections?.output == nil)
+            #expect(mongoConnections?.links == nil)
+            #expect(mongoConnections?.node == nil)
+            let mongoResponseTimes = mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
+            #expect(mongoResponseTimes == MongoHealthChecksMock.healthCheckItem)
+            #expect(mongoResponseTimes == MongoHealthChecksMock.healthCheckItem)
+            #expect(mongoResponseTimes?.componentType == .datastore)
+            #expect(mongoResponseTimes?.observedValue == 1.0)
+            #expect(mongoResponseTimes?.observedUnit == "s")
+            #expect(mongoResponseTimes?.status == .pass)
+            #expect(mongoResponseTimes?.affectedEndpoints == nil)
+            #expect(mongoResponseTimes?.output == "Ok")
+            #expect(mongoResponseTimes?.links == nil)
+            #expect(mongoResponseTimes?.node == nil)
+        }
+    }
+
+    @Test("Get connection")
+    func getConnection() async throws {
+        try await withApp { app in
+            app.mongoHealthChecks = MongoHealthChecksMock()
+            let resultMock = await app.mongoHealthChecks?.getConnection()
+            #expect(resultMock == "connecting")
+
+            app.mongoRequest = MongoRequestMock()
+            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            let result = await app.mongoHealthChecks?.getConnection()
+            #expect(result == "connecting")
+        }
     }
 }

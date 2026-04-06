@@ -24,5 +24,5 @@
 
 import Vapor
 
-/// Groups func for get mongo health check
-public protocol MongoHealthChecksProtocol: MongoChecksProtocol, ChecksProtocol {}
+/// Protocol defining MongoDB health check capabilities.
+public protocol MongoHealthChecksProtocol: MongoChecksProtocol, ChecksProtocol, Sendable {}

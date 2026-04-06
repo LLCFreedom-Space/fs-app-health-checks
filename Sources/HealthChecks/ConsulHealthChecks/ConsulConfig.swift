@@ -24,41 +24,37 @@
 
 import Vapor
 
-/// Represents configuration details for connecting to a Consul server.
-public struct ConsulConfig {
+/// Configuration object for connecting to a Consul service.
+public struct ConsulConfig: Sendable {
     /// A unique identifier for this Consul configuration within your application.
-    /// This ID is not related to Consul itself and can be used for internal reference.
-    /// Example: "43119325-63f5-4e14-9175-84e0e296c527"
     public var id: String
-
     /// The URL of the Consul server to connect to.
-    /// Example: "http://127.0.0.1:8500", "https://xmpl-consul.example.com"
     public var url: String
-
     /// The username for authenticating with Consul (optional).
-    /// Example: "username"
     public var username: String?
-
     /// The password for authenticating with Consul (optional).
-    /// Example: "password"
     public var password: String?
-    
-    /// Initializes a `ConsulConfig` with the specified details.
-    ///
+    /// The token for authenticating with Consul (optional).
+    public var token: String?
+
+    /// Creates a new `ConsulConfig` instance.
     /// - Parameters:
-    ///   - id: The unique identifier for this configuration.
+    ///   - id: A unique identifier for this configuration (application-level).
     ///   - url: The URL of the Consul server.
-    ///   - username: The username for authentication (optional).
-    ///   - password: The password for authentication (optional).
+    ///   - username: Optional username for authentication.
+    ///   - password: Optional password for authentication.
+    ///   - token: Optional token for authentication.
     public init(
         id: String,
         url: String,
         username: String? = nil,
-        password: String? = nil
+        password: String? = nil,
+        token: String? = nil
     ) {
         self.id = id
         self.url = url
         self.username = username
         self.password = password
+        self.token = token
     }
 }

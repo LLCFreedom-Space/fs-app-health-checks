@@ -23,23 +23,25 @@
 //
 
 import Vapor
-import MongoCore
 import MongoClient
 
+/// Concrete implementation of `MongoRequestSendable` for interacting with MongoDB.
 public struct MongoRequest: MongoRequestSendable {
     /// Instance of app as `Application`
     public let app: Application
-
     /// Initializer for MongoRequest
     /// - Parameter app: `Application`
     public init(app: Application) {
         self.app = app
     }
 
-    // WARNING: - This method create new connection every time, when you use it
-    /// Get mongo connection
-    /// - Parameter url: `String`
-    /// - Returns: `String`
+    /// Returns the current connection state of the Mongo cluster.
+    /// - Parameter url: The Mongo connection URL (currently not used in logic, but reserved for future use).
+    /// - Returns: A string describing the current connection state:
+    ///   - `"connecting"` — when the connection is in progress
+    ///   - `"connected"` — when the cluster is connected
+    ///   - `"disconnected"` — when the cluster is not available
+    ///   - `"closed"` — when the connection has been closed
     public func getConnection(by url: String) async -> String {
         guard let healthCheckMongoCluster = app.healthCheckMongoCluster else {
             app.logger.error("❌ HealthCheckMongoCluster not installed in app. Check your configuration, need to set `app.healthCheckMongoCluster")
@@ -64,14 +66,8 @@ public struct MongoRequest: MongoRequestSendable {
         }
     }
 
-    /// Attempts to reconnect the given `MongoCluster`.
-    ///
-    /// - Parameter mongoCluster: The `MongoCluster` instance that should be reconnected.
-    /// - Throws: Rethrows any error that occurs during the reconnect attempt.
-    /// - Note:
-    ///   - If `reconnect()` fails, the error will be caught internally and logged using `app.logger.error`.
-    ///   - This method ensures the app does not crash on reconnect failure, but still provides
-    ///     visibility of the issue in logs.
+    /// Attempts to reconnect the provided Mongo cluster.
+    /// - Parameter mongoCluster: The `MongoCluster` instance to reconnect.
     private func reconnect(mongoCluster: MongoCluster) async {
         do {
             app.logger.info("🔄 MongoCluster.reconnect is called.")

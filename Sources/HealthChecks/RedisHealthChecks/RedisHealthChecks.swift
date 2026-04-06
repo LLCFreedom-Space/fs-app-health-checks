@@ -27,22 +27,40 @@ import Redis
 
 /// Service that provides redis health check functionality
 public struct RedisHealthChecks: RedisHealthChecksProtocol {
-    /// Instance of app as `Application`
+    /// Instance of the application.
     public let app: Application
-    
-    /// Initializer for RedisHealthChecks
-    /// - Parameter app: `Application`
+    /// Initializes a new `RedisHealthChecks` instance.
+    /// - Parameter app: The `Application` instance.
     public init(app: Application) {
         self.app = app
     }
 
-    /// Get  redis connection
-    /// - Returns: `HealthCheckItem`
+    /// Retrieves the Redis connection status.
+    /// - Returns: A `HealthCheckItem` representing the current connection state.
     public func connection() async -> HealthCheckItem {
         let response = await ping()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
+            status: response.lowercased().contains("pong") ? .pass : .fail,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: !response.lowercased().contains("pong") ? response : nil,
+            links: nil,
+            node: nil
+        )
+        return result
+    }
+
+    /// Measures the Redis response time.
+    /// - Returns: A `HealthCheckItem` containing the observed response time in milliseconds and status.
+    public func responseTime() async -> HealthCheckItem {
+        let dateNow = Date().timeIntervalSince1970
+        let response = await ping()
+        let result = HealthCheckItem(
+            componentId: app.redisId,
+            componentType: .datastore,
+            observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
+            observedUnit: "ms",
             // TODO: need get active connection
             //            observedValue: "",
             status: response.lowercased().contains("pong") ? .pass : .fail,
@@ -54,27 +72,8 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         return result
     }
 
-    /// Get response time from redis
-    /// - Returns: `HealthCheckItem`
-    public func responseTime() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSince1970
-        let response = await ping()
-        let result = HealthCheckItem(
-            componentId: app.redisId,
-            componentType: .datastore,
-            observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
-            observedUnit: "ms",
-            status: response.lowercased().contains("pong") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: !response.lowercased().contains("pong") ? response : nil,
-            links: nil,
-            node: nil
-        )
-        return result
-    }
-
-    /// Get ping from redis
-    /// - Returns: `String`
+    /// Sends a ping to Redis and returns the response.
+    /// - Returns: A `String` representing the Redis ping response or an error message if not connected.
     public func ping() async -> String {
         let result = try? await app.redisRequest?.getPong()
         var connectionDescription = "ERROR: No connect to Redis database"
@@ -84,9 +83,9 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         return connectionDescription
     }
 
-    /// Check with setup options
-    /// - Parameter options: array of `MeasurementType`
-    /// - Returns: dictionary `[String: HealthCheckItem]`
+    /// Performs health checks based on the provided measurement types.
+    /// - Parameter options: An array of `MeasurementType` specifying which checks to perform.
+    /// - Returns: A dictionary mapping a string key to the resulting `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))

@@ -22,44 +22,48 @@
 //  Created by Mykola Buhaiov on 09.03.2023.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-/// Unit tests for the HealthChecks service.
-final class HealthChecksTests: XCTestCase {
-    let serviceId = UUID()
-    let releaseId = "1.0.0"
-    
-    func testGetPublicVersion() {
-        // Simulate retrieving the major version from a valid release version string.
-        let version = HealthChecks().getPublicVersion(from: releaseId)
-        XCTAssertEqual(version, "1")
-        
-        // Simulate retrieving the major version from an invalid release version string.
-        let invalidVersion = HealthChecks().getPublicVersion(from: "invalidVersion")
-        XCTAssertNil(invalidVersion)
-        
-        // Simulate retrieving the major version from a version string without dots.
-        let versionWithoutDots = HealthChecks().getPublicVersion(from: "12345")
-        XCTAssertNil(versionWithoutDots)
-        
-        // Simulate retrieving the major version from a version string with letters and dots.
-        let versionWithLettersAndDots = HealthChecks().getPublicVersion(from: "1a.b.c")
-        XCTAssertNil(versionWithLettersAndDots)
+@Suite("Health checks tests")
+struct HealthChecksTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
+        }
+        try await app.asyncShutdown()
     }
-    
-    /// Tests the `getHealth(from:)` method of the `HealthChecks` service.
-    func testGetHealth() {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        // Set up the application with a service ID and release version.
-        app.serviceId = serviceId
-        app.releaseId = releaseId
-        // Retrieve the health information using the `getHealth` method.
-        let response = HealthChecks().getHealth(from: app)
-        // Assert that the health information matches the expected values.
-        XCTAssertEqual(response.version, "1")
-        XCTAssertEqual(response.releaseId, releaseId)
-        XCTAssertEqual(response.serviceId, serviceId)
+
+    @Test("Get public version")
+    func getPublicVersion() async throws {
+        try await withApp { _ in
+            let releaseId = "1.0.0"
+            let version = HealthChecks().getPublicVersion(from: releaseId)
+            #expect(version == "1")
+            let invalidVersion = HealthChecks().getPublicVersion(from: "invalidVersion")
+            #expect(invalidVersion == nil)
+            let versionWithoutDots = HealthChecks().getPublicVersion(from: "12345")
+            #expect(versionWithoutDots == nil)
+            let versionWithLettersAndDots = HealthChecks().getPublicVersion(from: "1a.b.c")
+            #expect(versionWithLettersAndDots == nil)
+        }
+    }
+
+    @Test("Get health")
+    func getHealth() async throws {
+        try await withApp { app in
+            let serviceId = UUID()
+            let releaseId = "1.0.0"
+            app.serviceId = serviceId
+            app.releaseId = releaseId
+            let response = HealthChecks().getHealth(from: app)
+            #expect(response.version == "1")
+            #expect(response.releaseId == releaseId)
+            #expect(response.serviceId == serviceId)
+        }
     }
 }

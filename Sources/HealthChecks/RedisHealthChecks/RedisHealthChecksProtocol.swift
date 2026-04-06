@@ -24,5 +24,5 @@
 
 import Vapor
 
-/// Groups func for get redis health check
-public protocol RedisHealthChecksProtocol: RedisChecksProtocol, ChecksProtocol {}
+/// Protocol defining Redis health check functionality.
+public protocol RedisHealthChecksProtocol: RedisChecksProtocol, ChecksProtocol, Sendable {}

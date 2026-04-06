@@ -22,52 +22,62 @@
 //  Created by Mykola Buhaiov on 10.02.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-/// Integration tests for the check functionality in ApplicationHealthChecks.
-final class ApplicationHealthChecksCheckTests: XCTestCase {
-    /// Tests the interaction of multiple components during the check operation.
-    func testCheck() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.launchTime = Date().timeIntervalSince1970
-        app.applicationHealthChecks = ApplicationHealthChecksMock()
-        let result = await app.applicationHealthChecks?.check(for: [MeasurementType.uptime])
-        let uptime = result?[MeasurementType.uptime.rawValue]
-        XCTAssertEqual(uptime, ApplicationHealthChecksMock.healthCheckItem)
-    }
-    
-    /// Tests if the check operation returns valid items.
-    func testCheckReturnsValidItems() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        
-        let healthChecks = ApplicationHealthChecks(app: app)
-        let checks = await healthChecks.check(for: [.uptime])
-        XCTAssertEqual(checks.count, 1)
-        XCTAssertNotNil(checks)
-        XCTAssertTrue(checks.keys.contains("uptime"))
-        guard let uptimeItem = checks["uptime"] else {
-            return XCTFail("no have uptime")
+@Suite("Application health checks check tests")
+struct ApplicationHealthChecksCheckTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
         }
-        XCTAssertEqual(uptimeItem.componentType, .system)
-        XCTAssertEqual(uptimeItem.observedUnit, "s")
-        XCTAssertEqual(uptimeItem.status, .pass)
-        guard let observedValue = uptimeItem.observedValue else {
-            return XCTFail("no have observed value")
-        }
-        let expectedUptime = Date().timeIntervalSince1970 - app.launchTime
-        XCTAssertTrue(abs(observedValue - expectedUptime) < 1.0)
+        try await app.asyncShutdown()
     }
-    
-    /// Tests how the check operation handles unsupported types.
-    func testCheckHandlesUnsupportedTypes() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        
-        let healthChecks = ApplicationHealthChecks(app: app)
-        let checks = await healthChecks.check(for: [.connections])
-        XCTAssertEqual(checks.count, 0)  // Expect empty result, as .memory is not supported
+
+    @Test("Check")
+    func check() async throws {
+        try await withApp { app in
+            app.launchTime = Date().timeIntervalSince1970
+            app.applicationHealthChecks = ApplicationHealthChecksMock()
+            let result = await app.applicationHealthChecks?.check(for: [MeasurementType.uptime])
+            let uptime = result?[MeasurementType.uptime.rawValue]
+            #expect(uptime == ApplicationHealthChecksMock.healthCheckItem)
+        }
+    }
+
+    @Test("Check returns valid items")
+    func checkReturnsValidItems() async throws {
+        try await withApp { app in
+            let healthChecks = ApplicationHealthChecks(app: app)
+            let checks = await healthChecks.check(for: [.uptime])
+            #expect(checks.count == 1)
+            #expect(checks.keys.contains("uptime"))
+            guard let uptimeItem = checks["uptime"] else {
+                Issue.record("no have uptime")
+                return
+            }
+            #expect(uptimeItem.componentType == .system)
+            #expect(uptimeItem.observedUnit == "s")
+            #expect(uptimeItem.status == .pass)
+            guard let observedValue = uptimeItem.observedValue else {
+                Issue.record("No have observed value")
+                return
+            }
+            let expectedUptime = Date().timeIntervalSince1970 - app.launchTime
+            #expect(abs(observedValue - expectedUptime) < 1.0)
+        }
+    }
+
+    @Test("Check handles unsupported types")
+    func testCheckHandlesUnsupportedTypes() async throws {
+        try await withApp { app in
+            let healthChecks = ApplicationHealthChecks(app: app)
+            let checks = await healthChecks.check(for: [.connections])
+            #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported
+        }
     }
 }

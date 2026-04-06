@@ -24,5 +24,5 @@
 
 import Vapor
 
-/// Protocol defining an interface for performing Consul health checks.
-public protocol ConsulHealthChecksProtocol: ChecksProtocol {}
+/// A protocol defining health check capabilities for a Consul service.
+public protocol ConsulHealthChecksProtocol: ChecksProtocol, Sendable {}

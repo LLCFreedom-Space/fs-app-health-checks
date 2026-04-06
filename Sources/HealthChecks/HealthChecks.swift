@@ -24,31 +24,29 @@
 
 import Vapor
 
-/// Service that provides app health check functionality
+/// A utility struct for performing general health check operations.
 public struct HealthChecks {
-    /// Initializer for HealthChecks
+    /// Initializes a new `HealthChecks` instance.
     public init() {}
 
-    /// Gets the major version of the provided server version.
-    ///
-    /// - Parameter serverVersion: The version of the server as a `String`.
-    /// - Returns: The major version as a `String`, or `nil` if the provided version is invalid.
+    /// Extracts the major version from a full server version string.
+    /// - Parameter serverVersion: The full version string of the server (e.g., `"1.2.3"`).
+    /// - Returns: The major version as a `String` (e.g., `"1"`), or `nil`
     public func getPublicVersion(from version: String?) -> String? {
         guard let version = version, version.contains(".") else {
             return nil
         }
         let components = version.components(separatedBy: ".")
-        
+
         guard let firstComponent = components.first, firstComponent.rangeOfCharacter(from: CharacterSet.decimalDigits.inverted) == nil else {
             return nil
         }
         return components.first
     }
-    
-    /// Retrieves the health status for the given application.
-    ///
+
+    /// Generates a `HealthCheck` object representing the application's health status.
     /// - Parameter app: The `Application` instance.
-    /// - Returns: A `HealthCheck` instance representing the health status of the application.
+    /// - Returns: `HealthCheck`
     public func getHealth(from app: Application) -> HealthCheck {
         let healthCheck = HealthCheck(
             version: self.getPublicVersion(from: app.releaseId),

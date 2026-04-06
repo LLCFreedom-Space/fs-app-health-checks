@@ -24,59 +24,41 @@
 
 import Vapor
 
-/// A generic `HealthCheckItem` data that can be sent in response.
+/// Represents the health check data of a specific sub-component or dependency within a service.
 public struct HealthCheckItem: Content {
-    /// Is a unique identifier of an instance of a specific sub-component/dependency of a service.
-    /// Example: `43119325-63f5-4e14-9175-84e0e296c527`
+    /// Unique identifier of an instance of a specific sub-component or dependency.
     public var componentId: String?
-  
-    /// It's a type of the component
-    /// Example: one of the enumeration:`component` or `datastore` or `system`
+    /// Type of the component.
     public var componentType: ComponentType?
-    
-    /// Could be any valid JSON value, such as: `string`, `number`, object, array or literal
-    /// Example: `100`
+    /// Observed numeric value for the component (could be any valid measurement).
     public var observedValue: Double?
-    
-    /// Time-based value it is important to know whether the time is reported in seconds, minutes, hours or something else.
-    /// Example: `ms`
+    /// Unit of the observed value (important to know whether in seconds, minutes, etc.).
     public var observedUnit: String?
-    
-    /// It's a status of the health check
+    /// Status of this health check.
     public var status: HealthCheckStatus?
-    
-    /// Array of affected endpoints
-    /// Example: `http://example.com/pass/endpoints`
-    public var affectedEndpoints: [String]?
-    
-    /// Is the date-time, in ISO8601 format, at which the reading of the observedValue was recorded.
-    /// Example: `2024-01-17T03:36:48Z`
+    /// ISO8601 timestamp at which the observed value was recorded.
     public var time: String?
-    
-    /// Raw error output, in case of `fail` or `warn` states
-    /// Example: `"Redis database not exist"`
+    /// Array of affected endpoints.
+    public var affectedEndpoints: [String]?
+    /// Raw error output in case of `fail` or `warn` states.
     public var output: String?
-    
-    /// Dictionary of links for show more information about health check item
-    /// Example: `["about": "http://api.example.com/about/authz"]`
+    /// Dictionary of links with more information about this health check item.
     public var links: [String: String]?
-    
-    /// Number of node
-    /// Example: `1`
+    /// Node number of the component instance.
     public var node: Int?
-    
-    /// Initializer for HealthCheckItem
+
+    /// Initializes a new `HealthCheckItem`.
     /// - Parameters:
-    ///   - componentId: optional `String`
-    ///   - componentType: optional `ComponentType`
-    ///   - observedValue: optional `Double`
-    ///   - observedUnit: optional `String`
-    ///   - status: optional `HealthCheckStatus`
-    ///   - affectedEndpoints: optional `[String]`
-    ///   - time: optional `String`
-    ///   - output: optional `String`
-    ///   - links: optional `[String : String]`
-    ///   - node: optional `Int`
+    ///   - componentId: Optional unique identifier of the component.
+    ///   - componentType: Optional type of the component.
+    ///   - observedValue: Optional numeric value observed.
+    ///   - observedUnit: Optional unit for the observed value.
+    ///   - status: Optional health status.
+    ///   - affectedEndpoints: Optional list of affected endpoints.
+    ///   - time: Optional ISO8601 timestamp.
+    ///   - output: Optional raw output for errors/warnings.
+    ///   - links: Optional dictionary of related links.
+    ///   - node: Optional node number.
     public init(
         componentId: String? = nil,
         componentType: ComponentType? = nil,
@@ -100,8 +82,11 @@ public struct HealthCheckItem: Content {
         self.links = links
         self.node = node
     }
-    
-    /// Example of `HealthCheckItem`
+}
+
+extension HealthCheckItem {
+    // MARK: - Example
+    /// Example instance of `HealthCheckItem` for testing or documentation purposes.
     public static var example: HealthCheckItem {
         let observedValue: Double = 1234
         return HealthCheckItem(

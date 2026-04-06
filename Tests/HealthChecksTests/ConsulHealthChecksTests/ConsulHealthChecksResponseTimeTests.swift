@@ -22,48 +22,61 @@
 //  Created by Mykhailo Bondarenko on 08.03.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-/// Unit tests for response time functionality in ConsulHealthChecks.
-final class ConsulHealthChecksResponseTimeTests: XCTestCase {
-    /// Tests the creation of HealthCheckItem based on successful response time measurement.
-    func testCheckResponseTimeSuccess() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        app.consulConfig = ConsulConfig(
-            id: String(UUID()),
-            url: "consul-url"
-        )
-        let clientResponse = ClientResponse(status: .ok)
-        app.clients.use { app in
-            MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+@Suite("Consul health checks response time tests")
+struct ConsulHealthChecksResponseTimeTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
         }
-        let healthChecks = ConsulHealthChecks(app: app)
-        let response = await healthChecks.getStatus()
-        
-        let result = healthChecks.responseTime(from: response, Date().timeIntervalSince1970)
-        XCTAssertEqual(result.status, .pass)
-        guard let observedValue = result.observedValue else {
-            return XCTFail("no have observed value")
+        try await app.asyncShutdown()
+    }
+
+    @Test("Check response time success")
+    func checkResponseTimeSuccess() async throws {
+        try await withApp { app in
+            app.consulConfig = ConsulConfig(
+                id: String(UUID()),
+                url: "consul-url"
+            )
+            let clientResponse = ClientResponse(status: .ok)
+            app.clients.use { app in
+                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+            }
+            let healthChecks = ConsulHealthChecks(app: app)
+            let response = await healthChecks.getStatus()
+
+            let result = healthChecks.responseTime(from: response, Date().timeIntervalSince1970)
+            #expect(result.status == .pass)
+            guard let observedValue = result.observedValue else {
+                Issue.record("No have observed value")
+                return
+            }
+            #expect(observedValue > .zero)
+            #expect(result.output == nil)
         }
-        XCTAssertGreaterThan(observedValue, 0)
-        XCTAssertNil(result.output)
     }
     
-    /// Tests the creation of HealthCheckItem based on unsuccessful response time measurement.
-    func testCheckResponseTimeFail() async {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let clientResponse = ClientResponse(status: .badRequest)
-        let healthChecks = ConsulHealthChecks(app: app)
-        
-        let result = healthChecks.responseTime(from: clientResponse, Date().timeIntervalSince1970)
-        XCTAssertEqual(result.status, .fail)
-        guard let observedValue = result.observedValue else {
-            return XCTFail("no have observed value")
+    @Test("Check response time fail")
+    func checkResponseTimeFail() async throws {
+        try await withApp { app in
+            let clientResponse = ClientResponse(status: .badRequest)
+            let healthChecks = ConsulHealthChecks(app: app)
+
+            let result = healthChecks.responseTime(from: clientResponse, Date().timeIntervalSince1970)
+            #expect(result.status == .fail)
+            guard let observedValue = result.observedValue else {
+                Issue.record("No have observed value")
+                return
+            }
+            #expect(observedValue == .zero)
+            #expect(result.output != nil)
         }
-        XCTAssertEqual(observedValue, 0)
-        XCTAssertNotNil(result.output)
     }
 }

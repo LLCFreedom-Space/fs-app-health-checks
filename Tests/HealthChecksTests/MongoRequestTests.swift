@@ -22,14 +22,27 @@
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
-import XCTVapor
 @testable import HealthChecks
+import VaporTesting
+import Testing
 
-final class MongoRequestTests: XCTestCase {
-    func testGetConnection() async throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
-        let result = await MongoRequest(app: app).getConnection(by: "url")
-        XCTAssertEqual(result, "disconnected")
+@Suite("Mongo Request tests")
+struct MongoRequestTests {
+    private func withApp(_ test: (Application) async throws -> ()) async throws {
+        let app = try await Application.make(.testing)
+        do {
+            try await test(app)
+        } catch {
+            throw error
+        }
+        try await app.asyncShutdown()
+    }
+
+    @Test("Get connection")
+    func getConnection() async throws {
+        try await withApp { app in
+            let result = await MongoRequest(app: app).getConnection(by: "url")
+            #expect(result == "disconnected")
+        }
     }
 }

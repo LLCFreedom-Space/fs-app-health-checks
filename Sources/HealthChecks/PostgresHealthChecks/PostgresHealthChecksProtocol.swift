@@ -24,5 +24,5 @@
 
 import Vapor
 
-/// Groups func for get psql health check
-public protocol PostgresHealthChecksProtocol: PostgresChecksProtocol, ChecksProtocol {}
+/// Protocol defining PostgreSQL health check capabilities.
+public protocol PostgresHealthChecksProtocol: PostgresChecksProtocol, ChecksProtocol, Sendable {}

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "fs-app-health-checks",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -24,7 +24,8 @@ let package = Package(
         //  Vapor provider for RedisKit + RedisNIO
         .package(url: "https://github.com/vapor/redis.git", from: "5.0.0-alpha.2.2"),
         // 🐈 Mongo driver based on Swift NIO.
-        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.6.4"),
+        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.15.0"),
+        // 📄 Swift-DocC plugin for generating documentation.
         .package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.0.0"),
     ],
     targets: [
@@ -33,38 +34,18 @@ let package = Package(
         .target(
             name: "HealthChecks",
             dependencies: [
-                .product(
-                    name: "Vapor",
-                    package: "vapor"
-                ),
-                .product(
-                    name: "Fluent",
-                    package: "fluent"
-                ),
-                .product(
-                    name: "FluentPostgresDriver",
-                    package: "fluent-postgres-driver"
-                ),
-                .product(
-                    name: "Redis",
-                    package: "redis"
-                ),
-                .product(
-                    name: "MongoKitten",
-                    package: "MongoKitten"
-                ),
+                .product(name: "Vapor", package: "vapor"),
+                .product(name: "Fluent", package: "fluent"),
+                .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
+                .product(name: "Redis", package: "redis"),
+                .product(name: "MongoKitten", package: "MongoKitten"),
             ]
         ),
         .testTarget(
             name: "HealthChecksTests",
             dependencies: [
-                .target(
-                    name: "HealthChecks"
-                ),
-                .product(
-                    name: "XCTVapor",
-                    package: "vapor"
-                ),
+                .target(name: "HealthChecks"),
+                .product(name: "VaporTesting", package: "vapor")
             ]
         )
     ]

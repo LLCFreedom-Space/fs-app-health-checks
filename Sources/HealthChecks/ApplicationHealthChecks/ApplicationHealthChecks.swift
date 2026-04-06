@@ -24,21 +24,18 @@
 
 import Vapor
 
-/// Service that provides functionality to check the health of an application.
-///
-/// This struct implements the `ApplicationHealthChecksProtocol`, allowing you to perform various checks on your application's health.
+/// Provides health check functionality for the application.
 public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
-    /// Reference to the application instance.
+    /// The instance of the Vapor application.
     public let app: Application
-    
-    /// Initializer for ApplicationHealthChecks
-    /// - Parameter app: `Application`
+    /// Initializes a new `ApplicationHealthChecks` instance.
+    /// - Parameter app: The Vapor `Application` instance.
     public init(app: Application) {
         self.app = app
     }
 
-    /// Get uptime of the system.
-    /// - Returns: A `HealthCheckItem` representing the application's uptime.
+    /// Provides the application uptime as a health check item.
+    /// - Returns: `HealthCheckItem`
     public func uptime() -> HealthCheckItem {
         let uptime = Date().timeIntervalSince1970 - app.launchTime
         return HealthCheckItem(
@@ -50,9 +47,11 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
         )
     }
     
-    /// Performs health checks based on the specified `MeasurementType` options.
-    /// - Parameter options: An array of `MeasurementType` values indicating which checks to perform.
-    /// - Returns: A dictionary mapping each `MeasurementType` to a corresponding `HealthCheckItem` representing the result of the check.
+    /// Executes selected health check measurements and returns their results.
+    /// - Parameter options: An array of `MeasurementType` values specifying.
+    /// - Returns: A dictionary where:
+    ///   - Key: `String` representation of the `MeasurementType`
+    ///   - Value: Corresponding `HealthCheckItem` result
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         var result = ["": HealthCheckItem()]
         let measurementTypes = Array(Set(options))
