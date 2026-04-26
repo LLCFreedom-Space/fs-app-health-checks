@@ -16,20 +16,26 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  RedisHealthChecksMock.swift
-//  
+//  ConsulHealthChecksMock.swift
 //
-//  Created by Mykola Buhaiov on 21.02.2024.
+//
+//  Created by Mykola Buhaiov on 07.02.2024.
 //
 
 import Vapor
 @testable import HealthChecks
 
-public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
-    static let redisId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-    static let healthCheckItem = HealthCheckItem(
-        componentId: redisId,
-        componentType: .datastore,
+public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
+    private var healthCheckItem: HealthCheckItem
+    
+    public init(healthCheckItem: HealthCheckItem = healthCheckItem) {
+        self.healthCheckItem = healthCheckItem
+    }
+
+    public static let consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+    public static let healthCheckItem = HealthCheckItem(
+        componentId: consulId,
+        componentType: .component,
         observedValue: 1,
         observedUnit: "s",
         status: .pass,
@@ -40,22 +46,10 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
         node: nil
     )
 
-    public func connection() async -> HealthCheckItem {
-        RedisHealthChecksMock.healthCheckItem
-    }
-
-    public func responseTime() async -> HealthCheckItem {
-        RedisHealthChecksMock.healthCheckItem
-    }
-
-    public func ping() async -> String {
-        "PONG"
-    }
-
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.redis):\(MeasurementType.responseTime)": RedisHealthChecksMock.healthCheckItem,
-            "\(ComponentName.redis):\(MeasurementType.connections)": RedisHealthChecksMock.healthCheckItem
+            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem,
+            "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
         ]
         return result
     }

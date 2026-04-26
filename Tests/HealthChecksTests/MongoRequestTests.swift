@@ -22,6 +22,7 @@
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
 
+@testable import HealthChecksMocks
 @testable import HealthChecks
 import VaporTesting
 import Testing
@@ -41,7 +42,8 @@ struct MongoRequestTests {
     @Test("Get connection")
     func getConnection() async throws {
         try await withApp { app in
-            let result = await MongoRequest(app: app).getConnection(by: "url")
+            app.mongoRequest = MongoRequestMock(connection: "disconnected")
+            let result = await app.mongoRequest?.getConnection(by: "url")
             #expect(result == "disconnected")
         }
     }
