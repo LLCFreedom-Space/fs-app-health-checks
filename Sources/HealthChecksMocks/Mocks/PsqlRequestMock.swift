@@ -16,17 +16,27 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoRequestMock.swift
+//  PsqlRequestMock.swift
 //
 //
-//  Created by Mykola Buhaiov on 15.03.2024.
+//  Created by Mykola Buhaiov on 14.03.2024.
 //
 
 import Vapor
 @testable import HealthChecks
 
-public struct MongoRequestMock: MongoRequestSendable {
-    public func getConnection(by url: String) async -> String {
-        "connecting"
+public struct PsqlRequestMock: PsqlRequestSendable {
+    static let version =
+            """
+            PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+            """
+    public func getVersionDescription() async throws -> String {
+        """
+        PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+        """
+    }
+    
+    public func checkConnection(for databaseName: String) async throws -> String {
+        "active"
     }
 }

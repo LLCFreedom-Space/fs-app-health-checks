@@ -50,10 +50,10 @@ public struct MongoRequest: MongoRequestSendable {
         let dbName = healthCheckMongoCluster.settings.targetDatabase ?? "unknown_database_name"
         switch healthCheckMongoCluster.connectionState {
         case .connecting:
-            app.logger.debug("✅ HealthCheckMongoCluster connection.")
+            //            app.logger.debug("✅ HealthCheckMongoCluster connection.")
             return "connecting"
         case .connected(connectionCount: let connectionCount):
-            app.logger.debug("✅ HealthCheckMongoCluster connection and connectionCount: \(connectionCount).")
+            //            app.logger.debug("✅ HealthCheckMongoCluster connection and connectionCount: \(connectionCount).")
             return "connected"
         case .disconnected:
             app.logger.error("❌ HealthCheckMongoCluster is disconnected and try to reconnect to: \(dbName).")

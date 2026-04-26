@@ -22,6 +22,7 @@
 //  Created by Mykola Buhaiov on 07.02.2024.
 //
 
+@testable import HealthChecksMocks
 @testable import HealthChecks
 import VaporTesting
 import Testing
@@ -41,10 +42,11 @@ struct ConsulHealthChecksCheckTests {
     @Test("Health check")
     func healthCheck() async throws {
         try await withApp { app in
+            let consulUrl = "http://127.0.0.1:8500"
             app.consulHealthChecks = ConsulHealthChecksMock()
             let consulConfig = ConsulConfig(
                 id: UUID().uuidString,
-                url: Constants.consulUrl
+                url: consulUrl
             )
             app.consulConfig = consulConfig
             let result = await app.consulHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
@@ -95,6 +97,12 @@ struct ConsulHealthChecksCheckTests {
     @Test("Check handles unsupported types")
     func checkHandlesUnsupportedTypes() async throws {
         try await withApp { app in
+            let consulUrl = "http://127.0.0.1:8500"
+            let consulConfig = ConsulConfig(
+                id: UUID().uuidString,
+                url: consulUrl
+            )
+            app.consulConfig = consulConfig
             let healthChecks = ConsulHealthChecks(app: app)
             let checks = await healthChecks.check(for: [.uptime])
             #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported

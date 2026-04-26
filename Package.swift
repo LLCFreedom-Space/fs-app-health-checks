@@ -10,9 +10,8 @@ let package = Package(
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "HealthChecks",
-            targets: ["HealthChecks"])
+        .library(name: "HealthChecks", targets: ["HealthChecks"]),
+        .library(name: "HealthChecksMocks", targets: ["HealthChecksMocks"]),
     ],
     dependencies: [
         // 💧 A server-side Swift web framework.
@@ -41,10 +40,17 @@ let package = Package(
                 .product(name: "MongoKitten", package: "MongoKitten"),
             ]
         ),
+        .target(
+            name: "HealthChecksMocks",
+            dependencies: [
+                .target(name: "HealthChecks"),
+            ]
+        ),
         .testTarget(
             name: "HealthChecksTests",
             dependencies: [
                 .target(name: "HealthChecks"),
+                .target(name: "HealthChecksMocks"),
                 .product(name: "VaporTesting", package: "vapor")
             ]
         )

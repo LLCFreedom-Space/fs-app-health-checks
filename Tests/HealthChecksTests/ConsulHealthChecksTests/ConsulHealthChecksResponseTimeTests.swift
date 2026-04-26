@@ -22,6 +22,7 @@
 //  Created by Mykhailo Bondarenko on 08.03.2024.
 //
 
+@testable import HealthChecksMocks
 @testable import HealthChecks
 import VaporTesting
 import Testing

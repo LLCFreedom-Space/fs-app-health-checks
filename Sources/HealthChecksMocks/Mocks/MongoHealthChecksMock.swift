@@ -26,8 +26,14 @@ import Vapor
 @testable import HealthChecks
 
 public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
-    static let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-    static let healthCheckItem = HealthCheckItem(
+    private var healthCheckItem: HealthCheckItem
+    
+    public init(healthCheckItem: HealthCheckItem = healthCheckItem) {
+        self.healthCheckItem = healthCheckItem
+    }
+    
+    public static let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+    public static let healthCheckItem = HealthCheckItem(
         componentId: mongoId,
         componentType: .datastore,
         observedValue: 1,
