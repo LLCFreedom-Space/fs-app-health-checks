@@ -33,7 +33,10 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
     }
     
     public static let psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-    public static let version = Constants.psqlVersionDescription
+    public static let version =
+            """
+            PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+            """
     public static let healthCheckItem = HealthCheckItem(
         componentId: psqlId,
         componentType: .datastore,

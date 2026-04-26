@@ -118,6 +118,10 @@ struct PostgresHealthChecksTests {
     @Test("Get version")
     func getVersion() async throws {
         try await withApp { app in
+            let version =
+                """
+                PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+                """
             app.psqlId = UUID().uuidString
             app.psqlHealthChecks = PostgresHealthChecksMock()
             let resultMock = await app.psqlHealthChecks?.getVersion()
@@ -126,7 +130,7 @@ struct PostgresHealthChecksTests {
             app.psqlRequest = PsqlRequestMock()
             app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
             let result = await app.psqlHealthChecks?.getVersion()
-            #expect(result == Constants.psqlVersionDescription)
+            #expect(result == version)
         }
     }
 
