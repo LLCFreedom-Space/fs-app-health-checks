@@ -43,13 +43,13 @@ struct HealthChecksTests {
     func getPublicVersion() async throws {
         try await withApp { _ in
             let releaseId = "1.0.0"
-            let version = HealthChecks().getPublicVersion(from: releaseId)
+            let version = HealthChecks.getPublicVersion(from: releaseId)
             #expect(version == "1")
-            let invalidVersion = HealthChecks().getPublicVersion(from: "invalidVersion")
+            let invalidVersion = HealthChecks.getPublicVersion(from: "invalidVersion")
             #expect(invalidVersion == nil)
-            let versionWithoutDots = HealthChecks().getPublicVersion(from: "12345")
+            let versionWithoutDots = HealthChecks.getPublicVersion(from: "12345")
             #expect(versionWithoutDots == nil)
-            let versionWithLettersAndDots = HealthChecks().getPublicVersion(from: "1a.b.c")
+            let versionWithLettersAndDots = HealthChecks.getPublicVersion(from: "1a.b.c")
             #expect(versionWithLettersAndDots == nil)
         }
     }
@@ -61,7 +61,7 @@ struct HealthChecksTests {
             let releaseId = "1.0.0"
             app.serviceId = serviceId
             app.releaseId = releaseId
-            let response = HealthChecks().getHealth(from: app)
+            let response = HealthChecks.getHealth(from: app)
             #expect(response.version == "1")
             #expect(response.releaseId == releaseId)
             #expect(response.serviceId == serviceId)
