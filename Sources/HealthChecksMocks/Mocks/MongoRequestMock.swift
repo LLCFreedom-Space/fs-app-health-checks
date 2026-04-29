@@ -33,7 +33,7 @@ public struct MongoRequestMock: MongoRequestSendable {
         self.connection = connection
     }
 
-    public func getConnection(by url: String) async -> String {
+    public func getConnection() async -> String {
         self.connection
     }
 }

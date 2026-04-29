@@ -53,9 +53,10 @@ public struct PsqlRequest: PsqlRequestSendable {
     /// Checks the connection state for a specific PostgreSQL database.
     /// - Parameter databaseName: Name of the PostgreSQL database.
     /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
-    public func checkConnection(for databaseName: String) async throws -> String {
+    public func checkConnection() async throws -> String {
+        let query = "SELECT state FROM pg_stat_activity WHERE datname = current_database() AND state = 'active' LIMIT 1"
         let rows = try? await (app.db(.psql) as? PostgresDatabase)?
-            .simpleQuery("SELECT * FROM pg_stat_activity WHERE datname = '\(databaseName)' and state = 'active';")
+            .simpleQuery("\(query)")
             .get()
         let row = rows?.first?.makeRandomAccess()
         var connectionDescription = "ERROR: No connect to Postgres database and not check state connection"

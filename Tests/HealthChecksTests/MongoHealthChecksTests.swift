@@ -50,7 +50,7 @@ struct MongoHealthChecksTests {
             #expect(app.mongoId == mongoId)
 
             app.mongoRequest = MongoRequestMock()
-            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            app.mongoHealthChecks = MongoHealthChecks(app: app)
             let result = await app.mongoHealthChecks?.connection()
             #expect(result?.componentType == .datastore)
             #expect(result?.observedValue != 1.0)
@@ -70,7 +70,7 @@ struct MongoHealthChecksTests {
             #expect(resultMock == MongoHealthChecksMock.healthCheckItem)
 
             app.mongoRequest = MongoRequestMock()
-            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            app.mongoHealthChecks = MongoHealthChecks(app: app)
             let result = await app.mongoHealthChecks?.responseTime()
             #expect(result?.componentType == .datastore)
             #expect(result?.observedValue != 1.0)
@@ -101,7 +101,7 @@ struct MongoHealthChecksTests {
             #expect(mockMongoResponseTimes == MongoHealthChecksMock.healthCheckItem)
 
             app.mongoRequest = MongoRequestMock()
-            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            app.mongoHealthChecks = MongoHealthChecks(app: app)
             let result = await app.mongoHealthChecks?.check(
                 for: [
                     MeasurementType.responseTime,
@@ -139,7 +139,7 @@ struct MongoHealthChecksTests {
             #expect(resultMock == "connecting")
 
             app.mongoRequest = MongoRequestMock()
-            app.mongoHealthChecks = MongoHealthChecks(app: app, url: "url")
+            app.mongoHealthChecks = MongoHealthChecks(app: app)
             let result = await app.mongoHealthChecks?.getConnection()
             #expect(result == "connecting")
         }

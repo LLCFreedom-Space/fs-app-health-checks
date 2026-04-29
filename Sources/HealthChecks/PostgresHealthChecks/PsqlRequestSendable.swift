@@ -32,5 +32,5 @@ public protocol PsqlRequestSendable: Sendable {
     /// Checks the connection state for a specific PostgreSQL database.
     /// - Parameter databaseName: The name of the PostgreSQL database to check.
     /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
-    func checkConnection(for databaseName: String) async throws -> String
+    func checkConnection() async throws -> String
 }

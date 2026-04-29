@@ -30,15 +30,11 @@ import FluentPostgresDriver
 public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Instance of the application.
     public let app: Application
-    /// Name of the PostgreSQL database to check.
-    public let postgresDatabase: String
     /// Initializes a new `PostgresHealthChecks` instance.
     /// - Parameters:
     ///   - app: The `Application` instance.
-    ///   - postgresDatabase: Name of the PostgreSQL database.
-    public init(app: Application, postgresDatabase: String) {
+    public init(app: Application) {
         self.app = app
-        self.postgresDatabase = postgresDatabase
     }
 
     /// Checks the PostgreSQL connection status.
@@ -88,7 +84,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Checks the connection for the PostgreSQL database.
     /// - Returns: A `String` describing the connection status.
     public func checkConnection() async -> String {
-        guard let result = try? await app.psqlRequest?.checkConnection(for: postgresDatabase) else {
+        guard let result = try? await app.psqlRequest?.checkConnection() else {
             return "ERROR: No connect to Postgres database for check database"
         }
         return result
