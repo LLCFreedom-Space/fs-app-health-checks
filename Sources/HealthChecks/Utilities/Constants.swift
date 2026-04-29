@@ -32,4 +32,6 @@ public enum Constants {
     static let consulUrl = "http://127.0.0.1:8500"
     /// Default path for retrieving Consul leader status.
     static let consulStatusPath = "/v1/status/leader"
+    /// Default path for retrieving Consul leader key-value.
+    static let consulKeyValue = "/v1/kv/config"
 }

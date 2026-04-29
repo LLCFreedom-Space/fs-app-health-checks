@@ -17,13 +17,13 @@ let package = Package(
         // 💧 A server-side Swift web framework.
         .package(url: "https://github.com/vapor/vapor.git", from: "4.115.0"),
         // 🖋 Swift ORM (queries, models, and relations) for NoSQL and SQL databases.
-        .package(url: "https://github.com/vapor/fluent.git", from: "4.1.0"),
+        .package(url: "https://github.com/vapor/fluent.git", from: "4.5.0"),
         // 🐘 Swift ORM (queries, models, relations, etc) built on PostgreSQL.
-        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.1.1"),
+        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.4.0"),
+        // 🐈 MongoDB driver based on Swift NIO.
+        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.16.0"),
         //  Vapor provider for RedisKit + RedisNIO
-        .package(url: "https://github.com/vapor/redis.git", from: "5.0.0-alpha.2.2"),
-        // 🐈 Mongo driver based on Swift NIO.
-        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.15.0"),
+        .package(url: "https://github.com/vapor/redis.git", from: "4.14.0"),
         // 📄 Swift-DocC plugin for generating documentation.
         .package(url: "https://github.com/apple/swift-docc-plugin.git", from: "1.0.0"),
     ],

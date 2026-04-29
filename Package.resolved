@@ -1,5 +1,5 @@
 {
-  "originHash" : "d0b896b82793c315445afd54c4ff0418851eef5c6ac9c00e6aab3d155691a53b",
+  "originHash" : "6e0837e9de7c2b988f574273e1a1f8247465e608030ede83a331881fd37236b6",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -78,8 +78,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/orlandos-nl/MongoKitten.git",
       "state" : {
-        "revision" : "40575fe4ed2955071a1bd0f54d9b5e2803156b91",
-        "version" : "7.15.0"
+        "revision" : "89ac0ea331d51f1909042955c07632f40eec38fd",
+        "version" : "7.16.1"
       }
     },
     {
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/vapor/redis.git",
       "state" : {
-        "revision" : "2a8d3e4639b90b39b74309b54216bdfd9cb52b41",
-        "version" : "5.0.0-alpha.2.2"
+        "revision" : "bc960cc856ef9fd5da760d6a3afedb93fc92aa00",
+        "version" : "4.14.0"
       }
     },
     {
