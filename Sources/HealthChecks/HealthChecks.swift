@@ -25,20 +25,17 @@
 import Vapor
 
 /// A utility struct for performing general health check operations.
-public struct HealthChecks {
-    /// Initializes a new `HealthChecks` instance.
-    public init() {}
-
+public enum HealthChecks {
     /// Extracts the major version from a full server version string.
     /// - Parameter serverVersion: The full version string of the server (e.g., `"1.2.3"`).
     /// - Returns: The major version as a `String` (e.g., `"1"`), or `nil`
-    public func getPublicVersion(from version: String?) -> String? {
+    public static func getPublicVersion(from version: String?) -> String? {
         guard let version = version, version.contains(".") else {
             return nil
         }
         let components = version.components(separatedBy: ".")
 
-        guard let firstComponent = components.first, firstComponent.rangeOfCharacter(from: CharacterSet.decimalDigits.inverted) == nil else {
+        guard let first = components.first, !first.isEmpty, Int(first) != nil else {
             return nil
         }
         return components.first
@@ -47,12 +44,11 @@ public struct HealthChecks {
     /// Generates a `HealthCheck` object representing the application's health status.
     /// - Parameter app: The `Application` instance.
     /// - Returns: `HealthCheck`
-    public func getHealth(from app: Application) -> HealthCheck {
-        let healthCheck = HealthCheck(
-            version: self.getPublicVersion(from: app.releaseId),
+    public static func getHealth(from app: Application) -> HealthCheck {
+        return HealthCheck(
+            version: getPublicVersion(from: app.releaseId),
             releaseId: app.releaseId,
             serviceId: app.serviceId
         )
-        return healthCheck
     }
 }

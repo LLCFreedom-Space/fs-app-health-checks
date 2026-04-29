@@ -59,8 +59,8 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Retrieves the current status of the Consul service.
     /// - Returns: `ClientResponse`
     func getStatus() async -> ClientResponse {
-        guard let url = app.consulConfig?.url else {
-            app.logger.error("ERROR: Consul URL is not configured.")
+        guard let url = app.consulConfig?.url, !url.isEmpty else {
+            app.logger.error("Consul URL is not configured.")
             return ClientResponse()
         }
         let path = Constants.consulStatusPath
@@ -78,7 +78,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
         do {
             return try await app.client.get(uri, headers: headers)
         } catch {
-            app.logger.error("ERROR: Send request by uri - \(uri) and method get fail with error - \(error)")
+            app.logger.error("Send request by uri - \(uri) and method get fail with error - \(error).")
             return ClientResponse()
         }
     }
