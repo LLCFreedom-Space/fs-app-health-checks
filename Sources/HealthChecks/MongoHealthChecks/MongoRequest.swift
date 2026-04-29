@@ -36,13 +36,12 @@ public struct MongoRequest: MongoRequestSendable {
     }
 
     /// Returns the current connection state of the Mongo cluster.
-    /// - Parameter url: The Mongo connection URL (currently not used in logic, but reserved for future use).
     /// - Returns: A string describing the current connection state:
     ///   - `"connecting"` — when the connection is in progress
     ///   - `"connected"` — when the cluster is connected
     ///   - `"disconnected"` — when the cluster is not available
     ///   - `"closed"` — when the connection has been closed
-    public func getConnection(by url: String) async -> String {
+    public func getConnection() async -> String {
         guard let healthCheckMongoCluster = app.healthCheckMongoCluster else {
             app.logger.error("❌ HealthCheckMongoCluster not installed in app. Check your configuration, need to set `app.healthCheckMongoCluster")
             return "disconnected"

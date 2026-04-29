@@ -48,7 +48,7 @@ struct PostgresHealthChecksTests {
             #expect(mockResult == PostgresHealthChecksMock.healthCheckItem)
 
             app.psqlRequest = PsqlRequestMock()
-            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            app.psqlHealthChecks = PostgresHealthChecks(app: app)
             let result = await app.psqlHealthChecks?.connection()
             #expect(result?.componentType == .datastore)
             #expect(result?.status == .pass)
@@ -67,7 +67,7 @@ struct PostgresHealthChecksTests {
             #expect(resultMock == PostgresHealthChecksMock.healthCheckItem)
 
             app.psqlRequest = PsqlRequestMock()
-            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            app.psqlHealthChecks = PostgresHealthChecks(app: app)
             let result = await app.psqlHealthChecks?.responseTime()
             #expect(result?.componentType == .datastore)
             #expect(result?.observedValue != 1)
@@ -92,7 +92,7 @@ struct PostgresHealthChecksTests {
             #expect(mockPsqlResponseTimes == PostgresHealthChecksMock.healthCheckItem)
 
             app.psqlRequest = PsqlRequestMock()
-            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            app.psqlHealthChecks = PostgresHealthChecks(app: app)
             let result = await app.psqlHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
             let psqlConnections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
             #expect(psqlConnections?.componentType == .datastore)
@@ -128,7 +128,7 @@ struct PostgresHealthChecksTests {
             #expect(resultMock == PostgresHealthChecksMock.version)
 
             app.psqlRequest = PsqlRequestMock()
-            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            app.psqlHealthChecks = PostgresHealthChecks(app: app)
             let result = await app.psqlHealthChecks?.getVersion()
             #expect(result == version)
         }
@@ -143,7 +143,7 @@ struct PostgresHealthChecksTests {
             #expect(resultMock == "active")
 
             app.psqlRequest = PsqlRequestMock()
-            app.psqlHealthChecks = PostgresHealthChecks(app: app, postgresDatabase: "test")
+            app.psqlHealthChecks = PostgresHealthChecks(app: app)
             let result = await app.psqlHealthChecks?.checkConnection()
             #expect(result == "active")
         }

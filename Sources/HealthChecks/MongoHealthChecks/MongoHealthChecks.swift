@@ -29,15 +29,11 @@ import MongoClient
 public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Instance of the application.
     public let app: Application
-    /// Connection URL for the MongoDB instance.
-    public let url: String
     /// Initializes a new `MongoHealthChecks` instance.
     /// - Parameters:
     ///   - app: The `Application` instance.
-    ///   - url: Connection URL string for MongoDB.
-    public init(app: Application, url: String) {
+    public init(app: Application) {
         self.app = app
-        self.url = url
     }
 
     /// Checks the MongoDB connection status.
@@ -87,7 +83,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
             return "disconnected"
         }
-        return await mongoRequest.getConnection(by: url)
+        return await mongoRequest.getConnection()
     }
 
     /// Performs health checks for the given measurement types.

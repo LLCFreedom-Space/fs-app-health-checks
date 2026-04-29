@@ -26,8 +26,7 @@ import Vapor
 
 /// Protocol defining a sendable MongoDB request handler.
 public protocol MongoRequestSendable: Sendable {
-    /// Retrieves the connection description for a given MongoDB URL.
-    /// - Parameter url: The MongoDB connection URL.
+    /// Retrieves the connection description for a given MongoDB.
     /// - Returns: A `String` describing the connection status, e.g., `"connected"` or `"disconnected"`.
-    func getConnection(by url: String) async -> String
+    func getConnection() async -> String
 }
