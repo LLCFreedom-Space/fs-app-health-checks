@@ -38,8 +38,16 @@ jobs:
             ${{ runner.os }}-spm-
       - name: Build
         run: swift build -v
-      - name: Test (parallel)
-        run: swift test -v --parallel
+    - name: Test macOS
+      run: xcodebuild test -scheme fs-app-health-checks -destination "platform=macOS" -enableCodeCoverage YES
+    - name: Fetch Coverage
+      id: coverage-files
+      uses: sersoft-gmbh/swift-coverage-action@v4
+    - name: Publish Coverage to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ${{ steps.coverage-files.outputs.files }}
   # =========================
   # Linux
   # =========================
