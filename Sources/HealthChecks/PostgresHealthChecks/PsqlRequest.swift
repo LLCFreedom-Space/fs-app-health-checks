@@ -37,11 +37,6 @@ public struct PsqlRequest: PsqlRequestSendable {
         self.app = app
     }
 
-    /// Internal shortcut to the configured PostgreSQL database.
-    private var postgresDB: (any PostgresDatabase)? {
-        app.db(.psql) as? any PostgresDatabase
-    }
-
     /// Retrieves the PostgreSQL server version.
     /// Executes `SELECT version()` and parses the result into a structured format.
     /// - Returns: A string representing the PostgreSQL version (e.g. `"16.1"`).
@@ -66,7 +61,7 @@ public struct PsqlRequest: PsqlRequestSendable {
                 throw HealthCheckError(.emptyResponse, reason: .unexpectedState)
             }
 
-            guard let info = self.parsePostgreSQLVersion(rowDescription) else {
+            guard let info = PostgresVersionComponents(raw: rowDescription) else {
                 app.logger.error("Failed to parse version string: \(rowDescription).")
                 throw HealthCheckError(.parseVersionFailed, reason: .invalidVersionFormat)
             }
@@ -136,63 +131,5 @@ public struct PsqlRequest: PsqlRequestSendable {
             app.logger.error("Failed to get active connections count.", error: error)
             throw HealthCheckError(.queryFailed, reason: .queryExecutionFailed)
         }
-    }
-
-    /// Parses a raw PostgreSQL version string into a structured representation.
-    /// This function extracts metadata from the output of:
-    /// `SELECT version()`
-    /// Expected format example:
-    /// `PostgreSQL 16.1 on x86_64-apple-darwin, compiled by ...`
-    /// The parser uses a regular expression with named capture groups to extract:
-    /// - Database name
-    /// - Version
-    /// - Architecture
-    /// - Operating system
-    /// - Compiler information
-    /// - Build details
-    /// - Compiler version
-    /// - System bitness
-    ///
-    /// - Parameter raw: The raw version string returned by PostgreSQL.
-    /// - Returns: A `PostgresVersionInfo` object if parsing succeeds,
-    ///            otherwise `nil` if the format does not match expected structure.
-    private func parsePostgreSQLVersion(_ raw: String) -> PostgresVersionInfo? {
-        let pattern = /^(?<db>[a-zA-Z]+)\s+(?<ver>[\d.]+)\s+on\s+(?<arch>[a-zA-Z0-9_]+)-(?<os>[^,]+),\s+compiled\s+by\s+(?<compiler>[^(]+)\((?<build>[^)]+)\)\s+(?<compVer>[^,]+),\s+(?<bitness>.+)$/
-
-        guard let match = raw.wholeMatch(of: pattern) else { return nil }
-
-        return PostgresVersionInfo(
-            dbName: String(match.output.db),
-            version: String(match.output.ver),
-            architecture: String(match.output.arch),
-            osEnvironment: String(match.output.os),
-            compiler: match.output.compiler.trimmingCharacters(in: .whitespaces),
-            compilerBuild: String(match.output.build),
-            compilerVersion: String(match.output.compVer),
-            bitness: String(match.output.bitness)
-        )
-    }
-
-    /// Internal structured representation of parsed PostgreSQL version information.
-    /// This type is used to decode and normalize the raw string returned by
-    /// `SELECT version()` into strongly typed components for easier debugging,
-    /// logging, and future extensibility.
-    private struct PostgresVersionInfo: Content {
-        /// Database engine name (e.g. `"PostgreSQL"`).
-        let dbName: String
-        /// Semantic version of PostgreSQL (e.g. `"16.1"`).
-        let version: String
-        /// CPU architecture the database was built for (e.g. `"x86_64"`).
-        let architecture: String
-        /// Operating system on which PostgreSQL is running.
-        let osEnvironment: String
-        /// Compiler used to build PostgreSQL (e.g. `"gcc"`).
-        let compiler: String
-        /// Specific compiler build information or flags.
-        let compilerBuild: String
-        /// Compiler version string.
-        let compilerVersion: String
-        /// System bitness (e.g. `"64-bit"`).
-        let bitness: String
     }
 }
