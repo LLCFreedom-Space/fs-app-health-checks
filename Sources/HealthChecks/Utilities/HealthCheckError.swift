@@ -7,21 +7,35 @@
 
 import Vapor
 
+/// A structured error type used to report health-check failures across different services
+/// (PostgreSQL, MongoDB, Redis, etc.).
+/// Each error carries a ``Kind`` that describes the category of failure and an optional
+/// ``Reason`` that provides a more specific cause. Together they produce human-readable
+/// descriptions and actionable solutions.
+/// ## Example
+/// ```swift
+/// throw HealthCheckError(.queryFailed, reason: .queryExecutionFailed)
+/// ```
 public struct HealthCheckError: Error, CustomStringConvertible, CustomDebugStringConvertible {
     // MARK: - Kind
 
+    /// The high-level category of a health-check failure.
+    ///
+    /// Use `Kind` to branch on the type of problem without needing to inspect
+    /// the lower-level ``Reason``.
     public enum Kind: String, Codable, CustomStringConvertible, Equatable, Sendable {
-        /// Існуючий: неможливо підключитися до жодного хоста.
+        /// No host in the connection pool could be reached, so no queries can be sent.
         case cannotConnect
-        /// Запит до БД завершився помилкою.
+        /// A database query was attempted but did not complete successfully.
         case queryFailed
-        /// Не вдалося розпарсити рядок версії PostgreSQL.
+        /// The raw version string returned by PostgreSQL could not be parsed.
         case parseVersionFailed
-        /// Запит виконався, але повернув порожній результат.
+        /// A query executed successfully but returned an empty result set.
         case emptyResponse
-        /// З'єднання було втрачено під час виконання операції.
+        /// The connection to the database was dropped mid-operation.
         case connectionLost
 
+        /// A human-readable summary of the kind.
         public var description: String {
             switch self {
             case .cannotConnect:
@@ -40,24 +54,31 @@ public struct HealthCheckError: Error, CustomStringConvertible, CustomDebugStrin
 
     // MARK: - Reason
 
+    /// The specific underlying cause of a health-check failure.
+    ///
+    /// `Reason` refines the broader ``Kind`` and drives the ``HealthCheckError/recommendedSolution``
+    /// text shown to operators.
     public enum Reason: String, Codable, CustomStringConvertible, Equatable, Sendable {
-        /// Існуючий: з'єднання було закрито.
+        /// The connection was explicitly closed before the query could run.
         case connectionClosed
-        /// База даних не знайдена або недоступна через пул з'єднань.
+        /// The requested database could not be resolved from the connection pool.
         case databaseNotFound
-        /// Рядок версії має несподіваний формат.
+        /// The version string returned by the server does not match the expected pattern.
         case invalidVersionFormat
-        /// `pg_stat_activity` або інший запит не повернув жодного рядка.
+        /// The query succeeded but the result set contained no rows.
         case noRowsReturned
-        /// Виняток, кинутий під час виконання запиту (мережа, тайм-аут тощо).
+        /// An exception was thrown while executing the SQL query.
         case queryExecutionFailed
-        /// Рядок стану з'єднання знаходиться в несподіваному стані.
+        /// The connection or query result is in a state the health-check logic cannot handle.
         case unexpectedState
+        /// The MongoDB database has not been registered in the application configuration.
         case databaseNotConfigured
+        /// The expected field was absent from the Redis `INFO` response.
         case redisMissingField
-        /// Відповідь Redis не може бути перетворена на рядок.
+        /// The Redis server response could not be converted to a plain string.
         case redisInvalidResponse
-        
+
+        /// A human-readable summary of the reason.
         public var description: String {
             switch self {
             case .connectionClosed:
@@ -84,9 +105,19 @@ public struct HealthCheckError: Error, CustomStringConvertible, CustomDebugStrin
 
     // MARK: - Properties
 
+    /// The high-level category of the failure.
     public let kind: Kind
+
+    /// The specific underlying cause, if known.
     public let reason: Reason?
 
+    // MARK: - Initialiser
+
+    /// Creates a new `HealthCheckError`.
+    ///
+    /// - Parameters:
+    ///   - kind: The high-level category of the failure.
+    ///   - reason: The specific underlying cause, or `nil` if unknown.
     public init(_ kind: Kind, reason: Reason?) {
         self.kind = kind
         self.reason = reason
@@ -94,6 +125,9 @@ public struct HealthCheckError: Error, CustomStringConvertible, CustomDebugStrin
 
     // MARK: - Recommended Solution
 
+    /// A human-readable, operator-facing description of steps that may resolve the error.
+    ///
+    /// When ``reason`` is `nil`, a generic link to the issue tracker is returned.
     public var recommendedSolution: String {
         guard let reason = reason else {
             return "File a report on https://github.com/LLCFreedom-Space/fs-app-health-checks"
@@ -144,19 +178,21 @@ public struct HealthCheckError: Error, CustomStringConvertible, CustomDebugStrin
             - This is likely an internal logic error. Review the health-check implementation.
             - File a report on https://github.com/LLCFreedom-Space/fs-app-health-checks with reproduction steps.
             """
-            
+
         case .databaseNotConfigured:
             return """
             - Ensure `app.healthCheckMongoDatabase` is configured before the application starts.
             - Verify that the MongoKitten driver is properly set up in your configuration.
             - Check your environment variables (host, port, username, password, database name).
             """
+
         case .redisMissingField:
             return """
             - Verify the Redis server version supports the requested INFO section.
             - Check that the field name matches the Redis INFO output format.
             - File a report on https://github.com/LLCFreedom-Space/fs-app-health-checks if the issue persists.
             """
+
         case .redisInvalidResponse:
             return """
             - Check the Redis server logs for unexpected response formats.
@@ -168,8 +204,11 @@ public struct HealthCheckError: Error, CustomStringConvertible, CustomDebugStrin
 
     // MARK: - CustomStringConvertible
 
-    public var debugDescription: String { description }
+    /// A full description including the kind, reason, and recommended solution.
     public var description: String {
         "\(kind.description): \(reason?.description ?? "Unknown reason")\nSolution(s):\n\(recommendedSolution)"
     }
+
+    /// Identical to ``description``; provided for `CustomDebugStringConvertible` conformance.
+    public var debugDescription: String { description }
 }
