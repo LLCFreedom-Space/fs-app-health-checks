@@ -102,6 +102,10 @@ struct ConsulHealthChecksCheckTests {
                 id: UUID().uuidString,
                 url: consulUrl
             )
+            let clientResponse = ClientResponse(status: .ok)
+            app.clients.use { app in
+                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+            }
             app.consulConfig = consulConfig
             let healthChecks = ConsulHealthChecks(app: app)
             let checks = await healthChecks.check(for: [.uptime])

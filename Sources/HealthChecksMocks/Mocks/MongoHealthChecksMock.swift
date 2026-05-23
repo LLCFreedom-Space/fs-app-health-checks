@@ -54,8 +54,8 @@ public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
         MongoHealthChecksMock.healthCheckItem
     }
 
-    public func getConnection() async -> String {
-        "connecting"
+    public func checkConnection() async -> String {
+        "connected"
     }
 
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {

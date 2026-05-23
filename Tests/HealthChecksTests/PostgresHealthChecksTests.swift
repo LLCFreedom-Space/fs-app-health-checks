@@ -74,7 +74,7 @@ struct PostgresHealthChecksTests {
             #expect(result?.observedUnit == "ms")
             #expect(result?.status == .pass)
             #expect(result?.affectedEndpoints == nil)
-            #expect(result?.output == nil)
+            #expect(result?.output == "99")
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -115,37 +115,18 @@ struct PostgresHealthChecksTests {
         }
     }
 
-    @Test("Get version")
-    func getVersion() async throws {
-        try await withApp { app in
-            let version =
-                """
-                PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
-                """
-            app.psqlId = UUID().uuidString
-            app.psqlHealthChecks = PostgresHealthChecksMock()
-            let resultMock = await app.psqlHealthChecks?.getVersion()
-            #expect(resultMock == PostgresHealthChecksMock.version)
-
-            app.psqlRequest = PsqlRequestMock()
-            app.psqlHealthChecks = PostgresHealthChecks(app: app)
-            let result = await app.psqlHealthChecks?.getVersion()
-            #expect(result == version)
-        }
-    }
-
     @Test("Check connection")
     func checkConnection() async throws {
         try await withApp { app in
             app.psqlId = UUID().uuidString
             app.psqlHealthChecks = PostgresHealthChecksMock()
             let resultMock = await app.psqlHealthChecks?.checkConnection()
-            #expect(resultMock == "active")
+            #expect(resultMock == "connected")
 
             app.psqlRequest = PsqlRequestMock()
             app.psqlHealthChecks = PostgresHealthChecks(app: app)
             let result = await app.psqlHealthChecks?.checkConnection()
-            #expect(result == "active")
+            #expect(result == "connected")
         }
     }
 }

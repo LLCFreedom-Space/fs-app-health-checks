@@ -26,13 +26,13 @@ import Vapor
 
 /// Protocol defining Redis health check operations.
 public protocol RedisChecksProtocol {
-    /// Retrieves the Redis connection status.
-    /// - Returns: A `HealthCheckItem` representing the current connection state of Redis.
+    /// Retrieves the PostgreSQL connection status.
+    /// - Returns: A `HealthCheckItem` representing the connection state.
     func connection() async -> HealthCheckItem
-    /// Measures the Redis response time.
-    /// - Returns: A `HealthCheckItem` containing the observed response time and status.
+    /// Measures the PostgreSQL response time.
+    /// - Returns: A `HealthCheckItem` containing the response time metric.
     func responseTime() async -> HealthCheckItem
-    /// Sends a ping to Redis and returns the response.
-    /// - Returns: A `String` representing the Redis ping response.
-    func ping() async -> String
+    /// Checks the connection for the PostgreSQL database.
+    /// - Returns: A `String` describing the database connection status, e.g., `"connected"` or `"disconnected"`.
+    func checkConnection() async -> String
 }

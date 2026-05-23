@@ -29,4 +29,12 @@ public struct RedisRequestMock: RedisRequestSendable {
     public func getPong() async throws -> String {
         "PONG"
     }
+    
+    public func getVersion() async throws -> String {
+        "34"
+    }
+    
+    public func getTotalConnection() async throws -> Int {
+        400
+    }
 }

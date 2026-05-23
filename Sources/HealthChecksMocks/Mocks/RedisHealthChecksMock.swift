@@ -53,9 +53,9 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
     public func responseTime() async -> HealthCheckItem {
         RedisHealthChecksMock.healthCheckItem
     }
-
-    public func ping() async -> String {
-        "PONG"
+    
+    public func checkConnection() async -> String {
+        "connected"
     }
 
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {

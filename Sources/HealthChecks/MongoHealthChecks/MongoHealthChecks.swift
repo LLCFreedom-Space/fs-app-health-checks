@@ -39,15 +39,13 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Checks the MongoDB connection status.
     /// - Returns: A `HealthCheckItem` representing the connection state.
     public func connection() async -> HealthCheckItem {
-        let connectionDescription = await getConnection()
-        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
+        let connectionDescription = await checkConnection()
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
-            // TODO: fetch active connection count/value if available
-            status: connectionStatus ? .fail : .pass,
+            status: connectionDescription.contains("connected") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionStatus ? connectionDescription : nil,
+            output: connectionDescription.contains("connected") ? nil : connectionDescription,
             links: nil,
             node: nil
         )
@@ -58,18 +56,16 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// - Returns: A `HealthCheckItem` with the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
         let startTime = Date().timeIntervalSince1970
-        let connectionDescription = await getConnection()
-        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
+        let connectionDescription = await getActiveConnections()
+        let connectionStatus = connectionDescription == .zero ? HealthCheckStatus.fail : HealthCheckStatus.pass
         let result = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
             observedUnit: "ms",
-            // TODO: need get active connection
-            //            observedValue: "",
-            status: connectionStatus ? .fail : .pass,
+            status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionStatus ? connectionDescription : nil,
+            output: connectionDescription == .zero ? nil : connectionDescription.description,
             links: nil,
             node: nil
         )
@@ -78,12 +74,28 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
 
     /// Retrieves the MongoDB connection description.
     /// - Returns: A `String` describing the connection status.
-    public func getConnection() async -> String {
+    public func checkConnection() async -> String {
         guard let mongoRequest = app.mongoRequest else {
             app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
             return "disconnected"
         }
-        return await mongoRequest.getConnection()
+        do {
+            return try await mongoRequest.checkConnection()
+        } catch {
+            return "disconnected"
+        }
+    }
+    
+    public func getActiveConnections() async -> Int {
+        guard let mongoRequest = app.mongoRequest else {
+            app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
+            return .zero
+        }
+        do {
+            return try await mongoRequest.getTotalConnection()
+        } catch {
+            return .zero
+        }
     }
 
     /// Performs health checks for the given measurement types.

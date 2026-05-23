@@ -44,9 +44,9 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
-            status: connectionDescription.contains("active") ? .pass : .fail,
+            status: connectionDescription.contains("connected") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("active") ? connectionDescription : nil,
+            output: !connectionDescription.contains("connected") ? connectionDescription : nil,
             links: nil,
             node: nil
         )
@@ -57,37 +57,46 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// - Returns: A `HealthCheckItem` containing the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
         let startTime = Date().timeIntervalSince1970
-        let versionDescription = await getVersion()
+        let connectionDescription = await getActiveConnections()
+        let connectionStatus = connectionDescription == .zero ? HealthCheckStatus.fail : HealthCheckStatus.pass
         let result = HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
             observedUnit: "ms",
-            status: versionDescription.contains("PostgreSQL") ? .pass : .fail,
+            status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !versionDescription.contains("PostgreSQL") ? versionDescription : nil,
+            output: connectionDescription == .zero ? nil : connectionDescription.description,
             links: nil,
             node: nil
         )
         return result
     }
 
-    /// Retrieves the PostgreSQL version.
-    /// - Returns: A `String` describing the PostgreSQL version.
-    public func getVersion() async -> String {
-        guard let result = try? await app.psqlRequest?.getVersionDescription() else {
-            return "ERROR: No connect to Postgres database for get version"
-        }
-        return result
-    }
-
     /// Checks the connection for the PostgreSQL database.
     /// - Returns: A `String` describing the connection status.
     public func checkConnection() async -> String {
-        guard let result = try? await app.psqlRequest?.checkConnection() else {
-            return "ERROR: No connect to Postgres database for check database"
+        guard let psqlRequest = app.psqlRequest else {
+            app.logger.error("PSQLRequest in app not set. Check your configuration, need to set `app.psqlRequest`")
+            return "disconnected"
         }
-        return result
+        do {
+            return try await psqlRequest.checkConnection()
+        } catch {
+            return "disconnected"
+        }
+    }
+    
+    public func getActiveConnections() async -> Int {
+        guard let psqlRequest = app.psqlRequest else {
+            app.logger.error("PSQLRequest in app not set. Check your configuration, need to set `app.psqlRequest`")
+            return .zero
+        }
+        do {
+            return try await psqlRequest.getTotalConnection()
+        } catch {
+            return .zero
+        }
     }
 
     /// Performs health checks for the given measurement types.

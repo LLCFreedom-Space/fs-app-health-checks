@@ -77,7 +77,7 @@ struct MongoHealthChecksTests {
             #expect(result?.observedUnit == "ms")
             #expect(result?.status == .pass)
             #expect(result?.affectedEndpoints == nil)
-            #expect(result?.output == nil)
+            #expect(result?.output == "1")
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -135,13 +135,13 @@ struct MongoHealthChecksTests {
     func getConnection() async throws {
         try await withApp { app in
             app.mongoHealthChecks = MongoHealthChecksMock()
-            let resultMock = await app.mongoHealthChecks?.getConnection()
-            #expect(resultMock == "connecting")
+            let resultMock = await app.mongoHealthChecks?.checkConnection()
+            #expect(resultMock == "connected")
 
             app.mongoRequest = MongoRequestMock()
             app.mongoHealthChecks = MongoHealthChecks(app: app)
-            let result = await app.mongoHealthChecks?.getConnection()
-            #expect(result == "connecting")
+            let result = await app.mongoHealthChecks?.checkConnection()
+            #expect(result == "connected")
         }
     }
 }

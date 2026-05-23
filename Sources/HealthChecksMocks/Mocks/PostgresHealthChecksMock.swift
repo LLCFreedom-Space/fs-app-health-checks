@@ -58,8 +58,8 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
         PostgresHealthChecksMock.healthCheckItem
     }
 
-    public func getVersion() async -> String {
-        PostgresHealthChecksMock.version
+    public func checkConnection() async -> String {
+        "connected"
     }
 
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
@@ -68,9 +68,5 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
             "\(ComponentName.postgresql):\(MeasurementType.connections)": PostgresHealthChecksMock.healthCheckItem
         ]
         return result
-    }
-
-    public func checkConnection() async -> String {
-        "active"
     }
 }

@@ -42,9 +42,9 @@ struct MongoRequestTests {
     @Test("Get connection")
     func getConnection() async throws {
         try await withApp { app in
-            app.mongoRequest = MongoRequestMock(connection: "disconnected")
-            let result = await app.mongoRequest?.getConnection()
-            #expect(result == "disconnected")
+            app.mongoRequest = MongoRequestMock()
+            let result = try await app.mongoRequest?.checkConnection()
+            #expect(result == "connected")
         }
     }
 }

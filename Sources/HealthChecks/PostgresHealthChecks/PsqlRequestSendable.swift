@@ -26,11 +26,18 @@ import Vapor
 
 /// Protocol defining PostgreSQL request operations.
 public protocol PsqlRequestSendable: Sendable {
-    /// Retrieves the PostgreSQL version description.
-    /// - Returns: A `String` containing the PostgreSQL version.
-    func getVersionDescription() async throws -> String
-    /// Checks the connection state for a specific PostgreSQL database.
-    /// - Parameter databaseName: The name of the PostgreSQL database to check.
-    /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
+    /// Retrieves the PostgreSQL server version.
+    /// - Returns: A string containing the PostgreSQL version
+    ///   (for example: `"16.1"`).
+    /// - Throws: An error if the version cannot be retrieved.
+    func getVersion() async throws -> String
+    /// Checks the connection state for a PostgreSQL database.
+    /// - Returns: A string describing the connection status
+    ///   (for example: `"connected"`).
+    /// - Throws: An error if the connection check fails or the database is unreachable.
     func checkConnection() async throws -> String
+    /// Retrieves the total number of active PostgreSQL connections.
+    /// - Returns: A string representing the number of active connections.
+    /// - Throws: An error if the connection statistics cannot be retrieved.
+    func getTotalConnection() async throws -> Int
 }

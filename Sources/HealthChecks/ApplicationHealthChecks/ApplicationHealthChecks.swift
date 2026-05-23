@@ -47,6 +47,29 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
         )
     }
     
+    public func cpu() -> HealthCheckItem {
+        return HealthCheckItem(
+            componentType: .system,
+            observedValue: Double(ProcessInfo.processInfo.activeProcessorCount),
+            observedUnit: "int",
+            status: .pass,
+            time: app.dateTimeISOFormat.string(from: Date())
+        )
+    }
+    
+    public func memory() -> HealthCheckItem {
+        let processInfo = ProcessInfo.processInfo
+        let bytesInGB: Double = 1024 * 1024 * 1024
+        let physicalMemoryGB = Double(processInfo.physicalMemory) / bytesInGB
+        return HealthCheckItem(
+            componentType: .system,
+            observedValue: Double(physicalMemoryGB),
+            observedUnit: "GiB",
+            status: .pass,
+            time: app.dateTimeISOFormat.string(from: Date())
+        )
+    }
+    
     /// Executes selected health check measurements and returns their results.
     /// - Parameter options: An array of `MeasurementType` values specifying.
     /// - Returns: A dictionary where:
@@ -59,6 +82,9 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
             switch type {
             case .uptime:
                 result["\(MeasurementType.uptime)"] = uptime()
+            case .utilization:
+                result["\(ComponentName.cpu):\(MeasurementType.utilization)"] = cpu()
+                result["\(ComponentName.memory):\(MeasurementType.utilization)"] = memory()
             default:
                 break
             }

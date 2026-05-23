@@ -78,7 +78,7 @@ struct RedisHealthChecksTests {
             #expect(result?.observedUnit == "ms")
             #expect(result?.status == .pass)
             #expect(result?.affectedEndpoints == nil)
-            #expect(result?.output == nil)
+            #expect(result?.output == "400")
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -119,17 +119,17 @@ struct RedisHealthChecksTests {
         }
     }
 
-    @Test("Ping")
-    func ping() async throws {
+    @Test("Check connection")
+    func checkConnection() async throws {
         try await withApp { app in
             app.redisHealthChecks = RedisHealthChecksMock()
-            let mockResult = await app.redisHealthChecks?.ping()
-            #expect(mockResult == "PONG")
+            let mockResult = await app.redisHealthChecks?.checkConnection()
+            #expect(mockResult == "connected")
 
             app.redisRequest = RedisRequestMock()
             app.redisHealthChecks = RedisHealthChecks(app: app)
-            let result = await app.redisHealthChecks?.ping()
-            #expect(result == "PONG")
+            let result = await app.redisHealthChecks?.checkConnection()
+            #expect(result == "connected")
         }
     }
 }

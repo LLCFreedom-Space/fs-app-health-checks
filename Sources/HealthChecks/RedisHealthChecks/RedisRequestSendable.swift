@@ -27,7 +27,16 @@ import Redis
 
 /// A protocol for sending requests to a Redis server and receiving responses.
 public protocol RedisRequestSendable: Sendable {
-    /// Sends a ping request to the Redis server and returns the response.
-    /// - Returns: A `String` representing the Redis server response.
+    /// Sends a ping request to the Redis server.
+    /// - Returns: A string response from Redis (typically `"PONG"`).
+    /// - Throws: An error if the Redis server is unreachable or the request fails.
     func getPong() async throws -> String
+    /// Retrieves the Redis server version.
+    /// - Returns: A string representing the Redis version (e.g. `"7.2.4"`).
+    /// - Throws: An error if the version information cannot be retrieved.
+    func getVersion() async throws -> String
+    /// Retrieves the total number of active Redis connections.
+    /// - Returns: A string representing the number of active connections.
+    /// - Throws: An error if connection statistics cannot be retrieved.
+    func getTotalConnection() async throws -> Int
 }

@@ -38,13 +38,13 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Retrieves the Redis connection status.
     /// - Returns: A `HealthCheckItem` representing the current connection state.
     public func connection() async -> HealthCheckItem {
-        let response = await ping()
+        let response = await checkConnection()
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
-            status: response.lowercased().contains("pong") ? .pass : .fail,
+            status: response.lowercased().contains("connected") ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !response.lowercased().contains("pong") ? response : nil,
+            output: !response.lowercased().contains("connected") ? response : nil,
             links: nil,
             node: nil
         )
@@ -55,32 +55,48 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// - Returns: A `HealthCheckItem` containing the observed response time in milliseconds and status.
     public func responseTime() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSince1970
-        let response = await ping()
+        let connectionDescription = await getActiveConnections()
+        let connectionStatus = connectionDescription == .zero ? HealthCheckStatus.fail : HealthCheckStatus.pass
         let result = HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
             observedUnit: "ms",
-            // TODO: need get active connection
-            //            observedValue: "",
-            status: response.lowercased().contains("pong") ? .pass : .fail,
+            status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: !response.lowercased().contains("pong") ? response : nil,
+            output: connectionDescription == .zero ? nil : connectionDescription.description,
             links: nil,
             node: nil
         )
         return result
     }
-
-    /// Sends a ping to Redis and returns the response.
-    /// - Returns: A `String` representing the Redis ping response or an error message if not connected.
-    public func ping() async -> String {
-        let result = try? await app.redisRequest?.getPong()
-        var connectionDescription = "ERROR: No connect to Redis database"
-        if let result, result.lowercased().contains("pong") {
-            connectionDescription = result
+    
+    public func checkConnection() async -> String {
+        guard let redisRequest = app.redisRequest else {
+            app.logger.error("RedisRequest in app not set. Check your configuration, need to set `app.redisRequest`")
+            return "disconnected"
         }
-        return connectionDescription
+        do {
+            let respone = try await redisRequest.getPong()
+            guard respone.lowercased() == "pong" else {
+                return "disconnected"
+            }
+            return "connected"
+        } catch {
+            return "disconnected"
+        }
+    }
+    
+    public func getActiveConnections() async -> Int {
+        guard let redisRequest = app.redisRequest else {
+            app.logger.error("RedisRequest in app not set. Check your configuration, need to set `app.redisRequest`")
+            return .zero
+        }
+        do {
+            return try await redisRequest.getTotalConnection()
+        } catch {
+            return .zero
+        }
     }
 
     /// Performs health checks based on the provided measurement types.

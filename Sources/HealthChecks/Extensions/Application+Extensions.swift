@@ -23,7 +23,7 @@
 //
 
 import Vapor
-import MongoClient
+import MongoKitten
 
 extension Application {
     /// Storage key for PostgreSQL request context.
@@ -187,14 +187,14 @@ extension Application {
 
 extension Application {
     /// Storage key for MongoDB cluster.
-    private struct MongoClusterKey: StorageKey {
-        typealias Value = MongoCluster
+    private struct MongoDatabaseKey: StorageKey {
+        typealias Value = MongoDatabase
     }
     /// Shared MongoDB cluster instance.
     /// - Important: Should be initialized once during application bootstrap.
-    public var healthCheckMongoCluster: MongoCluster? {
-        get { storage[MongoClusterKey.self] }
-        set { storage[MongoClusterKey.self] = newValue }
+    public var healthCheckMongoDatabase: MongoDatabase? {
+        get { storage[MongoDatabaseKey.self] }
+        set { storage[MongoDatabaseKey.self] = newValue }
     }
 
     /// Initializes MongoDB cluster with eager connection.
@@ -202,9 +202,7 @@ extension Application {
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
     public func initializeMongoCluster(connectionString: String) async throws {
-        self.healthCheckMongoCluster = try await MongoCluster(
-            connectingTo: ConnectionSettings(connectionString)
-        )
+        self.healthCheckMongoDatabase = try await MongoDatabase.connect(to: connectionString)
     }
 
     /// Initializes MongoDB cluster with lazy connection.
@@ -212,9 +210,7 @@ extension Application {
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
     public func initializeLazyMongoCluster(connectionString: String) throws {
-        self.healthCheckMongoCluster = try MongoCluster(
-            lazyConnectingTo: ConnectionSettings(connectionString)
-        )
+        self.healthCheckMongoDatabase = try MongoDatabase.lazyConnect(to: connectionString)
     }
 }
 

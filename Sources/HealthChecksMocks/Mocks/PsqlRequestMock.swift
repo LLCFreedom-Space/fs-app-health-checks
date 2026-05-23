@@ -26,13 +26,15 @@ import Vapor
 @testable import HealthChecks
 
 public struct PsqlRequestMock: PsqlRequestSendable {
-    public func getVersionDescription() async throws -> String {
-        """
-        PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
-        """
+    public func getVersion() async throws -> String {
+        "34.0"
     }
     
     public func checkConnection() async throws -> String {
-        "active"
+        "connected"
+    }
+    
+    public func getTotalConnection() async throws -> Int {
+        99
     }
 }

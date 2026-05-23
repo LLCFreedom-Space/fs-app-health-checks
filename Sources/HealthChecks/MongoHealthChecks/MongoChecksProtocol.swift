@@ -35,5 +35,5 @@ public protocol MongoChecksProtocol {
     func responseTime() async -> HealthCheckItem
     /// Retrieves a string representation of the MongoDB connection state.
     /// - Returns: A `String` describing the current connection state.
-    func getConnection() async -> String
+    func checkConnection() async -> String
 }
