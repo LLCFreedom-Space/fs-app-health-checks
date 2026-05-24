@@ -84,7 +84,7 @@ public struct HealthCheckError: Error, CustomStringConvertible, CustomDebugStrin
             case .connectionClosed:
                 return "The connection was closed, therefore queries could not be executed. This error may occur during rediscovery if the server isn't available"
             case .databaseNotFound:
-                return "The PostgreSQL database could not be resolved from the connection pool; the identifier may be wrong or the pool is not configured"
+                return "Database could not be resolved from the connection pool; the identifier may be wrong or the pool is not configured"
             case .invalidVersionFormat:
                 return "The raw version string returned by PostgreSQL does not match the expected pattern and cannot be parsed"
             case .noRowsReturned:

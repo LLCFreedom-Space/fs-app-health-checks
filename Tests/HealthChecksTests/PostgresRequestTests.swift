@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoRequestTests.swift
+//  PostgresRequestTests.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 15.03.2024.
+//  Created by Mykola Buhaiov on 23.05.2026.
 //
 
 @testable import HealthChecksMocks
@@ -27,8 +27,8 @@
 import VaporTesting
 import Testing
 
-@Suite("Mongo Request tests")
-struct MongoRequestTests {
+@Suite("Postgres Request tests")
+struct PostgresRequestTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
         do {
@@ -42,8 +42,8 @@ struct MongoRequestTests {
     @Test("Get connection")
     func getConnection() async throws {
         try await withApp { app in
-            app.mongoRequest = MongoRequestMock()
-            let result = try await app.mongoRequest?.checkConnection()
+            app.psqlRequest = PsqlRequestMock()
+            let result = try await app.psqlRequest?.checkConnection()
             #expect(result == "connected")
         }
     }
@@ -51,18 +51,18 @@ struct MongoRequestTests {
     @Test("Get total connection")
     func getTotalConnection() async throws {
         try await withApp { app in
-            app.mongoRequest = MongoRequestMock()
-            let result = try await app.mongoRequest?.getTotalConnection()
-            #expect(result == 1)
+            app.psqlRequest = PsqlRequestMock()
+            let result = try await app.psqlRequest?.getTotalConnection()
+            #expect(result == 99)
         }
     }
     
     @Test("Get version")
     func getVersion() async throws {
         try await withApp { app in
-            app.mongoRequest = MongoRequestMock()
-            let result = try await app.mongoRequest?.getVersion()
-            #expect(result == "7.0.4")
+            app.psqlRequest = PsqlRequestMock()
+            let result = try await app.psqlRequest?.getVersion()
+            #expect(result == "34.0")
         }
     }
 }

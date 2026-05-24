@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MongoRequestTests.swift
+//  RedisRequestTests.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 15.03.2024.
+//  Created by Mykola Buhaiov on 23.05.2026.
 //
 
 @testable import HealthChecksMocks
@@ -27,8 +27,8 @@
 import VaporTesting
 import Testing
 
-@Suite("Mongo Request tests")
-struct MongoRequestTests {
+@Suite("Redis Request tests")
+struct RedisRequestTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
         do {
@@ -42,27 +42,32 @@ struct MongoRequestTests {
     @Test("Get connection")
     func getConnection() async throws {
         try await withApp { app in
-            app.mongoRequest = MongoRequestMock()
-            let result = try await app.mongoRequest?.checkConnection()
-            #expect(result == "connected")
+            app.redisRequest = RedisRequestMock()
+            let result = try await app.redisRequest?.getPong()
+            #expect(result == "PONG")
+            
+//            app.redisRequest = RedisRequest(app: app)
+//            let error = await #expect(throws: HealthCheckError.self) { try await app.redisRequest?.getPong() }
+//            #expect(error?.kind == .cannotConnect)
+//            #expect(error?.reason == .databaseNotFound)
         }
     }
     
     @Test("Get total connection")
     func getTotalConnection() async throws {
         try await withApp { app in
-            app.mongoRequest = MongoRequestMock()
-            let result = try await app.mongoRequest?.getTotalConnection()
-            #expect(result == 1)
+            app.redisRequest = RedisRequestMock()
+            let result = try await app.redisRequest?.getTotalConnection()
+            #expect(result == 400)
         }
     }
     
     @Test("Get version")
     func getVersion() async throws {
         try await withApp { app in
-            app.mongoRequest = MongoRequestMock()
-            let result = try await app.mongoRequest?.getVersion()
-            #expect(result == "7.0.4")
+            app.redisRequest = RedisRequestMock()
+            let result = try await app.redisRequest?.getVersion()
+            #expect(result == "34")
         }
     }
 }
