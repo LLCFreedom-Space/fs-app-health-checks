@@ -42,7 +42,7 @@ public struct MongoRequest: MongoRequestSendable {
     public func checkConnection() async throws -> String {
         guard let db = app.healthCheckMongoDatabase else {
             app.logger.error("HealthCheckMongoDatabase is not installed.")
-            throw HealthCheckError(.cannotConnect, reason: .databaseNotFound)
+            throw HealthCheckError(.cannotConnect, reason: .databaseNotConfigured)
         }
         do {
             try await db.checkConnection()
@@ -61,7 +61,7 @@ public struct MongoRequest: MongoRequestSendable {
     public func getTotalConnection() async throws -> Int {
         guard let db = app.healthCheckMongoDatabase else {
             app.logger.error("HealthCheckMongoDatabase is not installed.")
-            throw HealthCheckError(.cannotConnect, reason: .databaseNotFound)
+            throw HealthCheckError(.cannotConnect, reason: .databaseNotConfigured)
         }
         do {
             let connectionStats = try await db.getConnectionStats()
@@ -80,7 +80,7 @@ public struct MongoRequest: MongoRequestSendable {
     public func getVersion() async throws -> String {
         guard let db = app.healthCheckMongoDatabase else {
             app.logger.error("HealthCheckMongoDatabase is not installed.")
-            throw HealthCheckError(.cannotConnect, reason: .databaseNotFound)
+            throw HealthCheckError(.cannotConnect, reason: .databaseNotConfigured)
         }
         do {
             let buildInfo = try await db.buildInfo()

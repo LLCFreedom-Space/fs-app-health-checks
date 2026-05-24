@@ -64,7 +64,9 @@ extension PostgresVersionComponents {
     public init?(raw: String) {
         let pattern = /^(?<db>[a-zA-Z]+)\s+(?<ver>[\d.]+)\s+on\s+(?<arch>[a-zA-Z0-9_]+)-(?<os>[^,]+),\s+compiled\s+by\s+(?<compiler>[^(]+)\((?<build>[^)]+)\)\s+(?<compVer>[^,]+),\s+(?<bitness>.+)$/
 
-        guard let match = raw.wholeMatch(of: pattern) else { return nil }
+        guard let match = raw.wholeMatch(of: pattern) else {
+            return nil
+        }
 
         self.dbName = String(match.output.db)
         self.version = String(match.output.ver)

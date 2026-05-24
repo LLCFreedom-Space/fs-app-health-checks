@@ -39,7 +39,7 @@ public struct HealthCheckResponse: Content {
     ///   - dependencies: Health statuses of application dependencies.
     init(
         system: SystemInfo,
-        dependencies: [ComponentName: DependenciesHealth]
+        dependencies: [ComponentName: DependenciesHealth] = [:]
     ) {
         self.system = system
         self.dependencies = dependencies
