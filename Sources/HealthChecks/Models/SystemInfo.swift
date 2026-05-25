@@ -53,7 +53,7 @@ public struct SystemInfo: Content {
     ///   - osVersion: Operating system version.
     ///   - physicalMemoryGB: Total physical memory in gigabytes.
     init(
-        status: HealthCheckStatus,
+        status: HealthCheckStatus = .pass,
         appName: String,
         appVersion: String,
         uptime: TimeInterval,
