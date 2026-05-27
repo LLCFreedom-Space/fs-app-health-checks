@@ -36,4 +36,9 @@ public protocol MongoChecksProtocol {
     /// Retrieves a string representation of the MongoDB connection state.
     /// - Returns: A `String` describing the current connection state.
     func checkConnection() async -> String
+    /// Retrieves the MongoDB server version.
+    /// - Returns: A string containing the MongoDB version
+    ///   (for example: `"7.0.4"`).
+    /// - Throws: An error if the version information cannot be retrieved.
+    func getVersion() async -> String
 }

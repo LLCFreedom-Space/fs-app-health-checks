@@ -61,6 +61,10 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
     public func checkConnection() async -> String {
         "connected"
     }
+    
+    public func getVersion() async -> String {
+        "12.0"
+    }
 
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [

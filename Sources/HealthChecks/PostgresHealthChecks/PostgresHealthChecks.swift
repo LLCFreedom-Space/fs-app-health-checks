@@ -48,7 +48,8 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
             time: app.dateTimeISOFormat.string(from: Date()),
             output: !connectionDescription.contains("connected") ? connectionDescription : nil,
             links: nil,
-            node: nil
+            node: nil,
+            version: await getVersion()
         )
         return result
     }
@@ -68,7 +69,8 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
             time: app.dateTimeISOFormat.string(from: Date()),
             output: connectionDescription == .zero ? nil : connectionDescription.description,
             links: nil,
-            node: nil
+            node: nil,
+            version: await getVersion()
         )
         return result
     }
@@ -98,23 +100,35 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
             return .zero
         }
     }
+    
+    public func getVersion() async -> String {
+        guard let psqlRequest = app.psqlRequest else {
+            app.logger.error("PSQLRequest in app not set. Check your configuration, need to set `app.psqlRequest`")
+            return "No version"
+        }
+        do {
+            return try await psqlRequest.getVersion()
+        } catch {
+            return "No version"
+        }
+    }
 
     /// Performs health checks for the given measurement types.
     /// - Parameter options: Array of `MeasurementType` specifying which metrics to check.
     /// - Returns: Dictionary mapping `"<ComponentName>:<MeasurementType>"` to `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
+        var results: [String: HealthCheckItem] = [:]
         let measurementTypes = Array(Set(options)) // Remove duplicates
         for type in measurementTypes {
             switch type {
             case .responseTime:
-                result["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = await responseTime()
+                results["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = await responseTime()
             case .connections:
-                result["\(ComponentName.postgresql):\(MeasurementType.connections)"] = await connection()
+                results["\(ComponentName.postgresql):\(MeasurementType.connections)"] = await connection()
             default:
                 break
             }
         }
-        return result
+        return results
     }
 }

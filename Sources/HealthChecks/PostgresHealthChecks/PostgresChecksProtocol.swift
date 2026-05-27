@@ -35,4 +35,9 @@ public protocol PostgresChecksProtocol {
     /// Checks the connection for the PostgreSQL database.
     /// - Returns: A `String` describing the database connection status, e.g., `"connected"` or `"disconnected"`.
     func checkConnection() async -> String
+    /// Retrieves the PostgreSQL server version.
+    /// - Returns: A string containing the PostgreSQL version
+    ///   (for example: `"7.0.4"`).
+    /// - Throws: An error if the version information cannot be retrieved.
+    func getVersion() async -> String
 }

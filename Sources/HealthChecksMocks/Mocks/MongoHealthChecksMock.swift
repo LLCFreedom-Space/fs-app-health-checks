@@ -57,6 +57,10 @@ public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
     public func checkConnection() async -> String {
         "connected"
     }
+    
+    public func getVersion() async -> String {
+        "10.0"
+    }
 
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [

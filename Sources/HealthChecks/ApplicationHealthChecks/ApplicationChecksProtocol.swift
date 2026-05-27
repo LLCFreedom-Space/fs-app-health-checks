@@ -29,4 +29,6 @@ public protocol ApplicationChecksProtocol {
     /// Retrieves the uptime of the application as a health check item.
     /// - Returns: `HealthCheckItem`
     func uptime() -> HealthCheckItem
+    func cpu() -> HealthCheckItem
+    func memory() -> HealthCheckItem
 }

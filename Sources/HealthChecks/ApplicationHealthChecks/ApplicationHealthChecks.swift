@@ -26,16 +26,16 @@ import Vapor
 
 /// Provides health check functionality for the application.
 public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
-    /// The instance of the Vapor application.
     public let app: Application
-    /// Initializes a new `ApplicationHealthChecks` instance.
-    /// - Parameter app: The Vapor `Application` instance.
+
     public init(app: Application) {
         self.app = app
     }
 
-    /// Provides the application uptime as a health check item.
-    /// - Returns: `HealthCheckItem`
+    // MARK: - Public
+
+    /// Provides the application uptime in seconds as a health check item.
+    /// - Returns: A `HealthCheckItem` with `componentType: .system` and `observedUnit: "s"`.
     public func uptime() -> HealthCheckItem {
         let uptime = Date().timeIntervalSince1970 - app.launchTime
         return HealthCheckItem(
@@ -46,24 +46,51 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
             time: app.dateTimeISOFormat.string(from: Date())
         )
     }
+
+    public func cpu() -> HealthCheckItem {
+        let processInfo = ProcessInfo.processInfo
+        return HealthCheckItem(
+            componentType: .system,
+            observedValue: Double(processInfo.activeProcessorCount),
+            observedUnit: "cores",
+            status: .pass,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            version: processInfo.operatingSystemVersionString
+        )
+    }
+
+    public func memory() -> HealthCheckItem {
+        let processInfo = ProcessInfo.processInfo
+        let bytesInGiB: Double = 1024 * 1024 * 1024
+        let physicalMemoryGiB = Double(processInfo.physicalMemory) / bytesInGiB
+        return HealthCheckItem(
+            componentType: .system,
+            observedValue: physicalMemoryGiB,
+            observedUnit: "GiB",
+            status: .pass,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            version: processInfo.operatingSystemVersionString
+        )
+    }
     
     /// Executes selected health check measurements and returns their results.
-    /// - Parameter options: An array of `MeasurementType` values specifying.
-    /// - Returns: A dictionary where:
-    ///   - Key: `String` representation of the `MeasurementType`
-    ///   - Value: Corresponding `HealthCheckItem` result
+    /// - Parameter options: An array of `MeasurementType` values specifying which checks to run.
+    ///   Duplicate values are ignored.
+    /// - Returns: A dictionary keyed by the `MeasurementType` raw value,
+    ///   with the corresponding `HealthCheckItem` as the value.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
-        let measurementTypes = Array(Set(options))
-        for type in measurementTypes {
+        var results: [String: HealthCheckItem] = [:]
+        for type in Set(options) {
             switch type {
             case .uptime:
-                result["\(MeasurementType.uptime)"] = uptime()
+                results[MeasurementType.uptime.rawValue] = uptime()
+            case .utilization:
+                results["\(ComponentName.memory.rawValue):\(MeasurementType.utilization.rawValue)"] = memory()
+                results["\(ComponentName.cpu.rawValue):\(MeasurementType.utilization.rawValue)"] = cpu()
             default:
                 break
             }
         }
-        result[""] = nil
-        return result
+        return results
     }
 }

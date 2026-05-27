@@ -38,22 +38,21 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Parameter options: An array of `MeasurementType` values specifying.
     /// - Returns: `[String: HealthCheckItem]`
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
+        var results: [String: HealthCheckItem] = [:]
         let measurementTypes = Array(Set(options))
         let dateNow = Date().timeIntervalSince1970
         let response = await getStatus()
         for type in measurementTypes {
             switch type {
             case .responseTime:
-                result["\(ComponentName.consul):\(MeasurementType.responseTime)"] = responseTime(from: response, dateNow)
+                results["\(ComponentName.consul):\(MeasurementType.responseTime)"] = responseTime(from: response, dateNow)
             case .connections:
-                result["\(ComponentName.consul):\(MeasurementType.connections)"] = status(response)
+                results["\(ComponentName.consul):\(MeasurementType.connections)"] = status(response)
             default:
                 break
             }
         }
-        result[""] = nil
-        return result
+        return results
     }
 
     /// Retrieves the current status of the Consul service.

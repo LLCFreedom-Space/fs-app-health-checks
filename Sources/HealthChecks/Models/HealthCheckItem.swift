@@ -46,7 +46,9 @@ public struct HealthCheckItem: Content {
     public var links: [String: String]?
     /// Node number of the component instance.
     public var node: Int?
-
+    /// Version of the sub-component or dependency (e.g. database engine version).
+    public var version: String?
+    
     /// Initializes a new `HealthCheckItem`.
     /// - Parameters:
     ///   - componentId: Optional unique identifier of the component.
@@ -59,6 +61,7 @@ public struct HealthCheckItem: Content {
     ///   - output: Optional raw output for errors/warnings.
     ///   - links: Optional dictionary of related links.
     ///   - node: Optional node number.
+    ///   - version: Optional version string of the sub-component or dependency.
     public init(
         componentId: String? = nil,
         componentType: ComponentType? = nil,
@@ -69,7 +72,8 @@ public struct HealthCheckItem: Content {
         time: String? = nil,
         output: String? = nil,
         links: [String: String]? = nil,
-        node: Int? = nil
+        node: Int? = nil,
+        version: String? = nil
     ) {
         self.componentId = componentId
         self.componentType = componentType
@@ -81,6 +85,7 @@ public struct HealthCheckItem: Content {
         self.output = output
         self.links = links
         self.node = node
+        self.version = version
     }
 }
 
@@ -99,7 +104,8 @@ extension HealthCheckItem {
             time: "2018-01-17T03:36:48Z",
             output: "",
             links: ["self": "http://api.example.com/dbnode/dfd6cf2b/health"],
-            node: 1
+            node: 1,
+            version: "4.1.3"
         )
     }
 }

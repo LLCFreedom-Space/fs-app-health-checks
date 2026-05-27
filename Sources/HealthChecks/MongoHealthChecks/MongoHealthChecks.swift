@@ -47,7 +47,8 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             time: app.dateTimeISOFormat.string(from: Date()),
             output: connectionDescription.contains("connected") ? nil : connectionDescription,
             links: nil,
-            node: nil
+            node: nil,
+            version: await getVersion()
         )
         return result
     }
@@ -67,7 +68,8 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             time: app.dateTimeISOFormat.string(from: Date()),
             output: connectionDescription == .zero ? nil : connectionDescription.description,
             links: nil,
-            node: nil
+            node: nil,
+            version: await getVersion()
         )
         return result
     }
@@ -97,23 +99,35 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             return .zero
         }
     }
+    
+    public func getVersion() async -> String {
+        guard let mongoRequest = app.mongoRequest else {
+            app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
+            return "No version"
+        }
+        do {
+            return try await mongoRequest.getVersion()
+        } catch {
+            return "No version"
+        }
+    }
 
     /// Performs health checks for the given measurement types.
     /// - Parameter options: Array of `MeasurementType` specifying which metrics to check.
     /// - Returns: Dictionary mapping `"<ComponentName>:<MeasurementType>"` to `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
+        var results: [String: HealthCheckItem] = [:]
         let measurementTypes = Array(Set(options)) // Remove duplicates
         for type in measurementTypes {
             switch type {
             case .responseTime:
-                result["\(ComponentName.mongo):\(MeasurementType.responseTime)"] = await responseTime()
+                results["\(ComponentName.mongo):\(MeasurementType.responseTime)"] = await responseTime()
             case .connections:
-                result["\(ComponentName.mongo):\(MeasurementType.connections)"] = await connection()
+                results["\(ComponentName.mongo):\(MeasurementType.connections)"] = await connection()
             default:
                 break
             }
         }
-        return result
+        return results
     }
 }

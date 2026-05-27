@@ -57,6 +57,10 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
     public func checkConnection() async -> String {
         "connected"
     }
+    
+    public func getVersion() async -> String {
+        "7.0"
+    }
 
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
