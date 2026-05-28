@@ -40,6 +40,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Measures the PostgreSQL response time.
     /// - Returns: A `HealthCheckItem` containing the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
+        let startTime = Date().timeIntervalSince1970
         async let connectionDescription = checkConnection()
         async let version = getVersion()
         let (connections, resolvedVersion) = await (connectionDescription, version)
@@ -47,6 +48,8 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
+            observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
+            observedUnit: "ms",
             status: isConnected ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: isConnected ? nil : connections,
@@ -59,7 +62,6 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Checks the PostgreSQL connection status.
     /// - Returns: A `HealthCheckItem` representing the connection state.
     public func connection() async -> HealthCheckItem {
-        let startTime = Date().timeIntervalSince1970
         async let activeConnections = getActiveConnections()
         async let version = getVersion()
         let (connections, resolvedVersion) = await (activeConnections, version)
@@ -68,11 +70,9 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
-            observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
-            observedUnit: "ms",
             status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: isFailed ? nil : connections.description,
+            output: isFailed ? connections.description : nil,
             links: nil,
             node: nil,
             version: resolvedVersion

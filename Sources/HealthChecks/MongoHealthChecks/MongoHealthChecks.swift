@@ -39,6 +39,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Measures the MongoDB response time.
     /// - Returns: A `HealthCheckItem` with the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
+        let startTime = Date().timeIntervalSince1970
         async let connectionDescription = checkConnection()
         async let version = getVersion()
         let (connections, resolvedVersion) = await (connectionDescription, version)
@@ -46,6 +47,8 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
+            observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
+            observedUnit: "ms",
             status: isConnected ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: isConnected ? nil : connections,
@@ -58,7 +61,6 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     /// Checks the MongoDB connection status.
     /// - Returns: A `HealthCheckItem` representing the connection state.
     public func connection() async -> HealthCheckItem {
-        let startTime = Date().timeIntervalSince1970
         async let activeConnections = getActiveConnections()
         async let version = getVersion()
         let (connections, resolvedVersion) = await (activeConnections, version)
@@ -67,11 +69,9 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
-            observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
-            observedUnit: "ms",
             status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: isFailed ? nil : connections.description,
+            output: isFailed ? connections.description : nil,
             links: nil,
             node: nil,
             version: resolvedVersion

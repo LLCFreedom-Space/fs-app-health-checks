@@ -38,6 +38,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Measures the Redis response time.
     /// - Returns: A `HealthCheckItem` containing the observed response time in milliseconds and status.
     public func responseTime() async -> HealthCheckItem {
+        let dateNow = Date().timeIntervalSince1970
         async let connectionDescription = checkConnection()
         async let version = getVersion()
         let (connections, resolvedVersion) = await (connectionDescription, version)
@@ -45,6 +46,8 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
+            observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
+            observedUnit: "ms",
             status: isConnected ? .pass : .fail,
             time: app.dateTimeISOFormat.string(from: Date()),
             output: isConnected ? nil : connections,
@@ -57,7 +60,6 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// Retrieves the Redis connection status.
     /// - Returns: A `HealthCheckItem` representing the current connection state.
     public func connection() async -> HealthCheckItem {
-        let dateNow = Date().timeIntervalSince1970
         async let activeConnections = getActiveConnections()
         async let version = getVersion()
         let (connections, resolvedVersion) = await (activeConnections, version)
@@ -66,11 +68,9 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         return HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
-            observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
-            observedUnit: "ms",
             status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: isFailed ? nil : connections.description,
+            output: isFailed ? connections.description : nil,
             links: nil,
             node: nil,
             version: resolvedVersion

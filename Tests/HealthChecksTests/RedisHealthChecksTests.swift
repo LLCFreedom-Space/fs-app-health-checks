@@ -78,7 +78,7 @@ struct RedisHealthChecksTests {
             #expect(result?.observedUnit == "ms")
             #expect(result?.status == .pass)
             #expect(result?.affectedEndpoints == nil)
-            #expect(result?.output == "400")
+            #expect(result?.output == nil)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
