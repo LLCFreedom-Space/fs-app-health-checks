@@ -37,11 +37,40 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     /// Provides the application uptime as a health check item.
     /// - Returns: `HealthCheckItem`
     public func uptime() -> HealthCheckItem {
-        let uptime = Date().timeIntervalSince1970 - app.launchTime
+        let processInfo = ProcessInfo.processInfo
         return HealthCheckItem(
             componentType: .system,
-            observedValue: uptime,
+            observedValue: processInfo.systemUptime,
             observedUnit: "s",
+            status: .pass,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            version: processInfo.operatingSystemVersionString
+        )
+    }
+    
+    /// Provides the number of active CPU cores available to the process.
+    /// - Returns: `HealthCheckItem`
+    public func cpu() -> HealthCheckItem {
+        let processInfo = ProcessInfo.processInfo
+        return HealthCheckItem(
+            componentType: .system,
+            observedValue: Double(processInfo.activeProcessorCount),
+            observedUnit: "cores",
+            status: .pass,
+            time: app.dateTimeISOFormat.string(from: Date())
+        )
+    }
+    
+    /// Provides the total physical memory available on the host machine.
+    /// - Returns: `HealthCheckItem`
+    public func memory() -> HealthCheckItem {
+        let processInfo = ProcessInfo.processInfo
+        let bytesInGiB: Double = 1024 * 1024 * 1024
+        let physicalMemoryGiB = Double(processInfo.physicalMemory) / bytesInGiB
+        return HealthCheckItem(
+            componentType: .system,
+            observedValue: physicalMemoryGiB,
+            observedUnit: "GiB",
             status: .pass,
             time: app.dateTimeISOFormat.string(from: Date())
         )
@@ -53,17 +82,19 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     ///   - Key: `String` representation of the `MeasurementType`
     ///   - Value: Corresponding `HealthCheckItem` result
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
+        var results: [String: HealthCheckItem] = [:]
         let measurementTypes = Array(Set(options))
         for type in measurementTypes {
             switch type {
             case .uptime:
-                result["\(MeasurementType.uptime)"] = uptime()
+                results[MeasurementType.uptime.rawValue] = uptime()
+            case .utilization:
+                results["\(ComponentName.memory.rawValue):\(MeasurementType.utilization.rawValue)"] = memory()
+                results["\(ComponentName.cpu.rawValue):\(MeasurementType.utilization.rawValue)"] = cpu()
             default:
                 break
             }
         }
-        result[""] = nil
-        return result
+        return results
     }
 }

@@ -107,18 +107,6 @@ extension Application {
         get { storage[MongoIdKey.self] }
         set { storage[MongoIdKey.self] = newValue }
     }
-
-    /// Storage key for application launch time.
-    private struct LaunchTimeKey: StorageKey {
-        typealias Value = Double
-    }
-    /// UNIX timestamp representing the application launch time.
-    ///
-    /// - Note: Returns current timestamp if not previously set.
-    public var launchTime: Double {
-        get { storage[LaunchTimeKey.self] ?? Date().timeIntervalSince1970 }
-        set { storage[LaunchTimeKey.self] = newValue }
-    }
 }
 
 extension Application {

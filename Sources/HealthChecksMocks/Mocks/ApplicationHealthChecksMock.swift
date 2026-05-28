@@ -26,27 +26,48 @@ import Vapor
 @testable import HealthChecks
 
 public struct ApplicationHealthChecksMock: ApplicationHealthChecksProtocol {
-    private var healthCheckItem: HealthCheckItem
-    
-    public init(healthCheckItem: HealthCheckItem = healthCheckItem) {
-        self.healthCheckItem = healthCheckItem
-    }
-
-    public static let healthCheckItem = HealthCheckItem(
+    public static let uptimeHealthCheckItem = HealthCheckItem(
         componentType: .system,
         observedValue: 1,
         observedUnit: "s",
+        status: .pass,
+        time: "2024-02-01T11:11:59.364",
+        version: "22.0.4"
+    )
+    
+    public static let cpuHealthCheckItem = HealthCheckItem(
+        componentType: .system,
+        observedValue: 2,
+        observedUnit: "cores",
+        status: .pass,
+        time: "2024-02-01T11:11:59.364"
+    )
+    
+    public static let memoryHealthCheckItem = HealthCheckItem(
+        componentType: .system,
+        observedValue: 2,
+        observedUnit: "GiB",
         status: .pass,
         time: "2024-02-01T11:11:59.364"
     )
 
     public func uptime() -> HealthCheckItem {
-        ApplicationHealthChecksMock.healthCheckItem
+        ApplicationHealthChecksMock.uptimeHealthCheckItem
     }
-
+    
+    public func cpu() -> HealthCheckItem {
+        ApplicationHealthChecksMock.cpuHealthCheckItem
+    }
+    
+    public func memory() -> HealthCheckItem {
+        ApplicationHealthChecksMock.memoryHealthCheckItem
+    }
+    
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            MeasurementType.uptime.rawValue: ApplicationHealthChecksMock.healthCheckItem
+            MeasurementType.uptime.rawValue: ApplicationHealthChecksMock.uptimeHealthCheckItem,
+             "\(ComponentName.cpu):\(MeasurementType.utilization)": ApplicationHealthChecksMock.cpuHealthCheckItem,
+             "\(ComponentName.memory):\(MeasurementType.utilization)": ApplicationHealthChecksMock.memoryHealthCheckItem
         ]
         return result
     }
