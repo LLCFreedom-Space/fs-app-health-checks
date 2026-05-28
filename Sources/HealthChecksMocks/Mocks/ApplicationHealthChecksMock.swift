@@ -54,7 +54,9 @@ public struct ApplicationHealthChecksMock: ApplicationHealthChecksProtocol {
     
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            MeasurementType.uptime.rawValue: ApplicationHealthChecksMock.healthCheckItem
+            MeasurementType.uptime.rawValue: ApplicationHealthChecksMock.healthCheckItem,
+            "\(ComponentName.cpu):\(MeasurementType.utilization)": ApplicationHealthChecksMock.healthCheckItem,
+            "\(ComponentName.memory):\(MeasurementType.utilization)": ApplicationHealthChecksMock.healthCheckItem
         ]
         return result
     }

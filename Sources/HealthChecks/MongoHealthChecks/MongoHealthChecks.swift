@@ -36,42 +36,46 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
         self.app = app
     }
 
-    /// Checks the MongoDB connection status.
-    /// - Returns: A `HealthCheckItem` representing the connection state.
-    public func connection() async -> HealthCheckItem {
-        let connectionDescription = await checkConnection()
-        let result = HealthCheckItem(
-            componentId: app.mongoId,
-            componentType: .datastore,
-            status: connectionDescription.contains("connected") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription.contains("connected") ? nil : connectionDescription,
-            links: nil,
-            node: nil,
-            version: await getVersion()
-        )
-        return result
-    }
-
     /// Measures the MongoDB response time.
     /// - Returns: A `HealthCheckItem` with the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
+        async let connectionDescription = checkConnection()
+        async let version = getVersion()
+        let (connections, resolvedVersion) = await (connectionDescription, version)
+        let isConnected = connections.localizedCaseInsensitiveContains("connected")
+        return HealthCheckItem(
+            componentId: app.mongoId,
+            componentType: .datastore,
+            status: isConnected ? .pass : .fail,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: isConnected ? nil : connections,
+            links: nil,
+            node: nil,
+            version: resolvedVersion
+        )
+    }
+
+    /// Checks the MongoDB connection status.
+    /// - Returns: A `HealthCheckItem` representing the connection state.
+    public func connection() async -> HealthCheckItem {
         let startTime = Date().timeIntervalSince1970
-        let connectionDescription = await getActiveConnections()
-        let connectionStatus = connectionDescription == .zero ? HealthCheckStatus.fail : HealthCheckStatus.pass
-        let result = HealthCheckItem(
+        async let activeConnections = getActiveConnections()
+        async let version = getVersion()
+        let (connections, resolvedVersion) = await (activeConnections, version)
+        let isFailed = connections == .zero
+        let connectionStatus = isFailed ? HealthCheckStatus.fail : HealthCheckStatus.pass
+        return HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
             observedUnit: "ms",
             status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription == .zero ? nil : connectionDescription.description,
+            output: isFailed ? nil : connections.description,
             links: nil,
             node: nil,
-            version: await getVersion()
+            version: resolvedVersion
         )
-        return result
     }
 
     /// Retrieves the MongoDB connection description.
@@ -88,6 +92,9 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
         }
     }
     
+    /// Returns the total number of active MongoDB connections.
+    /// - Returns: The number of active MongoDB connections,
+    ///   or `0` if the value cannot be retrieved.
     public func getActiveConnections() async -> Int {
         guard let mongoRequest = app.mongoRequest else {
             app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
@@ -100,6 +107,9 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
         }
     }
     
+    /// Returns the MongoDB server version.
+    /// - Returns: The MongoDB server version string,
+    ///   or `"No version"` if unavailable.
     public func getVersion() async -> String {
         guard let mongoRequest = app.mongoRequest else {
             app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")

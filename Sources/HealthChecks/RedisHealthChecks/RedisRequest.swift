@@ -29,7 +29,6 @@ import Redis
 public struct RedisRequest: RedisRequestSendable {
     /// Instance of the Vapor application.
     public let app: Application
-
     /// Initializes a new `RedisRequest` instance.
     /// - Parameter app: The Vapor `Application` instance.
     public init(app: Application) {
@@ -79,7 +78,6 @@ public struct RedisRequest: RedisRequestSendable {
                 )
                 throw HealthCheckError(.emptyResponse, reason: .redisMissingField)
             }
-
             return version
         } catch let error as HealthCheckError {
             throw error

@@ -30,15 +30,10 @@ public enum HealthChecks {
     /// - Parameter serverVersion: The full version string of the server (e.g., `"1.2.3"`).
     /// - Returns: The major version as a `String` (e.g., `"1"`), or `nil`
     public static func getPublicVersion(from version: String?) -> String? {
-        guard let version = version, version.contains(".") else {
+        guard let match = version?.firstMatch(of: /^(\d+)\./) else {
             return nil
         }
-        let components = version.components(separatedBy: ".")
-
-        guard let first = components.first, !first.isEmpty, Int(first) != nil else {
-            return nil
-        }
-        return components.first
+        return String(match.1)
     }
 
     /// Generates a `HealthCheck` object representing the application's health status.

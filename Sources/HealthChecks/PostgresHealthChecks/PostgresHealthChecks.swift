@@ -37,42 +37,46 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         self.app = app
     }
 
-    /// Checks the PostgreSQL connection status.
-    /// - Returns: A `HealthCheckItem` representing the connection state.
-    public func connection() async -> HealthCheckItem {
-        let connectionDescription = await checkConnection()
-        let result = HealthCheckItem(
-            componentId: app.psqlId,
-            componentType: .datastore,
-            status: connectionDescription.contains("connected") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("connected") ? connectionDescription : nil,
-            links: nil,
-            node: nil,
-            version: await getVersion()
-        )
-        return result
-    }
-
     /// Measures the PostgreSQL response time.
     /// - Returns: A `HealthCheckItem` containing the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
+        async let connectionDescription = checkConnection()
+        async let version = getVersion()
+        let (connections, resolvedVersion) = await (connectionDescription, version)
+        let isConnected = connections.localizedCaseInsensitiveContains("connected")
+        return HealthCheckItem(
+            componentId: app.psqlId,
+            componentType: .datastore,
+            status: isConnected ? .pass : .fail,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: isConnected ? nil : connections,
+            links: nil,
+            node: nil,
+            version: resolvedVersion
+        )
+    }
+
+    /// Checks the PostgreSQL connection status.
+    /// - Returns: A `HealthCheckItem` representing the connection state.
+    public func connection() async -> HealthCheckItem {
         let startTime = Date().timeIntervalSince1970
-        let connectionDescription = await getActiveConnections()
-        let connectionStatus = connectionDescription == .zero ? HealthCheckStatus.fail : HealthCheckStatus.pass
-        let result = HealthCheckItem(
+        async let activeConnections = getActiveConnections()
+        async let version = getVersion()
+        let (connections, resolvedVersion) = await (activeConnections, version)
+        let isFailed = connections == .zero
+        let connectionStatus = isFailed ? HealthCheckStatus.fail : HealthCheckStatus.pass
+        return HealthCheckItem(
             componentId: app.psqlId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
             observedUnit: "ms",
             status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription == .zero ? nil : connectionDescription.description,
+            output: isFailed ? nil : connections.description,
             links: nil,
             node: nil,
-            version: await getVersion()
+            version: resolvedVersion
         )
-        return result
     }
 
     /// Checks the connection for the PostgreSQL database.
@@ -89,6 +93,9 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         }
     }
     
+    /// Returns the total number of active PostgreSQL connections.
+    /// - Returns: The number of active PostgreSQL connections,
+    ///   or `0` if the value cannot be retrieved.
     public func getActiveConnections() async -> Int {
         guard let psqlRequest = app.psqlRequest else {
             app.logger.error("PSQLRequest in app not set. Check your configuration, need to set `app.psqlRequest`")
@@ -101,6 +108,9 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         }
     }
     
+    /// Returns the PostgreSQL server version.
+    /// - Returns: The PostgreSQL server version string,
+    ///   or `"No version"` if unavailable.
     public func getVersion() async -> String {
         guard let psqlRequest = app.psqlRequest else {
             app.logger.error("PSQLRequest in app not set. Check your configuration, need to set `app.psqlRequest`")

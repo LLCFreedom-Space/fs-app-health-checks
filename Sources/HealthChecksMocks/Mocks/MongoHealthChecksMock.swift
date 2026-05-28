@@ -43,7 +43,8 @@ public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
         time: "2024-02-01T11:11:59.364",
         output: "Ok",
         links: nil,
-        node: nil
+        node: nil,
+        version: "10.0"
     )
 
     public func connection() async -> HealthCheckItem {

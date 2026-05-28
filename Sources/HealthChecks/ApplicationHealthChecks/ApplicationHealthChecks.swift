@@ -26,16 +26,19 @@ import Vapor
 
 /// Provides health check functionality for the application.
 public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
+    /// Vapor application instance used to access runtime metadata.
     public let app: Application
-
+    /// Creates a new application health checks provider.
+    /// - Parameter app: The Vapor application instance.
     public init(app: Application) {
         self.app = app
     }
 
-    // MARK: - Public
-
     /// Provides the application uptime in seconds as a health check item.
-    /// - Returns: A `HealthCheckItem` with `componentType: .system` and `observedUnit: "s"`.
+    /// - Returns: A `HealthCheckItem` with:
+    ///   - `componentType: .system`
+    ///   - `observedUnit: "s"`
+    ///   - `status: .pass`
     public func uptime() -> HealthCheckItem {
         let uptime = Date().timeIntervalSince1970 - app.launchTime
         return HealthCheckItem(
@@ -47,6 +50,11 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
         )
     }
 
+    /// Provides the number of active CPU cores available to the process.
+    /// - Returns: A `HealthCheckItem` with:
+    ///   - `componentType: .system`
+    ///   - `observedUnit: "cores"`
+    ///   - operating system version information
     public func cpu() -> HealthCheckItem {
         let processInfo = ProcessInfo.processInfo
         return HealthCheckItem(
@@ -59,6 +67,12 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
         )
     }
 
+    /// Provides the total physical memory available on the host machine.
+    /// Memory value is reported in gibibytes (GiB).
+    /// - Returns: A `HealthCheckItem` with:
+    ///   - `componentType: .system`
+    ///   - `observedUnit: "GiB"`
+    ///   - operating system version information
     public func memory() -> HealthCheckItem {
         let processInfo = ProcessInfo.processInfo
         let bytesInGiB: Double = 1024 * 1024 * 1024

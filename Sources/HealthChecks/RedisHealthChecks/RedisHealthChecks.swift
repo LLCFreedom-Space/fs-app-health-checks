@@ -35,44 +35,50 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         self.app = app
     }
 
-    /// Retrieves the Redis connection status.
-    /// - Returns: A `HealthCheckItem` representing the current connection state.
-    public func connection() async -> HealthCheckItem {
-        let response = await checkConnection()
-        let result = HealthCheckItem(
-            componentId: app.redisId,
-            componentType: .datastore,
-            status: response.lowercased().contains("connected") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: !response.lowercased().contains("connected") ? response : nil,
-            links: nil,
-            node: nil,
-            version: await getVersion()
-        )
-        return result
-    }
-
     /// Measures the Redis response time.
     /// - Returns: A `HealthCheckItem` containing the observed response time in milliseconds and status.
     public func responseTime() async -> HealthCheckItem {
+        async let connectionDescription = checkConnection()
+        async let version = getVersion()
+        let (connections, resolvedVersion) = await (connectionDescription, version)
+        let isConnected = connections.localizedCaseInsensitiveContains("connected")
+        return HealthCheckItem(
+            componentId: app.redisId,
+            componentType: .datastore,
+            status: isConnected ? .pass : .fail,
+            time: app.dateTimeISOFormat.string(from: Date()),
+            output: isConnected ? nil : connections,
+            links: nil,
+            node: nil,
+            version: resolvedVersion
+        )
+    }
+
+    /// Retrieves the Redis connection status.
+    /// - Returns: A `HealthCheckItem` representing the current connection state.
+    public func connection() async -> HealthCheckItem {
         let dateNow = Date().timeIntervalSince1970
-        let connectionDescription = await getActiveConnections()
-        let connectionStatus = connectionDescription == .zero ? HealthCheckStatus.fail : HealthCheckStatus.pass
-        let result = HealthCheckItem(
+        async let activeConnections = getActiveConnections()
+        async let version = getVersion()
+        let (connections, resolvedVersion) = await (activeConnections, version)
+        let isFailed = connections == .zero
+        let connectionStatus = isFailed ? HealthCheckStatus.fail : HealthCheckStatus.pass
+        return HealthCheckItem(
             componentId: app.redisId,
             componentType: .datastore,
             observedValue: (Date().timeIntervalSince1970 - dateNow) * 1000,
             observedUnit: "ms",
             status: connectionStatus,
             time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionDescription == .zero ? nil : connectionDescription.description,
+            output: isFailed ? nil : connections.description,
             links: nil,
             node: nil,
-            version: await getVersion()
+            version: resolvedVersion
         )
-        return result
     }
     
+    /// Checks the connection for the Redis database.
+    /// - Returns: A `String` describing the connection status.
     public func checkConnection() async -> String {
         guard let redisRequest = app.redisRequest else {
             app.logger.error("RedisRequest in app not set. Check your configuration, need to set `app.redisRequest`")
@@ -89,6 +95,9 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         }
     }
     
+    /// Returns the total number of active Redis connections.
+    /// - Returns: The number of active Redis connections,
+    ///   or `0` if the value cannot be retrieved.
     public func getActiveConnections() async -> Int {
         guard let redisRequest = app.redisRequest else {
             app.logger.error("RedisRequest in app not set. Check your configuration, need to set `app.redisRequest`")
@@ -101,6 +110,9 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         }
     }
     
+    /// Returns the Redis server version.
+    /// - Returns: The Redis server version string,
+    ///   or `"No version"` if unavailable.
     public func getVersion() async -> String {
         guard let redisRequest = app.redisRequest else {
             app.logger.error("RedisRequest in app not set. Check your configuration, need to set `app.redisRequest`")
