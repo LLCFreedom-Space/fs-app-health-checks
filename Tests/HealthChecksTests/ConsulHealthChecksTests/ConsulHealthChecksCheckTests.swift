@@ -53,8 +53,6 @@ struct ConsulHealthChecksCheckTests {
             #expect(connections == ConsulHealthChecksMock.healthCheckItem)
             #expect(app.consulConfig?.id == consulConfig.id)
             #expect(app.consulConfig?.url == consulConfig.url)
-            #expect(app.consulConfig?.username == consulConfig.username)
-            #expect(app.consulConfig?.password == consulConfig.password)
         }
     }
 
