@@ -55,6 +55,16 @@ extension Application {
         get { storage[MongoRequestKey.self] }
         set { storage[MongoRequestKey.self] = newValue }
     }
+    
+    /// Storage key for Consul request context.
+    private struct ConsulRequestKey: StorageKey {
+        typealias Value = ConsulRequestSendable
+    }
+    /// Consul request context associated with the current request.
+    public var consulRequest: ConsulRequestSendable? {
+        get { storage[ConsulRequestKey.self] }
+        set { storage[ConsulRequestKey.self] = newValue }
+    }
 }
 
 extension Application {

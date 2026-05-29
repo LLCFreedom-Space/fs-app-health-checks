@@ -30,10 +30,6 @@ public struct ConsulConfig: Sendable {
     public var id: String?
     /// The URL of the Consul server to connect to.
     public var url: String?
-    /// The username for authenticating with Consul (optional).
-    public var username: String?
-    /// The password for authenticating with Consul (optional).
-    public var password: String?
     /// The token for authenticating with Consul (optional).
     public var token: String?
 
@@ -47,14 +43,10 @@ public struct ConsulConfig: Sendable {
     public init(
         id: String? = nil,
         url: String? = nil,
-        username: String? = nil,
-        password: String? = nil,
         token: String? = nil
     ) {
         self.id = id
         self.url = url
-        self.username = username
-        self.password = password
         self.token = token
     }
 }

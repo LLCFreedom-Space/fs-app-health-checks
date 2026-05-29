@@ -42,16 +42,15 @@ struct ConsulHealthChecksCheckTests {
     @Test("Health check")
     func healthCheck() async throws {
         try await withApp { app in
-            let consulUrl = "http://127.0.0.1:8500"
             app.consulHealthChecks = ConsulHealthChecksMock()
             let consulConfig = ConsulConfig(
                 id: UUID().uuidString,
-                url: consulUrl
+                url: Constants.consulUrl
             )
             app.consulConfig = consulConfig
             let result = await app.consulHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-            let responseTimes = result?["\(ComponentName.consul):\(MeasurementType.responseTime)"]
-            #expect(responseTimes == ConsulHealthChecksMock.healthCheckItem)
+            let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
+            #expect(connections == ConsulHealthChecksMock.healthCheckItem)
             #expect(app.consulConfig?.id == consulConfig.id)
             #expect(app.consulConfig?.url == consulConfig.url)
             #expect(app.consulConfig?.username == consulConfig.username)
@@ -59,37 +58,22 @@ struct ConsulHealthChecksCheckTests {
         }
     }
 
-    @Test("Check for both success")
-    func checkForBothSuccess() async throws {
+    @Test("Response time")
+    func responseTime() async throws {
         try await withApp { app in
-            app.consulConfig = ConsulConfig(
-                id: String(UUID()),
-                url: "consul-url"
-            )
-            let clientResponse = ClientResponse(status: .ok)
-            app.clients.use { app in
-                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-            }
+            app.consulRequest = MockConsulRequest()
             let healthChecks = ConsulHealthChecks(app: app)
-            let check = await healthChecks.check(for: [.responseTime, .connections])
-            #expect(check.count == 2)
-            guard let responseTimeCheck = check["\(ComponentName.consul):\(MeasurementType.responseTime)"] else {
-                Issue.record("No have key for response time")
-                return
-            }
-            #expect(responseTimeCheck.status == .pass)
-            guard let observedValue = responseTimeCheck.observedValue else {
-                Issue.record("No have observed value")
-                return
-            }
-            #expect(observedValue > .zero)
-            #expect(responseTimeCheck.output == nil)
+            let check = await healthChecks.check(for: [.connections])
+            #expect(check.count == 1)
             guard let connectionsCheck = check["\(ComponentName.consul):\(MeasurementType.connections)"] else {
                 Issue.record("No have key for connections")
                 return
             }
+            #expect(connectionsCheck.componentType == .component)
             #expect(connectionsCheck.status == .pass)
-            #expect(connectionsCheck.observedValue == nil)
+            let observedValue = try #require(connectionsCheck.observedValue)
+            #expect(observedValue < 1.0)
+            #expect(connectionsCheck.observedUnit == "s")
             #expect(connectionsCheck.output == nil)
         }
     }
@@ -97,17 +81,7 @@ struct ConsulHealthChecksCheckTests {
     @Test("Check handles unsupported types")
     func checkHandlesUnsupportedTypes() async throws {
         try await withApp { app in
-            let consulUrl = "http://127.0.0.1:8500"
-            let consulConfig = ConsulConfig(
-                id: UUID().uuidString,
-                url: consulUrl
-            )
-            app.consulConfig = consulConfig
             let healthChecks = ConsulHealthChecks(app: app)
-            let clientResponse = ClientResponse(status: .ok)
-            app.clients.use { app in
-                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-            }
             let checks = await healthChecks.check(for: [.uptime])
             #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported
         }

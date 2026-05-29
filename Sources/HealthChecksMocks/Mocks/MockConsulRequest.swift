@@ -16,33 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulHealthChecksMock.swift
+//  MockConsulRequest.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 07.02.2024.
+//  Created by Mykola Buhaiov on 29.05.2026.
 //
 
 import Vapor
 @testable import HealthChecks
 
-public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
-    public static let healthCheckItem = HealthCheckItem(
-        componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
-        componentType: .component,
-        observedValue: 1,
-        observedUnit: "s",
-        status: .pass,
-        affectedEndpoints: nil,
-        time: "2024-02-01T11:11:59.364",
-        output: nil,
-        links: nil,
-        node: nil
-    )
-
-    public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        let result = [
-            "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
-        ]
-        return result
-    }
+public struct MockConsulRequest: ConsulRequestSendable {
+    public func checkConnection() async throws { }
 }

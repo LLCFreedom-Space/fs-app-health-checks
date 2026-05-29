@@ -24,14 +24,18 @@
 
 import Vapor
 
-/// A collection of constant values used throughout the application.
+/// A collection of configuration constants used throughout the application.
 public enum Constants {
     /// Default date format used for timestamps in health checks and logs.
     static let dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
     /// Default URL for connecting to a local Consul server.
     static let consulUrl = "http://127.0.0.1:8500"
-    /// Default path for retrieving Consul leader status.
+    /// Path for retrieving Consul leader status.
     static let consulStatusPath = "/v1/status/leader"
-    /// Default path for retrieving Consul leader key-value.
-    static let consulKeyValue = "/v1/kv/config"
+    /// Path for retrieving Consul leader health.
+    static let consulHealthPath = "/v1/health/service/consul"
+    /// Path for retrieving the health state of any service.
+    static let consulHealthAnyPath = "/v1/health/state/any"
+    /// Path for retrieving agent-level information.
+    static let consulSelfPath = "/v1/agent/self"
 }
