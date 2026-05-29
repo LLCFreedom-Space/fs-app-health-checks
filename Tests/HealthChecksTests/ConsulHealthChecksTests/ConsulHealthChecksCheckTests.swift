@@ -104,6 +104,10 @@ struct ConsulHealthChecksCheckTests {
             )
             app.consulConfig = consulConfig
             let healthChecks = ConsulHealthChecks(app: app)
+            let clientResponse = ClientResponse(status: .ok)
+            app.clients.use { app in
+                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+            }
             let checks = await healthChecks.check(for: [.uptime])
             #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported
         }

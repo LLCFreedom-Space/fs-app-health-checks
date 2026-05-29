@@ -29,7 +29,7 @@ public enum HealthCheckStatus: String {
     /// Unhealthy state — the service or component has failed health checks.
     case fail
     /// Healthy state with warnings — the service or component is operational but has some concerns.
-    case warm
+    case warn
     /// Fully healthy — the service or component is operational without any concerns.
     case pass
 }

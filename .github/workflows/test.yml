@@ -38,14 +38,14 @@ jobs:
             ${{ runner.os }}-spm-
       - name: Build
         run: swift build -v
-      - name: Test (parallel)
-        run: swift test -v --parallel
+      - name: Run tests
+        run: swift test
   # =========================
   # Linux
   # =========================
   linux:
     runs-on: ubuntu-latest
-    container: swift:6.0-jammy
+    container: swift:6.2-jammy
     steps:
       - name: Checkout
         uses: actions/checkout@v4
