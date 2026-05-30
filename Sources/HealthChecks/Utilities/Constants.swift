@@ -32,10 +32,4 @@ public enum Constants {
     static let consulUrl = "http://127.0.0.1:8500"
     /// Path for retrieving Consul leader status.
     static let consulStatusPath = "/v1/status/leader"
-    /// Path for retrieving Consul leader health.
-    static let consulHealthPath = "/v1/health/service/consul"
-    /// Path for retrieving the health state of any service.
-    static let consulHealthAnyPath = "/v1/health/state/any"
-    /// Path for retrieving agent-level information.
-    static let consulSelfPath = "/v1/agent/self"
 }
