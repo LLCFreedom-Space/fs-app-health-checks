@@ -39,13 +39,11 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Throws: `HealthCheckError`
     public func checkConnection() async throws {
         guard let db = app.healthCheckMongoDatabase else {
-            app.logger.error("HealthCheckMongoDatabase is not installed.")
             throw HealthCheckError.databaseNotSetup
         }
         do {
             try await db.checkConnection()
         } catch {
-            app.logger.error("Check connection failed.", error: error)
             throw error
         }
     }
@@ -55,14 +53,12 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Throws: `HealthCheckError` if the stats cannot be retrieved.
     public func getActiveConnections() async throws -> Int {
         guard let db = app.healthCheckMongoDatabase else {
-            app.logger.error("HealthCheckMongoDatabase is not installed.")
             throw HealthCheckError.databaseNotSetup
         }
         do {
             let connectionStats = try await db.getConnectionStats()
             return connectionStats.active
         } catch {
-            app.logger.error("Get connection count failed.", error: error)
             throw error
         }
     }
@@ -72,18 +68,15 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Throws: `HealthCheckError` if build info is missing or request fails.
     public func getVersion() async throws -> String {
         guard let db = app.healthCheckMongoDatabase else {
-            app.logger.error("HealthCheckMongoDatabase is not installed.")
             throw HealthCheckError.databaseNotSetup
         }
         do {
             let buildInfo = try await db.buildInfo()
             guard !buildInfo.version.isEmpty else {
-                app.logger.error("MongoDB buildInfo returned an empty version string.")
                 throw HealthCheckError.responseDecodingFailed
             }
             return buildInfo.version
         } catch {
-            app.logger.error("Get version failed.", error: error)
             throw error
         }
     }
