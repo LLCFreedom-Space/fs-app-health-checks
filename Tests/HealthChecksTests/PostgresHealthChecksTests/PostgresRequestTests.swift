@@ -53,6 +53,8 @@ struct PostgresRequestTests {
     @Test("Get database health metrics with error")
     func getDatabaseHealthMetricsWithError() async throws {
         try await withApp { app in
+            let sqlPostgresConfiguration = try SQLPostgresConfiguration(url: PostgresRequestTests.connectionString())
+            app.databases.use(DatabaseConfigurationFactory.postgres(configuration: sqlPostgresConfiguration), as: .psql)
             let request = PostgresRequest(app: app)
 
             await #expect(throws: HealthCheckError.databaseNotSetup) {
