@@ -86,8 +86,11 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         }
     }
 
-    /// Retrieves the PostgreSQL metrics.
-    /// - Returns: A `String` describing the PostgreSQL metrics.
+    /// Retrieves PostgreSQL connection statistics and server version.
+    /// - Returns: A tuple containing:
+    ///   - `activeConnections`: Number of currently active database connections (Int)
+    ///   - `version`: PostgreSQL server version string
+    /// - Throws: `HealthCheckError`
     @discardableResult public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
         guard let postgresRequest = app.postgresRequest else {
             throw HealthCheckError.serviceNotSetup

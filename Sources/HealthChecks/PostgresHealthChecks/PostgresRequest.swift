@@ -37,6 +37,9 @@ public struct PostgresRequest: PostgresRequestSendable {
     }
     
     /// Retrieves PostgreSQL connection statistics and server version.
+    /// - Returns: A tuple containing:
+    ///   - `activeConnections`: Number of currently active database connections (Int)
+    ///   - `version`: PostgreSQL server version string
     /// - Throws: `HealthCheckError`
     public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
         guard let db = app.db(.psql) as? (any PostgresDatabase) else {

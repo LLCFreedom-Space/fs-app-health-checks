@@ -26,7 +26,10 @@ import Vapor
 
 /// Protocol defining PostgreSQL request operations.
 public protocol PostgresRequestSendable: Sendable {
-    /// Retrieves the PostgreSQL metrics.
-    /// - Returns: A `String` containing the PostgreSQL version.
+    /// Retrieves PostgreSQL connection statistics and server version.
+    /// - Returns: A tuple containing:
+    ///   - `activeConnections`: Number of currently active database connections (Int)
+    ///   - `version`: PostgreSQL server version string
+    /// - Throws: `HealthCheckError`
     func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String)
 }
