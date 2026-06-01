@@ -26,14 +26,13 @@ import Vapor
 @testable import HealthChecks
 
 public struct MongoRequestMock: MongoRequestSendable {
-    // Example of value: `connecting`, `disconnected`, `connected(connectionCount: Int)`, `closed`
-    private var connection: String
+    public func checkConnection() async throws { }
     
-    public init(connection: String = "connecting") {
-        self.connection = connection
+    public func getActiveConnections() async throws -> Int {
+        2
     }
-
-    public func getConnection() async -> String {
-        self.connection
+    
+    public func getVersion() async throws -> String {
+        "7.0.1"
     }
 }

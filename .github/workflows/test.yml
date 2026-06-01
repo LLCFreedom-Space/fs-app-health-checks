@@ -33,19 +33,50 @@ jobs:
           path: |
             .build
             ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          key: ${{ runner.os }}-swift-${{ matrix.swift-version }}-spm-${{ hashFiles('Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
       - name: Build
         run: swift build -v
       - name: Run tests
         run: swift test
+
   # =========================
   # Linux
   # =========================
   linux:
     runs-on: ubuntu-latest
-    container: swift:6.2-jammy
+    container:
+      image: swift:6.2-jammy
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: vapor
+          POSTGRES_PASSWORD: vapor
+          POSTGRES_DB: vapor_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:8
+        env:
+          MONGO_INITDB_ROOT_USERNAME: vapor
+          MONGO_INITDB_ROOT_PASSWORD: vapor
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,10 +84,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .build
-          key: linux-spm-${{ hashFiles('Package.resolved') }}
+          key: ${{ runner.os }}-swift-${{ matrix.swift-version }}-spm-${{ hashFiles('Package.resolved') }}
           restore-keys: |
             linux-spm-
       - name: Build
         run: swift build -v
-      - name: Test (parallel)
-        run: swift test -v --parallel
+      - name: Run tests
+        run: swift test
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_USER: vapor
+          POSTGRES_PASSWORD: vapor
+          POSTGRES_DB: vapor_test
+          REDIS_HOST: redis
+          MONGO_HOST: mongo
+          MONGO_USER: vapor
+          MONGO_PASSWORD: vapor

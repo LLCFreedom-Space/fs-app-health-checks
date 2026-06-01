@@ -31,7 +31,11 @@ public enum HealthCheckError: Error {
     case unexpectedStatusCode
     /// The service instance is not registered in the application container.
     case serviceNotSetup
-
+    /// The database instance is not registered in the application container.
+    case databaseNotSetup
+    /// Failed to decode the response payload into the expected model.
+    case responseDecodingFailed
+    
     /// A human-readable summary of the reason.
     public var description: String {
         switch self {
@@ -41,6 +45,10 @@ public enum HealthCheckError: Error {
             return "The service returned an unexpected HTTP status code, indicating it may be unavailable or unhealthy."
         case .serviceNotSetup:
             return "The service is not registered in the application container."
+        case .databaseNotSetup:
+            return "The database is not registered in the application container."
+        case .responseDecodingFailed:
+            return "Failed to decode the service response into the expected format."
         }
     }
 }

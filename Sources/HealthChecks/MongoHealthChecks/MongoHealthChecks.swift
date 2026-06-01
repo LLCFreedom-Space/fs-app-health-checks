@@ -17,7 +17,7 @@
 
 //
 //  MongoHealthChecks.swift
-//  
+//
 //
 //  Created by Mykola Buhaiov on 15.03.2024.
 //
@@ -35,73 +35,113 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     public init(app: Application) {
         self.app = app
     }
-
-    /// Checks the MongoDB connection status.
-    /// - Returns: A `HealthCheckItem` representing the connection state.
-    public func connection() async -> HealthCheckItem {
-        let connectionDescription = await getConnection()
-        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
-        let result = HealthCheckItem(
-            componentId: app.mongoId,
-            componentType: .datastore,
-            // TODO: fetch active connection count/value if available
-            status: connectionStatus ? .fail : .pass,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionStatus ? connectionDescription : nil,
-            links: nil,
-            node: nil
-        )
-        return result
-    }
-
+    
     /// Measures the MongoDB response time.
     /// - Returns: A `HealthCheckItem` with the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
-        let startTime = Date().timeIntervalSince1970
-        let connectionDescription = await getConnection()
-        let connectionStatus = ["disconnected", "closed"].contains(where: connectionDescription.contains)
-        let result = HealthCheckItem(
+        let startTime: Date = .now
+        var healthCheckItem = HealthCheckItem(
             componentId: app.mongoId,
             componentType: .datastore,
-            observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
-            observedUnit: "ms",
-            // TODO: need get active connection
-            //            observedValue: "",
-            status: connectionStatus ? .fail : .pass,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: connectionStatus ? connectionDescription : nil,
+            status: .pass,
             links: nil,
             node: nil
         )
-        return result
+        do {
+            try await checkConnection()
+            healthCheckItem.observedValue = Date().timeIntervalSince(startTime)
+            healthCheckItem.observedUnit = "s"
+            healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
+            return healthCheckItem
+        } catch {
+            healthCheckItem.status = .fail
+            healthCheckItem.output = "\(error)"
+            return healthCheckItem
+        }
     }
-
+    
+    /// Checks the MongoDB connection status.
+    /// - Returns: A `HealthCheckItem` representing the connection state.
+    public func connection() async -> HealthCheckItem {
+        var healthCheckItem = HealthCheckItem(
+            componentId: app.mongoId,
+            componentType: .datastore,
+            status: .pass,
+            links: nil,
+            node: nil
+        )
+        do {
+            async let activeConnections = getActiveConnections()
+            async let version = getVersion()
+            let (connections, resolvedVersion) = try await (activeConnections, version)
+            let activeConnsections = connections
+            healthCheckItem.observedValue = Double(activeConnsections)
+            healthCheckItem.observedUnit = "number"
+            healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
+            healthCheckItem.version = resolvedVersion
+            return healthCheckItem
+        } catch {
+            healthCheckItem.status = .fail
+            healthCheckItem.output = "\(error)"
+            return healthCheckItem
+        }
+    }
+    
     /// Retrieves the MongoDB connection description.
     /// - Returns: A `String` describing the connection status.
-    public func getConnection() async -> String {
+    /// - Throws:
+    ///   - `HealthCheckError.serviceNotSetup` if `mongoRequest` is not configured.
+    ///   - Any error thrown by the underlying MongoDB client.
+    public func checkConnection() async throws {
         guard let mongoRequest = app.mongoRequest else {
             app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
-            return "disconnected"
+            throw HealthCheckError.serviceNotSetup
         }
-        return await mongoRequest.getConnection()
+        return try await mongoRequest.checkConnection()
     }
-
+    
+    /// Returns the total number of active MongoDB connections.
+    /// - Returns: The number of active MongoDB connections.
+    /// - Throws:
+    ///   - `HealthCheckError.serviceNotSetup` if `mongoRequest` is not configured.
+    ///   - Any error thrown by the underlying MongoDB client.
+    public func getActiveConnections() async throws -> Int {
+        guard let mongoRequest = app.mongoRequest else {
+            app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
+            throw HealthCheckError.serviceNotSetup
+        }
+        return try await mongoRequest.getActiveConnections()
+    }
+    
+    /// Returns the MongoDB server version.
+    /// - Returns: The MongoDB server version string.
+    /// - Throws:
+    ///   - `HealthCheckError.serviceNotSetup` if `mongoRequest` is not configured.
+    ///   - Any error thrown by the underlying MongoDB client.
+    public func getVersion() async throws -> String {
+        guard let mongoRequest = app.mongoRequest else {
+            app.logger.error("MongoRequest in app not set. Check your configuration, need to set `app.mongoRequest`")
+            throw HealthCheckError.serviceNotSetup
+        }
+        return try await mongoRequest.getVersion()
+    }
+    
     /// Performs health checks for the given measurement types.
     /// - Parameter options: Array of `MeasurementType` specifying which metrics to check.
     /// - Returns: Dictionary mapping `"<ComponentName>:<MeasurementType>"` to `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
-        let measurementTypes = Array(Set(options)) // Remove duplicates
-        for type in measurementTypes {
-            switch type {
-            case .responseTime:
-                result["\(ComponentName.mongo):\(MeasurementType.responseTime)"] = await responseTime()
-            case .connections:
-                result["\(ComponentName.mongo):\(MeasurementType.connections)"] = await connection()
-            default:
-                break
-            }
+        let types = Set(options)
+        async let responseTimeResult: HealthCheckItem? =
+        types.contains(.responseTime) ? responseTime() : nil
+        async let connectionsResult: HealthCheckItem? =
+        types.contains(.connections) ? connection() : nil
+        var results: [String: HealthCheckItem] = [:]
+        if let item = await responseTimeResult {
+            results["\(ComponentName.mongo):\(MeasurementType.responseTime)"] = item
         }
-        return result
+        if let item = await connectionsResult {
+            results["\(ComponentName.mongo):\(MeasurementType.connections)"] = item
+        }
+        return results
     }
 }

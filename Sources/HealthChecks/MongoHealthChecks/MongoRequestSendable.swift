@@ -26,7 +26,15 @@ import Vapor
 
 /// Protocol defining a sendable MongoDB request handler.
 public protocol MongoRequestSendable: Sendable {
-    /// Retrieves the connection description for a given MongoDB.
-    /// - Returns: A `String` describing the connection status, e.g., `"connected"` or `"disconnected"`.
-    func getConnection() async -> String
+    /// Checks whether MongoDB is reachable and responding.
+    /// - Throws: `HealthCheckError`
+    func checkConnection() async throws
+    /// Returns the number of available MongoDB connections.
+    /// - Returns: The number of currently available connections.
+    /// - Throws: `HealthCheckError` if the stats cannot be retrieved.
+    func getActiveConnections() async throws -> Int
+    /// Retrieves the MongoDB server version.
+    /// - Returns: Version string returned by MongoDB (e.g. `"7.0.4"`).
+    /// - Throws: `HealthCheckError` if build info is missing or request fails.
+    func getVersion() async throws -> String
 }
