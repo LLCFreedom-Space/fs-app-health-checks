@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PsqlRequestSendable.swift
+//  PostgresRequestSendable.swift
 //
 //
 //  Created by Mykola Buhaiov on 14.03.2024.
@@ -25,12 +25,16 @@
 import Vapor
 
 /// Protocol defining PostgreSQL request operations.
-public protocol PsqlRequestSendable: Sendable {
+public protocol PostgresRequestSendable: Sendable {
     /// Retrieves the PostgreSQL version description.
     /// - Returns: A `String` containing the PostgreSQL version.
-    func getVersionDescription() async throws -> String
+    func getVersion() async throws -> String
     /// Checks the connection state for a specific PostgreSQL database.
     /// - Parameter databaseName: The name of the PostgreSQL database to check.
-    /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
-    func checkConnection() async throws -> String
+    func checkConnection() async throws
+    /// Returns the number of active connections to the current PostgreSQL database.
+    /// Queries `pg_stat_activity` excluding the current backend process.
+    /// - Returns: Number of active connections as a string.
+    /// - Throws: `HealthCheckError` if query fails or response is invalid.
+    func getActiveConnections() async throws -> Int
 }

@@ -27,13 +27,13 @@ import MongoKitten
 
 extension Application {
     /// Storage key for PostgreSQL request context.
-    private struct PsqlRequestKey: StorageKey {
-        typealias Value = PsqlRequestSendable
+    private struct PostgresRequestKey: StorageKey {
+        typealias Value = PostgresRequestSendable
     }
     /// PostgreSQL request context associated with the current request.
-    public var psqlRequest: PsqlRequestSendable? {
-        get { storage[PsqlRequestKey.self] }
-        set { storage[PsqlRequestKey.self] = newValue }
+    public var postgresRequest: PostgresRequestSendable? {
+        get { storage[PostgresRequestKey.self] }
+        set { storage[PostgresRequestKey.self] = newValue }
     }
 
     /// Storage key for Redis request context.
@@ -89,13 +89,13 @@ extension Application {
     }
 
     /// Storage key for PostgreSQL identifier.
-    private struct PsqlIdKey: StorageKey {
+    private struct PostgresIdKey: StorageKey {
         typealias Value = String
     }
     /// Unique identifier for the PostgreSQL instance.
-    public var psqlId: String? {
-        get { storage[PsqlIdKey.self] }
-        set { storage[PsqlIdKey.self] = newValue }
+    public var postgresId: String? {
+        get { storage[PostgresIdKey.self] }
+        set { storage[PostgresIdKey.self] = newValue }
     }
 
     /// Storage key for Redis identifier.
@@ -125,7 +125,7 @@ extension Application {
         typealias Value = PostgresHealthChecksProtocol
     }
     /// PostgreSQL health checks handler.
-    public var psqlHealthChecks: PostgresHealthChecksProtocol? {
+    public var postgresHealthChecks: PostgresHealthChecksProtocol? {
         get { storage[PostgresHealthChecksKey.self] }
         set { storage[PostgresHealthChecksKey.self] = newValue }
     }

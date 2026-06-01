@@ -26,19 +26,13 @@ import Vapor
 @testable import HealthChecks
 
 public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
-    private var healthCheckItem: HealthCheckItem
-    
-    public init(healthCheckItem: HealthCheckItem = healthCheckItem) {
-        self.healthCheckItem = healthCheckItem
-    }
-    
-    public static let psqlId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+    public static let postgresId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     public static let version =
             """
             PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
             """
     public static let healthCheckItem = HealthCheckItem(
-        componentId: psqlId,
+        componentId: postgresId,
         componentType: .datastore,
         observedValue: 1,
         observedUnit: "s",
@@ -69,8 +63,10 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
         ]
         return result
     }
-
-    public func checkConnection() async -> String {
-        "active"
+    
+    public func checkConnection() async throws { }
+    
+    public func getActiveConnections() async throws -> Int {
+        2
     }
 }

@@ -100,3 +100,4 @@ jobs:
           MONGO_HOST: mongo
           MONGO_USER: vapor
           MONGO_PASSWORD: vapor
+          MONGO_DB: vapor_test

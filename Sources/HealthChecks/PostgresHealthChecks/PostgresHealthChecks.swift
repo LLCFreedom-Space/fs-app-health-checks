@@ -40,72 +40,100 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// Checks the PostgreSQL connection status.
     /// - Returns: A `HealthCheckItem` representing the connection state.
     public func connection() async -> HealthCheckItem {
-        let connectionDescription = await checkConnection()
-        let result = HealthCheckItem(
-            componentId: app.psqlId,
+        var healthCheckItem = HealthCheckItem(
+            componentId: app.postgresId,
             componentType: .datastore,
-            status: connectionDescription.contains("active") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: !connectionDescription.contains("active") ? connectionDescription : nil,
+            status: .pass,
             links: nil,
             node: nil
         )
-        return result
+        do {
+            async let activeConnections = getActiveConnections()
+            async let version = getVersion()
+            let (connections, resolvedVersion) = try await (activeConnections, version)
+            let activeConnsections = connections
+            healthCheckItem.observedValue = Double(activeConnsections)
+            healthCheckItem.observedUnit = "number"
+            healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
+            healthCheckItem.version = resolvedVersion
+            return healthCheckItem
+        } catch {
+            healthCheckItem.status = .fail
+            healthCheckItem.output = "\(error)"
+            return healthCheckItem
+        }
     }
 
     /// Measures the PostgreSQL response time.
     /// - Returns: A `HealthCheckItem` containing the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
-        let startTime = Date().timeIntervalSince1970
-        let versionDescription = await getVersion()
-        let result = HealthCheckItem(
-            componentId: app.psqlId,
+        let startTime: Date = .now
+        var healthCheckItem = HealthCheckItem(
+            componentId: app.postgresId,
             componentType: .datastore,
-            observedValue: (Date().timeIntervalSince1970 - startTime) * 1000,
-            observedUnit: "ms",
-            status: versionDescription.contains("PostgreSQL") ? .pass : .fail,
-            time: app.dateTimeISOFormat.string(from: Date()),
-            output: !versionDescription.contains("PostgreSQL") ? versionDescription : nil,
+            status: .pass,
             links: nil,
             node: nil
         )
-        return result
+        do {
+            try await checkConnection()
+            healthCheckItem.observedValue = Date().timeIntervalSince(startTime)
+            healthCheckItem.observedUnit = "s"
+            healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
+            return healthCheckItem
+        } catch {
+            healthCheckItem.status = .fail
+            healthCheckItem.output = "\(error)"
+            return healthCheckItem
+        }
     }
 
     /// Retrieves the PostgreSQL version.
     /// - Returns: A `String` describing the PostgreSQL version.
-    public func getVersion() async -> String {
-        guard let result = try? await app.psqlRequest?.getVersionDescription() else {
-            return "ERROR: No connect to Postgres database for get version"
+    public func getVersion() async throws -> String {
+        guard let postgresRequest = app.postgresRequest else {
+            throw HealthCheckError.serviceNotSetup
         }
-        return result
+        return try await postgresRequest.getVersion()
     }
 
     /// Checks the connection for the PostgreSQL database.
     /// - Returns: A `String` describing the connection status.
-    public func checkConnection() async -> String {
-        guard let result = try? await app.psqlRequest?.checkConnection() else {
-            return "ERROR: No connect to Postgres database for check database"
+    public func checkConnection() async throws {
+        guard let postgresRequest = app.postgresRequest else {
+            throw HealthCheckError.serviceNotSetup
         }
-        return result
+        return try await postgresRequest.checkConnection()
     }
-
+    
+    /// Returns the total number of active PostgreSQL connections.
+    /// - Returns: The number of active PostgreSQL connections.
+    /// - Throws:
+    ///   - `HealthCheckError.serviceNotSetup` if `mongoRequest` is not configured.
+    ///   - Any error thrown by the underlying PostgreSQL client.
+    public func getActiveConnections() async throws -> Int {
+        guard let postgresRequest = app.postgresRequest else {
+            throw HealthCheckError.serviceNotSetup
+        }
+        return try await postgresRequest.getActiveConnections()
+    }
+    
     /// Performs health checks for the given measurement types.
     /// - Parameter options: Array of `MeasurementType` specifying which metrics to check.
     /// - Returns: Dictionary mapping `"<ComponentName>:<MeasurementType>"` to `HealthCheckItem`.
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
-        let measurementTypes = Array(Set(options)) // Remove duplicates
-        for type in measurementTypes {
-            switch type {
-            case .responseTime:
-                result["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = await responseTime()
-            case .connections:
-                result["\(ComponentName.postgresql):\(MeasurementType.connections)"] = await connection()
-            default:
-                break
-            }
+        let types = Set(options)
+        async let responseTimeResult: HealthCheckItem? =
+        types.contains(.responseTime) ? responseTime() : nil
+        async let connectionsResult: HealthCheckItem? =
+        types.contains(.connections) ? connection() : nil
+        var results: [String: HealthCheckItem] = [:]
+        if let item = await responseTimeResult {
+            results["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = item
         }
-        return result
+        if let item = await connectionsResult {
+            results["\(ComponentName.postgresql):\(MeasurementType.connections)"] = item
+        }
+        return results
     }
 }
