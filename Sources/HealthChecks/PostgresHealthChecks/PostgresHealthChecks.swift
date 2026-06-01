@@ -48,14 +48,12 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
             node: nil
         )
         do {
-            async let activeConnections = getActiveConnections()
-            async let version = getVersion()
-            let (connections, resolvedVersion) = try await (activeConnections, version)
+            let (connections, version) = try await getDatabaseHealthMetrics()
             let activeConnsections = connections
             healthCheckItem.observedValue = Double(activeConnsections)
             healthCheckItem.observedUnit = "number"
             healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
-            healthCheckItem.version = resolvedVersion
+            healthCheckItem.version = version
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
@@ -76,7 +74,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
             node: nil
         )
         do {
-            try await checkConnection()
+            try await getDatabaseHealthMetrics()
             healthCheckItem.observedValue = Date().timeIntervalSince(startTime)
             healthCheckItem.observedUnit = "s"
             healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
@@ -88,34 +86,13 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
         }
     }
 
-    /// Retrieves the PostgreSQL version.
-    /// - Returns: A `String` describing the PostgreSQL version.
-    public func getVersion() async throws -> String {
+    /// Retrieves the PostgreSQL metrics.
+    /// - Returns: A `String` describing the PostgreSQL metrics.
+    @discardableResult public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
         guard let postgresRequest = app.postgresRequest else {
             throw HealthCheckError.serviceNotSetup
         }
-        return try await postgresRequest.getVersion()
-    }
-
-    /// Checks the connection for the PostgreSQL database.
-    /// - Returns: A `String` describing the connection status.
-    public func checkConnection() async throws {
-        guard let postgresRequest = app.postgresRequest else {
-            throw HealthCheckError.serviceNotSetup
-        }
-        return try await postgresRequest.checkConnection()
-    }
-    
-    /// Returns the total number of active PostgreSQL connections.
-    /// - Returns: The number of active PostgreSQL connections.
-    /// - Throws:
-    ///   - `HealthCheckError.serviceNotSetup` if `mongoRequest` is not configured.
-    ///   - Any error thrown by the underlying PostgreSQL client.
-    public func getActiveConnections() async throws -> Int {
-        guard let postgresRequest = app.postgresRequest else {
-            throw HealthCheckError.serviceNotSetup
-        }
-        return try await postgresRequest.getActiveConnections()
+        return try await postgresRequest.getDatabaseHealthMetrics()
     }
     
     /// Performs health checks for the given measurement types.

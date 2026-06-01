@@ -36,60 +36,34 @@ public struct PostgresRequest: PostgresRequestSendable {
         self.app = app
     }
     
-    /// Retrieves the PostgreSQL server version.
-    /// Executes `SELECT version()` and parses the result into a structured format.
-    /// - Returns: A string representing the PostgreSQL version (e.g. `"16.1"`).
-    /// - Throws: `HealthCheckError` if the database is unavailable, query fails,
-    ///           or version cannot be parsed.
-    public func getVersion() async throws -> String {
+    /// Retrieves PostgreSQL connection statistics and server version.
+    /// - Throws: `HealthCheckError`
+    public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
         guard let db = app.db(.psql) as? (any PostgresDatabase) else {
             throw HealthCheckError.databaseNotSetup
         }
-        let rows = try await db.simpleQuery("SELECT version()").get()
-        guard let row = rows.first?.makeRandomAccess() else {
-            throw HealthCheckError.responseDecodingFailed
-        }
-        guard let version = row[data: "version"].string else {
-            throw HealthCheckError.responseDecodingFailed
-        }
-        return version
-    }
-    
-    /// Checks whether the PostgreSQL database is reachable.
-    /// Executes a lightweight `SELECT 1` query.
-    /// - Throws: `HealthCheckError` if the query execution fails.
-    public func checkConnection() async throws {
-        guard let db = app.db(.psql) as? (any PostgresDatabase) else {
-            throw HealthCheckError.databaseNotSetup
-        }
-        try await db.simpleQuery("SELECT 1").get()
-    }
-    
-    /// Returns the number of active connections to the current PostgreSQL database.
-    /// Queries `pg_stat_activity` excluding the current backend process.
-    /// - Returns: Number of active connections as a string.
-    /// - Throws: `HealthCheckError` if query fails or response is invalid.
-    public func getActiveConnections() async throws -> Int {
-        guard let db = app.db(.psql) as? (any PostgresDatabase) else {
-            throw HealthCheckError.databaseNotSetup
-        }
+
         let query = """
-            SELECT COUNT(*) AS count
-            FROM pg_stat_activity
-            WHERE datname = current_database()
-              AND pid != pg_backend_pid()
-              AND state = 'active'
+            SELECT
+                COUNT(*) FILTER (
+                    WHERE datname = current_database()
+                      AND pid != pg_backend_pid()
+                      AND state = 'active'
+                ) AS active_connections,
+                version() AS version
+            FROM pg_stat_activity;
         """
 
         let rows = try await db.simpleQuery(query).get()
+
         guard
             let row = rows.first?.makeRandomAccess(),
-            let countString = row[data: "count"].string,
-            let count = Int(countString)
+            let activeConnectionsString = row[data: "active_connections"].string,
+            let activeConnections = Int(activeConnectionsString),
+            let version = row[data: "version"].string
         else {
             throw HealthCheckError.responseDecodingFailed
         }
-
-        return count
+        return (activeConnections, version)
     }
 }

@@ -50,73 +50,28 @@ struct PostgresRequestTests {
         return "postgres://\(user):\(password)@\(host):5432\(db)"
     }
 
-    @Test("Check connection - database not setup")
-    func checkConnectionNotSetup() async throws {
+    @Test("Get database health metrics with error")
+    func getDatabaseHealthMetricsWithError() async throws {
         try await withApp { app in
             let request = PostgresRequest(app: app)
 
             await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.checkConnection()
+                try await request.getDatabaseHealthMetrics()
             }
         }
     }
 
-    @Test("Get active connections - database not setup")
-    func getActiveConnectionsNotSetup() async throws {
-        try await withApp { app in
-            let request = PostgresRequest(app: app)
-
-            await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.getActiveConnections()
-            }
-        }
-    }
-
-    @Test("Get version - database not setup")
-    func getVersionNotSetup() async throws {
-        try await withApp { app in
-            let request = PostgresRequest(app: app)
-
-            await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.getVersion()
-            }
-        }
-    }
-
-    @Test("Check connection", .enabled(if: ProcessInfo.processInfo.environment["POSTGRES_HOST"] != nil))
-    func checkConnection() async throws {
+    @Test("Get database health metrics", .enabled(if: ProcessInfo.processInfo.environment["POSTGRES_HOST"] != nil))
+    func getDatabaseHealthMetrics() async throws {
         try await withApp { app in
             let sqlPostgresConfiguration = try SQLPostgresConfiguration(url: PostgresRequestTests.connectionString())
             app.databases.use(DatabaseConfigurationFactory.postgres(configuration: sqlPostgresConfiguration), as: .psql)
 
             let request = PostgresRequest(app: app)
-            try await request.checkConnection()
-        }
-    }
+            let (activeConnections, version) = try await request.getDatabaseHealthMetrics()
 
-    @Test("Get active connections", .enabled(if: ProcessInfo.processInfo.environment["POSTGRES_HOST"] != nil))
-    func getActiveConnections() async throws {
-        try await withApp { app in
-            let sqlPostgresConfiguration = try SQLPostgresConfiguration(url: PostgresRequestTests.connectionString())
-            app.databases.use(DatabaseConfigurationFactory.postgres(configuration: sqlPostgresConfiguration), as: .psql)
-
-            let request = PostgresRequest(app: app)
-            let count = try await request.getActiveConnections()
-
-            #expect(count > .zero)
-        }
-    }
-
-    @Test("Get version", .enabled(if: ProcessInfo.processInfo.environment["POSTGRES_HOST"] != nil))
-    func getVersion() async throws {
-        try await withApp { app in
-            let sqlPostgresConfiguration = try SQLPostgresConfiguration(url: PostgresRequestTests.connectionString())
-            app.databases.use(DatabaseConfigurationFactory.postgres(configuration: sqlPostgresConfiguration), as: .psql)
-
-            let request = PostgresRequest(app: app)
-            let version = try await request.getVersion()
-
-            #expect(!version.isEmpty)
+            #expect(activeConnections > .zero)
+            #expect(version.isEmpty == false)
         }
     }
 }

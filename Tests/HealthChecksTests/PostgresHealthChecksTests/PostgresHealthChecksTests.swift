@@ -41,12 +41,12 @@ struct PostgresHealthChecksTests {
     @Test("Connection")
     func connection() async throws {
         try await withApp { app in
-            let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-            app.mongoId = mongoId
+            let postgresId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+            app.postgresId = postgresId
             app.postgresHealthChecks = PostgresHealthChecksMock()
             let mockResult = await app.postgresHealthChecks?.connection()
             #expect(mockResult == PostgresHealthChecksMock.healthCheckItem)
-            #expect(app.mongoId == mongoId)
+            #expect(app.postgresId == postgresId)
 
             app.postgresRequest = PostgresRequestMock()
             app.postgresHealthChecks = PostgresHealthChecks(app: app)
@@ -84,20 +84,20 @@ struct PostgresHealthChecksTests {
     @Test("Check")
     func check() async throws {
         try await withApp { app in
-            app.mongoId = UUID().uuidString
+            app.postgresId = UUID().uuidString
             app.postgresHealthChecks = PostgresHealthChecksMock()
             let mock = await app.postgresHealthChecks?.check(
                 for: [.responseTime, .connections, .utilization]
             )
-            #expect(mock?["\(ComponentName.mongo):\(MeasurementType.connections)"] == PostgresHealthChecksMock.healthCheckItem)
-            #expect(mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"] == PostgresHealthChecksMock.healthCheckItem)
+            #expect(mock?["\(ComponentName.postgresql):\(MeasurementType.connections)"] == PostgresHealthChecksMock.healthCheckItem)
+            #expect(mock?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] == PostgresHealthChecksMock.healthCheckItem)
 
             app.postgresRequest = PostgresRequestMock()
             app.postgresHealthChecks = PostgresHealthChecks(app: app)
             let result = await app.postgresHealthChecks?.check(
                 for: [.responseTime, .connections, .utilization]
             )
-            let connections = result?["\(ComponentName.mongo):\(MeasurementType.connections)"]
+            let connections = result?["\(ComponentName.postgresql):\(MeasurementType.connections)"]
             #expect(connections?.componentType == .datastore)
             #expect(connections?.observedUnit == "number")
             #expect(connections?.status == .pass)
@@ -105,7 +105,7 @@ struct PostgresHealthChecksTests {
             #expect(connections?.links == nil)
             #expect(connections?.node == nil)
 
-            let responseTime = result?["\(ComponentName.mongo):\(MeasurementType.responseTime)"]
+            let responseTime = result?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"]
             #expect(responseTime?.componentType == .datastore)
             #expect(responseTime?.observedUnit == "s")
             #expect(responseTime?.status == .pass)
@@ -113,66 +113,18 @@ struct PostgresHealthChecksTests {
             #expect(responseTime?.links == nil)
             #expect(responseTime?.node == nil)
 
-            #expect(result?["\(ComponentName.mongo):\(MeasurementType.utilization)"] == nil)
+            #expect(result?["\(ComponentName.postgresql):\(MeasurementType.utilization)"] == nil)
         }
     }
 
-    @Test("Check connection")
-    func checkConnection() async throws {
+    @Test("getDatabaseHealthMetrics")
+    func getDatabaseHealthMetrics() async throws {
         try await withApp { app in
             app.postgresRequest = PostgresRequestMock()
-            let checks = MongoHealthChecks(app: app)
-            try await checks.checkConnection()
-        }
-    }
-
-    @Test("Check connection - service not setup")
-    func checkConnectionNotSetup() async throws {
-        try await withApp { app in
-            let checks = MongoHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) {
-                try await checks.checkConnection()
-            }
-        }
-    }
-
-    @Test("Get active connections")
-    func getActiveConnections() async throws {
-        try await withApp { app in
-            app.postgresRequest = PostgresRequestMock()
-            let checks = MongoHealthChecks(app: app)
-            let count = try await checks.getActiveConnections()
-            #expect(count > .zero)
-        }
-    }
-
-    @Test("Get active connections - service not setup")
-    func getActiveConnectionsNotSetup() async throws {
-        try await withApp { app in
-            let checks = MongoHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) {
-                try await checks.getActiveConnections()
-            }
-        }
-    }
-
-    @Test("Get version")
-    func getVersion() async throws {
-        try await withApp { app in
-            app.postgresRequest = PostgresRequestMock()
-            let checks = MongoHealthChecks(app: app)
-            let version = try await checks.getVersion()
+            let checks = PostgresHealthChecks(app: app)
+            let (activeConnections, version) = try await checks.getDatabaseHealthMetrics()
+            #expect(activeConnections > .zero)
             #expect(!version.isEmpty)
-        }
-    }
-
-    @Test("Get version - service not setup")
-    func getVersionNotSetup() async throws {
-        try await withApp { app in
-            let checks = MongoHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) {
-                try await checks.getVersion()
-            }
         }
     }
 }

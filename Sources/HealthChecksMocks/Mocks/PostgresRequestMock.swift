@@ -26,15 +26,12 @@ import Vapor
 @testable import HealthChecks
 
 public struct PostgresRequestMock: PostgresRequestSendable {
-    public func getVersion() async throws -> String {
-    """
-    PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
-    """
-    }
+    public static let version =
+        """
+        PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
+        """
     
-    public func checkConnection() async throws { }
-    
-    public func getActiveConnections() async throws -> Int {
-        2
+    public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
+        (2, PostgresRequestMock.version)
     }
 }

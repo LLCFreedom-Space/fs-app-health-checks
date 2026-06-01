@@ -32,13 +32,7 @@ public protocol PostgresChecksProtocol {
     /// Measures the PostgreSQL response time.
     /// - Returns: A `HealthCheckItem` containing the response time metric.
     func responseTime() async -> HealthCheckItem
-    /// Retrieves the PostgreSQL version string.
-    /// - Returns: A `String` representing the PostgreSQL version.
-    func getVersion() async throws -> String
-    /// Checks the connection for the PostgreSQL database.
-    func checkConnection() async throws
-    /// Returns the number of available PostgreSQL connections.
-    /// - Returns: The number of currently available connections.
-    /// - Throws: `HealthCheckError` if the stats cannot be retrieved.
-    func getActiveConnections() async throws -> Int
+    /// Retrieves the PostgreSQL metrics.
+    /// - Returns: A `String` describing the PostgreSQL metrics.
+    func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String)
 }
