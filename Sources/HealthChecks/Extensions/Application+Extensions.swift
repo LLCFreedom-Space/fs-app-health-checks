@@ -23,7 +23,7 @@
 //
 
 import Vapor
-import MongoClient
+import MongoKitten
 
 extension Application {
     /// Storage key for PostgreSQL request context.
@@ -184,35 +184,31 @@ extension Application {
 }
 
 extension Application {
-    /// Storage key for MongoDB cluster.
-    private struct MongoClusterKey: StorageKey {
-        typealias Value = MongoCluster
+    /// Storage key for Mongo database.
+    private struct MongoDatabaseKey: StorageKey {
+        typealias Value = MongoDatabase
     }
-    /// Shared MongoDB cluster instance.
+    /// Shared Mongo database instance.
     /// - Important: Should be initialized once during application bootstrap.
-    public var healthCheckMongoCluster: MongoCluster? {
-        get { storage[MongoClusterKey.self] }
-        set { storage[MongoClusterKey.self] = newValue }
+    public var healthCheckMongoDatabase: MongoDatabase? {
+        get { storage[MongoDatabaseKey.self] }
+        set { storage[MongoDatabaseKey.self] = newValue }
     }
 
-    /// Initializes MongoDB cluster with eager connection.
+    /// Initializes Mongo database with eager connection.
     /// - Parameter connectionString: MongoDB connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
-    public func initializeMongoCluster(connectionString: String) async throws {
-        self.healthCheckMongoCluster = try await MongoCluster(
-            connectingTo: ConnectionSettings(connectionString)
-        )
+    public func initializeMongo(connectionString: String) async throws {
+        self.healthCheckMongoDatabase = try await MongoDatabase.connect(to: connectionString)
     }
 
-    /// Initializes MongoDB cluster with lazy connection.
-    /// - Parameter connectionString: MongoDB connection string.
+    /// Initializes Mongo database with lazy connection.
+    /// - Parameter connectionString: Mongo database connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
-    public func initializeLazyMongoCluster(connectionString: String) throws {
-        self.healthCheckMongoCluster = try MongoCluster(
-            lazyConnectingTo: ConnectionSettings(connectionString)
-        )
+    public func initializeLazyMongo(connectionString: String) throws {
+        self.healthCheckMongoDatabase = try MongoDatabase.lazyConnect(to: connectionString)
     }
 }
 

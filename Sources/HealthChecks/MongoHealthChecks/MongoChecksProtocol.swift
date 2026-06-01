@@ -34,6 +34,14 @@ public protocol MongoChecksProtocol {
     /// - Returns: A `HealthCheckItem` containing the observed response time.
     func responseTime() async -> HealthCheckItem
     /// Retrieves a string representation of the MongoDB connection state.
-    /// - Returns: A `String` describing the current connection state.
-    func getConnection() async -> String
+    func checkConnection() async throws
+    /// Retrieves the MongoDB server version.
+    /// - Returns: A string containing the MongoDB version
+    ///   (for example: `"7.0.4"`).
+    /// - Throws: An error if the version information cannot be retrieved.
+    func getVersion() async throws -> String
+    /// Returns the number of available MongoDB connections.
+    /// - Returns: The number of currently available connections.
+    /// - Throws: `HealthCheckError` if the stats cannot be retrieved.
+    func getActiveConnections() async throws -> Int 
 }

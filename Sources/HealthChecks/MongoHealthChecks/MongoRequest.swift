@@ -34,45 +34,50 @@ public struct MongoRequest: MongoRequestSendable {
     public init(app: Application) {
         self.app = app
     }
-
-    /// Returns the current connection state of the Mongo cluster.
-    /// - Returns: A string describing the current connection state:
-    ///   - `"connecting"` — when the connection is in progress
-    ///   - `"connected"` — when the cluster is connected
-    ///   - `"disconnected"` — when the cluster is not available
-    ///   - `"closed"` — when the connection has been closed
-    public func getConnection() async -> String {
-        guard let healthCheckMongoCluster = app.healthCheckMongoCluster else {
-            app.logger.error("❌ HealthCheckMongoCluster not installed in app. Check your configuration, need to set `app.healthCheckMongoCluster")
-            return "disconnected"
+    
+    /// Checks whether MongoDB is reachable and responding.
+    /// - Throws: `HealthCheckError`
+    public func checkConnection() async throws {
+        guard let db = app.healthCheckMongoDatabase else {
+            throw HealthCheckError.databaseNotSetup
         }
-        let dbName = healthCheckMongoCluster.settings.targetDatabase ?? "unknown_database_name"
-        switch healthCheckMongoCluster.connectionState {
-        case .connecting:
-            //            app.logger.debug("✅ HealthCheckMongoCluster connection.")
-            return "connecting"
-        case .connected(connectionCount: let connectionCount):
-            //            app.logger.debug("✅ HealthCheckMongoCluster connection and connectionCount: \(connectionCount).")
-            return "connected"
-        case .disconnected:
-            app.logger.error("❌ HealthCheckMongoCluster is disconnected and try to reconnect to: \(dbName).")
-            await reconnect(mongoCluster: healthCheckMongoCluster)
-            return "\(healthCheckMongoCluster.connectionState)"
-        case .closed:
-            app.logger.error("❌ HealthCheckMongoCluster is closed and try to reconnect to: \(dbName).")
-            await reconnect(mongoCluster: healthCheckMongoCluster)
-            return "\(healthCheckMongoCluster.connectionState)"
+        do {
+            try await db.checkConnection()
+        } catch {
+            throw error
         }
     }
-
-    /// Attempts to reconnect the provided Mongo cluster.
-    /// - Parameter mongoCluster: The `MongoCluster` instance to reconnect.
-    private func reconnect(mongoCluster: MongoCluster) async {
+    
+    /// Returns the number of available MongoDB connections.
+    /// - Returns: The number of currently available connections.
+    /// - Throws: `HealthCheckError` if the stats cannot be retrieved.
+    public func getActiveConnections() async throws -> Int {
+        guard let db = app.healthCheckMongoDatabase else {
+            throw HealthCheckError.databaseNotSetup
+        }
         do {
-            app.logger.info("🔄 MongoCluster.reconnect is called.")
-            try await mongoCluster.reconnect()
+            let connectionStats = try await db.getConnectionStats()
+            return connectionStats.active
         } catch {
-            app.logger.error("MongoCluster.reconnect is failed error: \(error), localized description: \(error.localizedDescription).")
+            throw error
+        }
+    }
+    
+    /// Retrieves the MongoDB server version.
+    /// - Returns: Version string returned by MongoDB (e.g. `"7.0.4"`).
+    /// - Throws: `HealthCheckError` if build info is missing or request fails.
+    public func getVersion() async throws -> String {
+        guard let db = app.healthCheckMongoDatabase else {
+            throw HealthCheckError.databaseNotSetup
+        }
+        do {
+            let buildInfo = try await db.buildInfo()
+            guard !buildInfo.version.isEmpty else {
+                throw HealthCheckError.responseDecodingFailed
+            }
+            return buildInfo.version
+        } catch {
+            throw error
         }
     }
 }
