@@ -57,7 +57,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - start: The start time used to calculate response duration.
     /// - Returns: `HealthCheckItem`
     func responseTime() async -> HealthCheckItem {
-        let startTime = Date()
+        let startTime: Date = .now
         var healthCheckItem = HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
@@ -69,7 +69,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
             try await checkConnection()
             healthCheckItem.observedValue = Date().timeIntervalSince(startTime)
             healthCheckItem.observedUnit = "s"
-            healthCheckItem.time = app.dateTimeISOFormat.string(from: Date())
+            healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
