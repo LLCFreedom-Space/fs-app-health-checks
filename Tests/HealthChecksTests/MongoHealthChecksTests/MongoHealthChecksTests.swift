@@ -124,6 +124,9 @@ struct MongoHealthChecksTests {
             app.mongoRequest = MongoRequestMock()
             let checks = MongoHealthChecks(app: app)
             try await checks.checkConnection()
+            
+            app.mongoHealthChecks = MongoHealthChecksMock()
+            await #expect(throws: Never.self) { try await app.mongoHealthChecks?.checkConnection() }
         }
     }
 
@@ -151,9 +154,11 @@ struct MongoHealthChecksTests {
     func getActiveConnectionsNotSetup() async throws {
         try await withApp { app in
             let checks = MongoHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) {
-                try await checks.getActiveConnections()
-            }
+            await #expect(throws: HealthCheckError.serviceNotSetup) { try await checks.getActiveConnections() }
+            
+            app.mongoHealthChecks = MongoHealthChecksMock()
+            let mockResult = try await app.mongoHealthChecks?.getActiveConnections()
+            #expect(mockResult == MongoHealthChecksMock.activeConnections)
         }
     }
 
@@ -164,6 +169,10 @@ struct MongoHealthChecksTests {
             let checks = MongoHealthChecks(app: app)
             let version = try await checks.getVersion()
             #expect(!version.isEmpty)
+            
+            app.mongoHealthChecks = MongoHealthChecksMock()
+            let mockResult = try await app.mongoHealthChecks?.getVersion()
+            #expect(mockResult == MongoHealthChecksMock.version)
         }
     }
 

@@ -126,6 +126,11 @@ struct RedisHealthChecksTests {
             let (activeConnections, version) = try await checks.getDatabaseHealthMetrics()
             #expect(activeConnections > .zero)
             #expect(!version.isEmpty)
+            
+            app.redisHealthChecks = RedisHealthChecksMock()
+            let mockResult = try await app.redisHealthChecks?.getDatabaseHealthMetrics()
+            #expect(mockResult?.connectedClients == RedisHealthChecksMock.connectedClients)
+            #expect(mockResult?.version == RedisHealthChecksMock.version)
         }
     }
     
