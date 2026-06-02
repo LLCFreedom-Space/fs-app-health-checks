@@ -46,7 +46,7 @@ struct MongoRequestTests {
         let user = ProcessInfo.processInfo.environment["MONGO_USER"] ?? "vapor"
         let password = ProcessInfo.processInfo.environment["MONGO_PASSWORD"] ?? "vapor"
         let db = ProcessInfo.processInfo.environment["MONGO_DB"] ?? "vapor_test"
-        return "mongodb://\(user):\(password)@\(host):27017\(db)"
+        return "mongodb://\(user):\(password)@\(host):27017/\(db)"
     }
 
     @Test("Check connection", .enabled(if: ProcessInfo.processInfo.environment["MONGO_HOST"] != nil))

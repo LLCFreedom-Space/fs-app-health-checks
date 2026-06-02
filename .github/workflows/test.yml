@@ -39,15 +39,7 @@ jobs:
       - name: Build
         run: swift build -v
       - name: Run tests
-        run: swift test -v --enable-code-coverage
-      - name: Fetch Coverage
-        id: coverage-files
-        uses: sersoft-gmbh/swift-coverage-action@v4
-      - name: Publish Coverage to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ steps.coverage-files.outputs.files }}
+        run: swift test
   # =========================
   # Linux
   # =========================
@@ -79,6 +71,7 @@ jobs:
         env:
           MONGO_INITDB_ROOT_USERNAME: vapor
           MONGO_INITDB_ROOT_PASSWORD: vapor
+          MONGO_DB: vapor_test
         options: >-
           --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })' --quiet"
           --health-interval 10s

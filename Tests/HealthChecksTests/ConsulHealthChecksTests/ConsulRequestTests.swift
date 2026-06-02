@@ -31,12 +31,12 @@ import Testing
 struct ConsulRequestTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
-        do {
-            try await test(app)
-        } catch {
-            throw error
+        defer {
+            Task {
+                try? await app.asyncShutdown()
+            }
         }
-        try await app.asyncShutdown()
+        try await test(app)
     }
 
     @Test("Check connection with errors")

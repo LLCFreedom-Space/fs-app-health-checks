@@ -88,24 +88,3 @@ public struct HealthCheckItem: Content {
         self.version = version
     }
 }
-
-extension HealthCheckItem {
-    // MARK: - Example
-    /// Example instance of `HealthCheckItem` for testing or documentation purposes.
-    public static var example: HealthCheckItem {
-        let observedValue: Double = 1234
-        return HealthCheckItem(
-            componentId: "6fd416e0-8920-410f-9c7b-c479000f7227",
-            componentType: .component,
-            observedValue: observedValue,
-            observedUnit: "ms",
-            status: .pass,
-            affectedEndpoints: ["/users/{userId}"],
-            time: "2018-01-17T03:36:48Z",
-            output: "",
-            links: ["self": "http://api.example.com/dbnode/dfd6cf2b/health"],
-            node: 1,
-            version: "22.04.4"
-        )
-    }
-}
