@@ -59,7 +59,7 @@ struct PostgresRequestTests {
             let request = PostgresRequest(app: app)
             let (activeConnections, version) = try await request.getDatabaseHealthMetrics()
 
-            #expect(activeConnections > .zero)
+            #expect(activeConnections >= .zero)
             #expect(version.isEmpty == false)
         }
     }

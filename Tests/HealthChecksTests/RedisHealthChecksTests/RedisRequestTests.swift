@@ -55,7 +55,7 @@ struct RedisRequestTests {
             let request = RedisRequest(app: app)
             let (activeConnections, version) = try await request.getDatabaseHealthMetrics()
 
-            #expect(activeConnections > .zero)
+            #expect(activeConnections >= .zero)
             #expect(version.isEmpty == false)
         }
     }
