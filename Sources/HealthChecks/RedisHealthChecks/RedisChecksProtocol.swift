@@ -32,7 +32,10 @@ public protocol RedisChecksProtocol {
     /// Measures the Redis response time.
     /// - Returns: A `HealthCheckItem` containing the observed response time and status.
     func responseTime() async -> HealthCheckItem
-    /// Sends a ping to Redis and returns the response.
-    /// - Returns: A `String` representing the Redis ping response.
-    func ping() async -> String
+    /// Retrieves Redis connection statistics and server version.
+    /// - Returns: A tuple containing:
+    ///   - `activeConnections`: Number of currently active database connections (Int)
+    ///   - `version`: Redis server version string
+    /// - Throws: `HealthCheckError`
+    func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String)
 }
