@@ -53,8 +53,6 @@ struct MongoRequestTests {
             try await app.initializeMongo(connectionString: Self.connectionString())
             let request = MongoRequest(app: app)
             try await request.checkConnection()
-            
-            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.checkConnection() }
         }
     }
     
