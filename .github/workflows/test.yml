@@ -39,7 +39,15 @@ jobs:
         run: swift build -v
 
       - name: Run tests
-        run: swift test
+        run: swift test -v --enable-code-coverage
+      - name: Fetch Coverage
+        id: coverage-files
+        uses: sersoft-gmbh/swift-coverage-action@v4
+      - name: Publish Coverage to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ steps.coverage-files.outputs.files }}
 
 # =========================
 # Linux (Docker services)
@@ -131,8 +139,7 @@ jobs:
         run: swift build -v
 
       - name: Run tests
-#        run: swift test
-        run: swift test -v --enable-code-coverage
+        run: swift test
         env:
           POSTGRES_HOST: postgres
           POSTGRES_PORT: 5432
@@ -144,11 +151,3 @@ jobs:
           MONGO_HOST: mongo
           MONGO_PORT: 27017
           MONGO_DB: vapor_test
-      - name: Fetch Coverage
-        id: coverage-files
-        uses: sersoft-gmbh/swift-coverage-action@v4
-      - name: Publish Coverage to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ steps.coverage-files.outputs.files }}
