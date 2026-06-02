@@ -42,18 +42,20 @@ struct RedisHealthChecksTests {
     @Test("Connection")
     func connection() async throws {
         try await withApp { app in
-            app.redisId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+            let redisId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
+            app.redisId = redisId
             app.redisHealthChecks = RedisHealthChecksMock()
             let mockResult = await app.redisHealthChecks?.connection()
             #expect(mockResult == RedisHealthChecksMock.healthCheckItem)
+            #expect(app.redisId == redisId)
 
             app.redisRequest = RedisRequestMock()
             app.redisHealthChecks = RedisHealthChecks(app: app)
             let result = await app.redisHealthChecks?.connection()
             #expect(result?.componentType == .datastore)
-            #expect(result?.observedValue != 1.0)
+            #expect(result?.observedValue != nil)
+            #expect(result?.observedUnit == "number")
             #expect(result?.status == .pass)
-            #expect(result?.affectedEndpoints == nil)
             #expect(result?.output == nil)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
@@ -63,73 +65,67 @@ struct RedisHealthChecksTests {
     @Test("Response time")
     func responseTime() async throws {
         try await withApp { app in
-            let redisId = UUID().uuidString
-            app.redisId = redisId
             app.redisHealthChecks = RedisHealthChecksMock()
-            let mockResult = await app.redisHealthChecks?.responseTime()
-            #expect(mockResult == RedisHealthChecksMock.healthCheckItem)
-            #expect(app.redisId == redisId)
+            let resultMock = await app.redisHealthChecks?.responseTime()
+            #expect(resultMock == RedisHealthChecksMock.healthCheckItem)
 
             app.redisRequest = RedisRequestMock()
             app.redisHealthChecks = RedisHealthChecks(app: app)
             let result = await app.redisHealthChecks?.responseTime()
             #expect(result?.componentType == .datastore)
-            #expect(result?.observedValue != 1.0)
-            #expect(result?.observedUnit == "ms")
+            #expect(result?.observedValue != nil)
+            #expect(result?.observedUnit == "s")
             #expect(result?.status == .pass)
-            #expect(result?.affectedEndpoints == nil)
             #expect(result?.output == nil)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
     }
 
-    @Test("Health check")
-    func healthCheck() async throws {
+    @Test("Check")
+    func check() async throws {
         try await withApp { app in
+            app.redisId = UUID().uuidString
             app.redisHealthChecks = RedisHealthChecksMock()
-            let mockResult = await app.redisHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-            let mockRedisConnections = mockResult?["\(ComponentName.redis):\(MeasurementType.connections)"]
-            #expect(mockRedisConnections == RedisHealthChecksMock.healthCheckItem)
-            let mockRedisResponseTimes = mockResult?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
-            #expect(mockRedisResponseTimes == RedisHealthChecksMock.healthCheckItem)
+            let mock = await app.redisHealthChecks?.check(
+                for: [.responseTime, .connections, .utilization]
+            )
+            #expect(mock?["\(ComponentName.redis):\(MeasurementType.connections)"] == RedisHealthChecksMock.healthCheckItem)
+            #expect(mock?["\(ComponentName.redis):\(MeasurementType.responseTime)"] == RedisHealthChecksMock.healthCheckItem)
 
             app.redisRequest = RedisRequestMock()
             app.redisHealthChecks = RedisHealthChecks(app: app)
-            let result = await app.redisHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-            let redisConnections = result?["\(ComponentName.redis):\(MeasurementType.connections)"]
-            #expect(redisConnections?.componentType == .datastore)
-            #expect(redisConnections?.observedValue != 1.0)
-            #expect(redisConnections?.status == .pass)
-            #expect(redisConnections?.affectedEndpoints == nil)
-            #expect(redisConnections?.output == nil)
-            #expect(redisConnections?.links == nil)
-            #expect(redisConnections?.node == nil)
-            let redisResponseTimes = mockResult?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
-            #expect(redisResponseTimes == PostgresHealthChecksMock.healthCheckItem)
-            #expect(redisResponseTimes == PostgresHealthChecksMock.healthCheckItem)
-            #expect(redisResponseTimes?.componentType == .datastore)
-            #expect(redisResponseTimes?.observedValue == 1.0)
-            #expect(redisResponseTimes?.observedUnit == "s")
-            #expect(redisResponseTimes?.status == .pass)
-            #expect(redisResponseTimes?.affectedEndpoints == nil)
-            #expect(redisResponseTimes?.output == "Ok")
-            #expect(redisResponseTimes?.links == nil)
-            #expect(redisResponseTimes?.node == nil)
+            let result = await app.redisHealthChecks?.check(
+                for: [.responseTime, .connections, .utilization]
+            )
+            let connections = result?["\(ComponentName.redis):\(MeasurementType.connections)"]
+            #expect(connections?.componentType == .datastore)
+            #expect(connections?.observedUnit == "number")
+            #expect(connections?.status == .pass)
+            #expect(connections?.output == nil)
+            #expect(connections?.links == nil)
+            #expect(connections?.node == nil)
+
+            let responseTime = result?["\(ComponentName.redis):\(MeasurementType.responseTime)"]
+            #expect(responseTime?.componentType == .datastore)
+            #expect(responseTime?.observedUnit == "s")
+            #expect(responseTime?.status == .pass)
+            #expect(responseTime?.output == nil)
+            #expect(responseTime?.links == nil)
+            #expect(responseTime?.node == nil)
+
+            #expect(result?["\(ComponentName.redis):\(MeasurementType.utilization)"] == nil)
         }
     }
 
-    @Test("Ping")
-    func ping() async throws {
+    @Test("Get database health metrics")
+    func getDatabaseHealthMetrics() async throws {
         try await withApp { app in
-            app.redisHealthChecks = RedisHealthChecksMock()
-            let mockResult = await app.redisHealthChecks?.ping()
-            #expect(mockResult == "PONG")
-
             app.redisRequest = RedisRequestMock()
-            app.redisHealthChecks = RedisHealthChecks(app: app)
-            let result = await app.redisHealthChecks?.ping()
-            #expect(result == "PONG")
+            let checks = RedisHealthChecks(app: app)
+            let (activeConnections, version) = try await checks.getDatabaseHealthMetrics()
+            #expect(activeConnections > .zero)
+            #expect(!version.isEmpty)
         }
     }
 }

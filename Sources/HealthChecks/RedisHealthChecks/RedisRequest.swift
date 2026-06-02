@@ -35,9 +35,35 @@ public struct RedisRequest: RedisRequestSendable {
         self.app = app
     }
 
-    /// Sends a ping request to the Redis server and returns the response.
-    /// - Returns: A `String` response from Redis, typically `"PONG"` if successful.
-    public func getPong() async throws -> String {
-        try await app.redis.ping().get()
+    /// Retrieves Redis server version and the number of currently connected clients.
+    /// - Returns: A tuple containing:
+    ///   - `connectedClients`: The number of currently connected clients.
+    ///   - `version`: The Redis server version.
+    /// - Throws:
+    ///   - `HealthCheckError.responseDecodingFailed` if the Redis response cannot be decoded
+    ///     or the required fields are missing.
+    ///   - Any error thrown while executing the Redis command.
+    public func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) {
+        try? await app.asyncBoot()
+
+        let command = ByteBufferAllocator().buffer(string: "INFO")
+        let response = try await app.redis.send(
+            command: "INFO",
+            with: [RESPValue.bulkString(command)]
+        )
+
+        guard let string = response.string else {
+            throw HealthCheckError.responseDecodingFailed
+        }
+        let dict = string.parseRedisInfo()
+
+        guard
+            let version = dict["redis_version"],
+            let clientsString = dict["connected_clients"],
+            let connectedClients = Int(clientsString)
+        else {
+            throw HealthCheckError.responseDecodingFailed
+        }
+        return (connectedClients, version)
     }
 }
