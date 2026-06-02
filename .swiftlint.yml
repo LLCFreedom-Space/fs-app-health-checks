@@ -226,6 +226,7 @@ identifier_name:
     - ok
     - or
     - ID
+    - db
 # naming rules can set warnings/errors for min_length and max_length
 # additionally they can set excluded names
 type_name:

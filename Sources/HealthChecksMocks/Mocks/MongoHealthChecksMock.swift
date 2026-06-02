@@ -39,15 +39,15 @@ public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
         links: nil,
         node: nil
     )
-
+    
     public func connection() async -> HealthCheckItem {
         MongoHealthChecksMock.healthCheckItem
     }
-
+    
     public func responseTime() async -> HealthCheckItem {
         MongoHealthChecksMock.healthCheckItem
     }
-
+    
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             "\(ComponentName.mongo):\(MeasurementType.responseTime)": MongoHealthChecksMock.healthCheckItem,

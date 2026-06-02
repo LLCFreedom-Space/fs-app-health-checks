@@ -44,15 +44,15 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
         links: nil,
         node: nil
     )
-
+    
     public func connection() async -> HealthCheckItem {
         PostgresHealthChecksMock.healthCheckItem
     }
-
+    
     public func responseTime() async -> HealthCheckItem {
         PostgresHealthChecksMock.healthCheckItem
     }
-
+    
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             "\(ComponentName.postgresql):\(MeasurementType.responseTime)": PostgresHealthChecksMock.healthCheckItem,

@@ -38,7 +38,7 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
         links: nil,
         node: nil
     )
-
+    
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem

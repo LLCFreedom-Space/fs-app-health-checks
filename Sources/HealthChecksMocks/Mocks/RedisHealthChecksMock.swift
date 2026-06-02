@@ -45,19 +45,19 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
         links: nil,
         node: nil
     )
-
+    
     public func connection() async -> HealthCheckItem {
         RedisHealthChecksMock.healthCheckItem
     }
-
+    
     public func responseTime() async -> HealthCheckItem {
         RedisHealthChecksMock.healthCheckItem
     }
-
+    
     public func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) {
         return (2, "7.0.1")
     }
-
+    
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             "\(ComponentName.redis):\(MeasurementType.responseTime)": RedisHealthChecksMock.healthCheckItem,
