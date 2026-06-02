@@ -60,7 +60,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         }
     }
 
-    /// Measures the PostgreSQL response time.
+    /// Measures the Redis response time.
     /// - Returns: A `HealthCheckItem` containing the response time in milliseconds.
     public func responseTime() async -> HealthCheckItem {
         let startTime: Date = .now
@@ -104,10 +104,10 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
         types.contains(.connections) ? connection() : nil
         var results: [String: HealthCheckItem] = [:]
         if let item = await responseTimeResult {
-            results["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] = item
+            results["\(ComponentName.redis):\(MeasurementType.responseTime)"] = item
         }
         if let item = await connectionsResult {
-            results["\(ComponentName.postgresql):\(MeasurementType.connections)"] = item
+            results["\(ComponentName.redis):\(MeasurementType.connections)"] = item
         }
         return results
     }
