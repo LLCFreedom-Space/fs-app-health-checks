@@ -35,7 +35,6 @@ public enum HealthCheckError: Error {
     case databaseNotSetup
     /// Failed to decode the response payload into the expected model.
     case responseDecodingFailed
-    
 }
 
 extension HealthCheckError: LocalizedError {

@@ -32,8 +32,6 @@ public protocol RedisRequestSendable: Sendable {
     ///   - `connectedClients`: The number of currently connected clients.
     ///   - `version`: The Redis server version.
     /// - Throws:
-    ///   - `HealthCheckError.responseDecodingFailed` if the Redis response cannot be decoded
-    ///     or the required fields are missing.
     ///   - Any error thrown while executing the Redis command.
     func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) 
 }
