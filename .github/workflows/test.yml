@@ -131,7 +131,8 @@ jobs:
         run: swift build -v
 
       - name: Run tests
-        run: swift test -v --enable-code-coverage
+        run: swift test
+#        run: swift test -v --enable-code-coverage
         env:
           POSTGRES_HOST: postgres
           POSTGRES_PORT: 5432
