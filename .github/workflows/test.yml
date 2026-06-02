@@ -30,12 +30,10 @@ jobs:
       - name: Cache SwiftPM
         uses: actions/cache@v4
         with:
-          path: |
-            .build
-            ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          path: .build
+          key: ${{ runner.os }}-swift-spm-${{ hashFiles('Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-spm-
+            ${{ runner.os }}-swift-spm-
 
       - name: Build
         run: swift build -v
@@ -124,7 +122,7 @@ jobs:
           path: .build
           key: ${{ runner.os }}-swift-spm-${{ hashFiles('Package.resolved') }}
           restore-keys: |
-            linux-swift-spm-
+            ${{ runner.os }}-swift-spm-
 
       # =========================
       # Build & Test
@@ -134,6 +132,17 @@ jobs:
 
       - name: Run tests
         run: swift test -v --enable-code-coverage
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: vapor_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+          MONGO_HOST: mongo
+          MONGO_PORT: 27017
+          MONGO_DB: vapor_test
       - name: Fetch Coverage
         id: coverage-files
         uses: sersoft-gmbh/swift-coverage-action@v4
@@ -142,16 +151,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ steps.coverage-files.outputs.files }}
-        env:
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
-          POSTGRES_DB: vapor_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-
-          REDIS_HOST: redis
-          REDIS_PORT: 6379
-
-          MONGO_HOST: mongo
-          MONGO_PORT: 27017
-          MONGO_DB: vapor_test
