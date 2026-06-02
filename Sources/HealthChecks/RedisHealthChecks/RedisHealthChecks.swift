@@ -23,7 +23,6 @@
 //
 
 import Vapor
-import Redis
 
 /// Service that provides redis health check functionality
 public struct RedisHealthChecks: RedisHealthChecksProtocol {

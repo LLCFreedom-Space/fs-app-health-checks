@@ -63,9 +63,6 @@ public struct MongoRequest: MongoRequestSendable {
             throw HealthCheckError.databaseNotSetup
         }
         let buildInfo = try await db.buildInfo()
-        guard !buildInfo.version.isEmpty else {
-            throw HealthCheckError.responseDecodingFailed
-        }
         return buildInfo.version
     }
 }

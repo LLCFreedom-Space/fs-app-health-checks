@@ -23,8 +23,6 @@
 //
 
 import Vapor
-import Fluent
-import FluentPostgresDriver
 
 /// Concrete implementation of `PostgresHealthChecksProtocol` for monitoring PostgreSQL health.
 public struct PostgresHealthChecks: PostgresHealthChecksProtocol {

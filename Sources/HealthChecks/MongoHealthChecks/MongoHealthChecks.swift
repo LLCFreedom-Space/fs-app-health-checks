@@ -23,7 +23,6 @@
 //
 
 import Vapor
-import MongoClient
 
 /// Concrete implementation of `MongoHealthChecksProtocol` for monitoring MongoDB health.
 public struct MongoHealthChecks: MongoHealthChecksProtocol {

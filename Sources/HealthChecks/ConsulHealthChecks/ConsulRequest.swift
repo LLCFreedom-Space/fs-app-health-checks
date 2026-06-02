@@ -23,7 +23,6 @@
 //
 
 import Vapor
-import MongoClient
 
 /// Concrete implementation of `ConsulRequestSendable` for interacting with MongoDB.
 public struct ConsulRequest: ConsulRequestSendable {

@@ -45,4 +45,6 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
         ]
         return result
     }
+    
+    public func checkConnection() async throws { }
 }

@@ -79,4 +79,26 @@ struct ConsulHealthChecksCheckTests {
             #expect(connections.output == nil)
         }
     }
+    
+    @Test("Check connection")
+    func checkConnection() async throws {
+        try await withApp { app in
+            app.consulRequest = MockConsulRequest()
+            let checks = ConsulHealthChecks(app: app)
+            try await checks.checkConnection()
+            
+            app.consulHealthChecks = ConsulHealthChecksMock()
+            await #expect(throws: Never.self) { try await app.consulHealthChecks?.checkConnection() }
+        }
+    }
+
+    @Test("Check connection - service not setup")
+    func checkConnectionNotSetup() async throws {
+        try await withApp { app in
+            let checks = ConsulHealthChecks(app: app)
+            await #expect(throws: HealthCheckError.serviceNotSetup) {
+                try await checks.checkConnection()
+            }
+        }
+    }
 }
