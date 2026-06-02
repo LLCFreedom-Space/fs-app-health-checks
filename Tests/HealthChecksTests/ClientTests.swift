@@ -16,26 +16,29 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  MockClient.swift
-//  
+//  ClientTests.swift
+//  fs-app-health-checks
 //
-//  Created by Mykhailo Bondarenko on 23.02.2024.
+//  Created by Mykola Buhaiov on 02.06.2026.
 //
 
-import Vapor
+@testable import HealthChecksMocks
+@testable import HealthChecks
+import VaporTesting
+import Testing
 
-public struct MockClient: Client {
-    public var eventLoop: EventLoop
-    public var clientResponse: ClientResponse
-
-    public func send(_ request: ClientRequest) -> EventLoopFuture<ClientResponse> {
-        self.eventLoop.makeSucceededFuture(self.clientResponse)
-    }
-    
-    public func delegating(to eventLoop: EventLoop) -> Client {
-        MockClient(
-            eventLoop: eventLoop,
-            clientResponse: clientResponse
+@Suite("Client tests")
+struct ClientTests {
+    @Test("Delegating returns same instance")
+    func delegatingReturnsSameInstance() {
+        let firstLoop = EmbeddedEventLoop()
+        let secondLoop = EmbeddedEventLoop()
+        
+        let client = MockClient(
+            eventLoop: firstLoop,
+            clientResponse: ClientResponse(status: .ok)
         )
+        let delegated = client.delegating(to: secondLoop) as? MockClient
+        #expect(delegated?.eventLoop === secondLoop)
     }
 }
