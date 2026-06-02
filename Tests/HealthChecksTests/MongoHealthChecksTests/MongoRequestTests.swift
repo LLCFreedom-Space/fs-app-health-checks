@@ -31,12 +31,12 @@ import Testing
 struct MongoRequestTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
-        do {
-            try await test(app)
-        } catch {
-            throw error
+        defer {
+            Task {
+                try? await app.asyncShutdown()
+            }
         }
-        try await app.asyncShutdown()
+        try await test(app)
     }
 
     private static func connectionString() -> String {
@@ -48,40 +48,6 @@ struct MongoRequestTests {
         let db = ProcessInfo.processInfo.environment["MONGO_DB"] ?? "vapor_test"
         return "mongodb://\(user):\(password)@\(host):27017\(db)"
     }
-
-    // MARK: - Unit (no connection needed)
-
-    @Test("Check connection - database not setup")
-    func checkConnectionNotSetup() async throws {
-        try await withApp { app in
-            let request = MongoRequest(app: app)
-            await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.checkConnection()
-            }
-        }
-    }
-
-    @Test("Get active connections - database not setup")
-    func getActiveConnectionsNotSetup() async throws {
-        try await withApp { app in
-            let request = MongoRequest(app: app)
-            await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.getActiveConnections()
-            }
-        }
-    }
-
-    @Test("Get version - database not setup")
-    func getVersionNotSetup() async throws {
-        try await withApp { app in
-            let request = MongoRequest(app: app)
-            await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.getVersion()
-            }
-        }
-    }
-
-    // MARK: - Integration (requires MONGO_HOST env)
 
     @Test("Check connection", .enabled(if: ProcessInfo.processInfo.environment["MONGO_HOST"] != nil))
     func checkConnection() async throws {

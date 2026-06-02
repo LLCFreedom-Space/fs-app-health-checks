@@ -38,15 +38,12 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Parameter options: An array of `MeasurementType` values specifying.
     /// - Returns: `[String: HealthCheckItem]`
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+        let types = Set(options)
+        async let responseTimeResult: HealthCheckItem? =
+        types.contains(.responseTime) ? responseTime() : nil
         var results: [String: HealthCheckItem] = [:]
-        let measurementTypes = Array(Set(options))
-        for type in measurementTypes {
-            switch type {
-            case .connections:
-                results["\(ComponentName.consul):\(MeasurementType.connections)"] = await responseTime()
-            default:
-                break
-            }
+        if let item = await responseTimeResult {
+            results["\(ComponentName.consul):\(MeasurementType.responseTime)"] = item
         }
         return results
     }
@@ -82,7 +79,6 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Returns: A `String` describing the connection status.
     public func checkConnection() async throws {
         guard let consulRequest = app.consulRequest else {
-            app.logger.error("Consul in app not set. Check your configuration, need to set `app.consulRequest`.")
             throw HealthCheckError.serviceNotSetup
         }
         return try await consulRequest.checkConnection()

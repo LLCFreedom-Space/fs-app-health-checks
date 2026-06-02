@@ -41,11 +41,7 @@ public struct MongoRequest: MongoRequestSendable {
         guard let db = app.healthCheckMongoDatabase else {
             throw HealthCheckError.databaseNotSetup
         }
-        do {
-            try await db.checkConnection()
-        } catch {
-            throw error
-        }
+        try await db.checkConnection()
     }
     
     /// Returns the number of available MongoDB connections.
@@ -55,12 +51,8 @@ public struct MongoRequest: MongoRequestSendable {
         guard let db = app.healthCheckMongoDatabase else {
             throw HealthCheckError.databaseNotSetup
         }
-        do {
-            let connectionStats = try await db.getConnectionStats()
-            return connectionStats.active
-        } catch {
-            throw error
-        }
+        let connectionStats = try await db.getConnectionStats()
+        return connectionStats.active
     }
     
     /// Retrieves the MongoDB server version.
@@ -70,14 +62,10 @@ public struct MongoRequest: MongoRequestSendable {
         guard let db = app.healthCheckMongoDatabase else {
             throw HealthCheckError.databaseNotSetup
         }
-        do {
-            let buildInfo = try await db.buildInfo()
-            guard !buildInfo.version.isEmpty else {
-                throw HealthCheckError.responseDecodingFailed
-            }
-            return buildInfo.version
-        } catch {
-            throw error
+        let buildInfo = try await db.buildInfo()
+        guard !buildInfo.version.isEmpty else {
+            throw HealthCheckError.responseDecodingFailed
         }
+        return buildInfo.version
     }
 }

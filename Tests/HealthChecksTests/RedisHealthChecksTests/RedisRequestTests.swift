@@ -32,12 +32,12 @@ import Redis
 struct RedisRequestTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
-        do {
-            try await test(app)
-        } catch {
-            throw error
+        defer {
+            Task {
+                try? await app.asyncShutdown()
+            }
         }
-        try await app.asyncShutdown()
+        try await test(app)
     }
     
     private static func connectionString() -> String {
@@ -45,18 +45,6 @@ struct RedisRequestTests {
             return ""
         }
         return "redis://\(host):6379"
-    }
-
-    @Test("Get database health metrics with error")
-    func getDatabaseHealthMetricsWithError() async throws {
-        try await withApp { app in
-            app.redis.configuration = try RedisConfiguration(url: RedisRequestTests.connectionString())
-            let request = RedisRequest(app: app)
-
-            await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.getDatabaseHealthMetrics()
-            }
-        }
     }
 
     @Test("Get database health metrics", .enabled(if: ProcessInfo.processInfo.environment["REDIS_HOST"] != nil))

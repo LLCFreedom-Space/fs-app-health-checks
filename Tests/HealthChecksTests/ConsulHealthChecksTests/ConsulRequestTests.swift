@@ -43,7 +43,7 @@ struct ConsulRequestTests {
     func checkConnectionWithErros() async throws {
         try await withApp { app in
             app.consulRequest = ConsulRequest(app: app)
-            let error = await #expect(throws: HealthCheckError.self) { try await app.consulRequest?.checkConnection() }
+            var error = await #expect(throws: HealthCheckError.self) { try await app.consulRequest?.checkConnection() }
             #expect(error == HealthCheckError.urlNotConfigured)
             
             app.consulConfig = ConsulConfig(url: Constants.consulUrl)
@@ -51,8 +51,8 @@ struct ConsulRequestTests {
             app.clients.use { app in
                 MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
             }
-            let error2 = await #expect(throws: HealthCheckError.self) { try await app.consulRequest?.checkConnection() }
-            #expect(error2 == HealthCheckError.unexpectedStatusCode)
+            error = await #expect(throws: HealthCheckError.self) { try await app.consulRequest?.checkConnection() }
+            #expect(error == HealthCheckError.unexpectedStatusCode)
         }
     }
 }

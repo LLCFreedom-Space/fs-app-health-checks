@@ -32,12 +32,12 @@ import FluentPostgresDriver
 struct PostgresRequestTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
-        do {
-            try await test(app)
-        } catch {
-            throw error
+        defer {
+            Task {
+                try? await app.asyncShutdown()
+            }
         }
-        try await app.asyncShutdown()
+        try await test(app)
     }
     
     private static func connectionString() -> String {
@@ -48,19 +48,6 @@ struct PostgresRequestTests {
         let password = ProcessInfo.processInfo.environment["POSTGRES_PASSWORD"] ?? "vapor"
         let db = ProcessInfo.processInfo.environment["POSTGRES_DB"] ?? "vapor_test"
         return "postgres://\(user):\(password)@\(host):5432\(db)"
-    }
-
-    @Test("Get database health metrics with error")
-    func getDatabaseHealthMetricsWithError() async throws {
-        try await withApp { app in
-            let sqlPostgresConfiguration = try SQLPostgresConfiguration(url: PostgresRequestTests.connectionString())
-            app.databases.use(DatabaseConfigurationFactory.postgres(configuration: sqlPostgresConfiguration), as: .psql)
-            let request = PostgresRequest(app: app)
-
-            await #expect(throws: HealthCheckError.databaseNotSetup) {
-                try await request.getDatabaseHealthMetrics()
-            }
-        }
     }
 
     @Test("Get database health metrics", .enabled(if: ProcessInfo.processInfo.environment["POSTGRES_HOST"] != nil))

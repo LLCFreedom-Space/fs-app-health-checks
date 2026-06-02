@@ -37,35 +37,12 @@ public struct ConsulRequest: ConsulRequestSendable {
     
     public func checkConnection() async throws {
         guard let url = app.consulConfig?.url, !url.isEmpty else {
-            app.logger.error(
-                "Consul request failed",
-                metadata: ["reason": "URL is not configured."]
-            )
             throw HealthCheckError.urlNotConfigured
         }
         let uri = URI(string: url + Constants.consulStatusPath)
-        do {
-            let response = try await app.client.get(uri)
-            guard response.status == .ok else {
-                app.logger.warning(
-                    "Consul request failed not with 200.",
-                    metadata: [
-                        "uri": "\(uri)",
-                        "status": "\(response.status)"
-                    ]
-                )
-                throw HealthCheckError.unexpectedStatusCode
-            }
-        } catch {
-            app.logger.error(
-                "Consul request failed",
-                error: error,
-                metadata: [
-                    "uri": "\(uri)",
-                    "method": "GET"
-                ]
-            )
-            throw error
+        let response = try await app.client.get(uri)
+        guard response.status == .ok else {
+            throw HealthCheckError.unexpectedStatusCode
         }
     }
 }
