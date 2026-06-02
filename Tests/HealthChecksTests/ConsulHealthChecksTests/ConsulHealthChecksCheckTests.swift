@@ -48,40 +48,35 @@ struct ConsulHealthChecksCheckTests {
                 url: Constants.consulUrl
             )
             app.consulConfig = consulConfig
-            let result = await app.consulHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
+            let result = await app.consulHealthChecks?.check(
+                for: [MeasurementType.responseTime, MeasurementType.connections]
+            )
             let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
             #expect(connections == ConsulHealthChecksMock.healthCheckItem)
             #expect(app.consulConfig?.id == consulConfig.id)
             #expect(app.consulConfig?.url == consulConfig.url)
+            
+            #expect(result?["\(ComponentName.consul):\(MeasurementType.uptime)"] == nil)
         }
     }
 
-    @Test("Response time")
-    func responseTime() async throws {
+    @Test("Connections")
+    func connections() async throws {
         try await withApp { app in
             app.consulRequest = MockConsulRequest()
             let healthChecks = ConsulHealthChecks(app: app)
-            let check = await healthChecks.check(for: [.connections])
-            #expect(check.count == 1)
-            guard let connectionsCheck = check["\(ComponentName.consul):\(MeasurementType.connections)"] else {
+            let result = await healthChecks.check(for: [.connections, .uptime])
+            #expect(result.count == 1)
+            guard let connections = result["\(ComponentName.consul):\(MeasurementType.connections)"] else {
                 Issue.record("No have key for connections")
                 return
             }
-            #expect(connectionsCheck.componentType == .component)
-            #expect(connectionsCheck.status == .pass)
-            let observedValue = try #require(connectionsCheck.observedValue)
+            #expect(connections.componentType == .component)
+            #expect(connections.status == .pass)
+            let observedValue = try #require(connections.observedValue)
             #expect(observedValue < 1.0)
-            #expect(connectionsCheck.observedUnit == "s")
-            #expect(connectionsCheck.output == nil)
-        }
-    }
-
-    @Test("Check handles unsupported types")
-    func checkHandlesUnsupportedTypes() async throws {
-        try await withApp { app in
-            let healthChecks = ConsulHealthChecks(app: app)
-            let checks = await healthChecks.check(for: [.uptime])
-            #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported
+            #expect(connections.observedUnit == "s")
+            #expect(connections.output == nil)
         }
     }
 }

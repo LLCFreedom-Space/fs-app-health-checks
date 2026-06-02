@@ -40,10 +40,10 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let types = Set(options)
         async let responseTimeResult: HealthCheckItem? =
-        types.contains(.responseTime) ? responseTime() : nil
+        types.contains(.connections) ? connection() : nil
         var results: [String: HealthCheckItem] = [:]
         if let item = await responseTimeResult {
-            results["\(ComponentName.consul):\(MeasurementType.responseTime)"] = item
+            results["\(ComponentName.consul):\(MeasurementType.connections)"] = item
         }
         return results
     }
@@ -53,7 +53,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - response: The `ClientResponse` from the Consul status request.
     ///   - start: The start time used to calculate response duration.
     /// - Returns: `HealthCheckItem`
-    func responseTime() async -> HealthCheckItem {
+    func connection() async -> HealthCheckItem {
         let startTime: Date = .now
         var healthCheckItem = HealthCheckItem(
             componentId: app.consulConfig?.id,
