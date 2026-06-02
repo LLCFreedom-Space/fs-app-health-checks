@@ -63,6 +63,7 @@ public struct RedisRequest: RedisRequestSendable {
             let clientsString = dict["connected_clients"],
             let connectedClients = Int(clientsString)
         else {
+            app.logger.error("-------------\(dict)")
             throw HealthCheckError.responseDecodingFailed
         }
         return (connectedClients, version)
