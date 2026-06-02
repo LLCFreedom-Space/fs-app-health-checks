@@ -53,9 +53,9 @@ public struct RedisRequest: RedisRequestSendable {
         )
 
         guard let string = response.string else {
-            app.logger.error("-------------\(response)")
             throw HealthCheckError.responseDecodingFailed
         }
+        app.logger.error("-------------\(string)")
         let dict = string.parseRedisInfo()
 
         guard
