@@ -53,7 +53,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - response: The `ClientResponse` from the Consul status request.
     ///   - start: The start time used to calculate response duration.
     /// - Returns: `HealthCheckItem`
-    func connection() async -> HealthCheckItem {
+    public func connection() async -> HealthCheckItem {
         let startTime: Date = .now
         var healthCheckItem = HealthCheckItem(
             componentId: app.consulConfig?.id,

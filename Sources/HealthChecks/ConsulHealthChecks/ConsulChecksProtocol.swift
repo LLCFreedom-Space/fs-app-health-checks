@@ -26,6 +26,9 @@ import Vapor
 
 /// Protocol defining a sendable Consul request handler.
 public protocol ConsulChecksProtocol: Sendable {
+    /// Retrieves the Consul connection status.
+    /// - Returns: A `HealthCheckItem` representing the connection state.
+    func connection() async -> HealthCheckItem
     /// Checks whether Consul is reachable and responding.
     /// - Throws: `HealthCheckError`
     func checkConnection() async throws

@@ -101,4 +101,30 @@ struct ConsulHealthChecksCheckTests {
             }
         }
     }
+    
+    @Test("Connection")
+    func connection() async throws {
+        try await withApp { app in
+            let consulConfig = ConsulConfig(
+                id: UUID().uuidString,
+                url: Constants.consulUrl
+            )
+            app.consulConfig = consulConfig
+            app.consulHealthChecks = ConsulHealthChecksMock()
+            let mockResult = await app.consulHealthChecks?.connection()
+            #expect(mockResult == ConsulHealthChecksMock.healthCheckItem)
+            #expect(app.consulConfig?.id == consulConfig.id)
+
+            app.consulRequest = MockConsulRequest()
+            app.consulHealthChecks = ConsulHealthChecks(app: app)
+            let result = await app.consulHealthChecks?.connection()
+            #expect(result?.componentType == .component)
+            #expect(result?.observedValue != nil)
+            #expect(result?.observedUnit == "s")
+            #expect(result?.status == .pass)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
+    }
 }
