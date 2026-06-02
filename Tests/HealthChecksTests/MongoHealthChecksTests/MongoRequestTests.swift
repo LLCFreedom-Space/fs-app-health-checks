@@ -53,6 +53,16 @@ struct MongoRequestTests {
             try await app.initializeMongo(connectionString: Self.connectionString())
             let request = MongoRequest(app: app)
             try await request.checkConnection()
+            
+            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.checkConnection() }
+        }
+    }
+    
+    @Test("Check connection with error", .enabled(if: ProcessInfo.processInfo.environment["MONGO_HOST"] != nil))
+    func checkConnectionWithError() async throws {
+        try await withApp { app in
+            let request = MongoRequest(app: app)
+            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.checkConnection() }
         }
     }
 
@@ -65,6 +75,14 @@ struct MongoRequestTests {
             #expect(count > .zero)
         }
     }
+    
+    @Test("Get active connections with error", .enabled(if: ProcessInfo.processInfo.environment["MONGO_HOST"] != nil))
+    func getActiveConnectionsWithError() async throws {
+        try await withApp { app in
+            let request = MongoRequest(app: app)
+            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.getActiveConnections() }
+        }
+    }
 
     @Test("Get version", .enabled(if: ProcessInfo.processInfo.environment["MONGO_HOST"] != nil))
     func getVersion() async throws {
@@ -73,6 +91,14 @@ struct MongoRequestTests {
             let request = MongoRequest(app: app)
             let version = try await request.getVersion()
             #expect(!version.isEmpty)
+        }
+    }
+    
+    @Test("Get version with error", .enabled(if: ProcessInfo.processInfo.environment["MONGO_HOST"] != nil))
+    func getVersionWithError() async throws {
+        try await withApp { app in
+            let request = MongoRequest(app: app)
+            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.getVersion() }
         }
     }
 }

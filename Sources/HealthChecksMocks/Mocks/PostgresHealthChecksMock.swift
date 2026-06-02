@@ -30,7 +30,7 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
             """
             PostgreSQL 14.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20231014) 13.2.1 20231014, 64-bit
             """
-    
+    public static let activeConnections = 2
     public static let postgresId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     public static let healthCheckItem = HealthCheckItem(
         componentId: postgresId,
@@ -62,6 +62,6 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
     }
     
     public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
-        return (2, PostgresHealthChecksMock.version)
+        return (PostgresHealthChecksMock.activeConnections, PostgresHealthChecksMock.version)
     }
 }

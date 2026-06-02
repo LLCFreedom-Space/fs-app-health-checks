@@ -125,6 +125,11 @@ struct PostgresHealthChecksTests {
             let (activeConnections, version) = try await checks.getDatabaseHealthMetrics()
             #expect(activeConnections > .zero)
             #expect(!version.isEmpty)
+            
+            app.postgresHealthChecks = PostgresHealthChecksMock()
+            let mockResult = try await app.postgresHealthChecks?.getDatabaseHealthMetrics()
+            #expect(mockResult?.activeConnections == PostgresHealthChecksMock.activeConnections)
+            #expect(mockResult?.version == PostgresHealthChecksMock.version)
         }
     }
     
