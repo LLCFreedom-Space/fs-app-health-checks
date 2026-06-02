@@ -70,7 +70,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
-            healthCheckItem.output = "\(error)"
+            healthCheckItem.output = error.localizedDescription
             return healthCheckItem
         }
     }

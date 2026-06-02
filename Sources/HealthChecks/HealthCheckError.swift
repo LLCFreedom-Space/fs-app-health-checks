@@ -36,8 +36,11 @@ public enum HealthCheckError: Error {
     /// Failed to decode the response payload into the expected model.
     case responseDecodingFailed
     
-    /// A human-readable summary of the reason.
-    public var description: String {
+}
+
+extension HealthCheckError: LocalizedError {
+    /// Human-readable description used by `localizedDescription`
+    public var errorDescription: String? {
         switch self {
         case .urlNotConfigured:
             return "The service URL is not set in the application configuration."

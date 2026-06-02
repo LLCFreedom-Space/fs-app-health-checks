@@ -54,7 +54,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
-            healthCheckItem.output = "\(error)"
+            healthCheckItem.output = error.localizedDescription
             return healthCheckItem
         }
     }
@@ -81,7 +81,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
-            healthCheckItem.output = "\(error)"
+            healthCheckItem.output = error.localizedDescription
             return healthCheckItem
         }
     }

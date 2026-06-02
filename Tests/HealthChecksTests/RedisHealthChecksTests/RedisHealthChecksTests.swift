@@ -61,6 +61,21 @@ struct RedisHealthChecksTests {
             #expect(result?.node == nil)
         }
     }
+    
+    @Test("Connection with error")
+    func connectionWithError() async throws {
+        try await withApp { app in
+            app.redisHealthChecks = RedisHealthChecks(app: app)
+            let result = await app.redisHealthChecks?.connection()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue == nil)
+            #expect(result?.observedUnit == nil)
+            #expect(result?.status == .fail)
+            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
+    }
 
     @Test("Response time")
     func responseTime() async throws {
@@ -77,6 +92,21 @@ struct RedisHealthChecksTests {
             #expect(result?.observedUnit == "s")
             #expect(result?.status == .pass)
             #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
+    }
+    
+    @Test("Response time with error")
+    func responseTimeWithError() async throws {
+        try await withApp { app in
+            app.redisHealthChecks = RedisHealthChecks(app: app)
+            let result = await app.redisHealthChecks?.responseTime()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue == nil)
+            #expect(result?.observedUnit == nil)
+            #expect(result?.status == .fail)
+            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }

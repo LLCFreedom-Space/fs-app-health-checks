@@ -54,7 +54,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
-            healthCheckItem.output = "\(error)"
+            healthCheckItem.output = error.localizedDescription
             return healthCheckItem
         }
     }
@@ -78,7 +78,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
-            healthCheckItem.output = "\(error)"
+            healthCheckItem.output = error.localizedDescription
             return healthCheckItem
         }
     }

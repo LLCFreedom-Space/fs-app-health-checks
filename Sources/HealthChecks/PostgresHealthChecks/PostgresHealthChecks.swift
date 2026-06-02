@@ -55,7 +55,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
-            healthCheckItem.output = "\(error)"
+            healthCheckItem.output = error.localizedDescription
             return healthCheckItem
         }
     }
@@ -79,7 +79,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
             return healthCheckItem
         } catch {
             healthCheckItem.status = .fail
-            healthCheckItem.output = "\(error)"
+            healthCheckItem.output = error.localizedDescription
             return healthCheckItem
         }
     }

@@ -127,4 +127,19 @@ struct ConsulHealthChecksCheckTests {
             #expect(result?.node == nil)
         }
     }
+    
+    @Test("Connection with error")
+    func connectionWithError() async throws {
+        try await withApp { app in
+            app.consulHealthChecks = ConsulHealthChecks(app: app)
+            let result = await app.consulHealthChecks?.connection()
+            #expect(result?.componentType == .component)
+            #expect(result?.observedValue == nil)
+            #expect(result?.observedUnit == nil)
+            #expect(result?.status == .fail)
+            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
+    }
 }
