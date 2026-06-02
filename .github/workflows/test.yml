@@ -33,7 +33,7 @@ jobs:
           path: |
             .build
             ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-swift-${{ matrix.swift-version }}-spm-${{ hashFiles('Package.resolved') }}
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
       - name: Build
