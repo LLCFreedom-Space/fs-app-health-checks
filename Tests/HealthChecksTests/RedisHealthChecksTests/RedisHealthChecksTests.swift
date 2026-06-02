@@ -128,4 +128,12 @@ struct RedisHealthChecksTests {
             #expect(!version.isEmpty)
         }
     }
+    
+    @Test("Get database health metrics with error")
+    func getDatabaseHealthMetricsWithError() async throws {
+        try await withApp { app in
+            let checks = RedisHealthChecks(app: app)
+            await #expect(throws: HealthCheckError.serviceNotSetup.self) { try await checks.getDatabaseHealthMetrics() }
+        }
+    }
 }
