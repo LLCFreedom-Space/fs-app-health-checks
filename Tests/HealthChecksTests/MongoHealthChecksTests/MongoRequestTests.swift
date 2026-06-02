@@ -45,7 +45,8 @@ struct MongoRequestTests {
         }
         let user = ProcessInfo.processInfo.environment["MONGO_USER"] ?? "vapor"
         let password = ProcessInfo.processInfo.environment["MONGO_PASSWORD"] ?? "vapor"
-        return "mongodb://\(user):\(password)@\(host):27017"
+        let db = ProcessInfo.processInfo.environment["MONGO_DB"] ?? "vapor_test"
+        return "mongodb://\(user):\(password)@\(host):27017\(db)"
     }
 
     // MARK: - Unit (no connection needed)
@@ -97,7 +98,7 @@ struct MongoRequestTests {
             try await app.initializeMongo(connectionString: Self.connectionString())
             let request = MongoRequest(app: app)
             let count = try await request.getActiveConnections()
-            #expect(count >= 0)
+            #expect(count > .zero)
         }
     }
 
