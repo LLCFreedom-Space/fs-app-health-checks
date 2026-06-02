@@ -45,11 +45,9 @@ public struct RedisRequest: RedisRequestSendable {
     ///   - Any error thrown while executing the Redis command.
     public func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) {
         try? await app.asyncBoot()
-
-        let command = ByteBufferAllocator().buffer(string: "INFO")
         let response = try await app.redis.send(
             command: "INFO",
-            with: [RESPValue.bulkString(command)]
+            with: []
         )
 
         guard let string = response.string else {
