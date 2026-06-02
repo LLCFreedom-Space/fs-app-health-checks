@@ -44,10 +44,8 @@ struct PostgresRequestTests {
         guard let host = ProcessInfo.processInfo.environment["POSTGRES_HOST"] else {
             return ""
         }
-        let user = ProcessInfo.processInfo.environment["POSTGRES_USER"] ?? "vapor"
-        let password = ProcessInfo.processInfo.environment["POSTGRES_PASSWORD"] ?? "vapor"
         let db = ProcessInfo.processInfo.environment["POSTGRES_DB"] ?? "vapor_test"
-        return "postgres://\(user):\(password)@\(host):5432/\(db)"
+        return "postgres://\(host):5432/\(db)"
     }
 
     @Test("Get database health metrics", .enabled(if: ProcessInfo.processInfo.environment["POSTGRES_HOST"] != nil))

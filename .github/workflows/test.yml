@@ -51,8 +51,6 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: vapor
-          POSTGRES_PASSWORD: vapor
           POSTGRES_DB: vapor_test
         options: >-
           --health-cmd pg_isready
@@ -69,8 +67,6 @@ jobs:
       mongo:
         image: mongo:8
         env:
-          MONGO_INITDB_ROOT_USERNAME: vapor
-          MONGO_INITDB_ROOT_PASSWORD: vapor
           MONGO_DB: vapor_test
         options: >-
           --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })' --quiet"
@@ -93,11 +89,7 @@ jobs:
         run: swift test
         env:
           POSTGRES_HOST: postgres
-          POSTGRES_USER: vapor
-          POSTGRES_PASSWORD: vapor
           POSTGRES_DB: vapor_test
           REDIS_HOST: redis
           MONGO_HOST: mongo
-          MONGO_USER: vapor
-          MONGO_PASSWORD: vapor
           MONGO_DB: vapor_test
