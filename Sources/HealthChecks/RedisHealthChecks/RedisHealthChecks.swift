@@ -87,7 +87,7 @@ public struct RedisHealthChecks: RedisHealthChecksProtocol {
     /// - Returns: A `String` representing the Redis ping response or an error message if not connected.
     @discardableResult public func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) {
         guard let redisRequest = app.redisRequest else {
-            throw HealthCheckError.serviceNotSetup
+            throw HealthCheckError.serviceNotSetup(name: ComponentName.redis.rawValue)
         }
         return try await redisRequest.getDatabaseHealthMetrics()
     }

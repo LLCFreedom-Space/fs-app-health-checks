@@ -93,7 +93,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     ///   - Any error thrown by the underlying MongoDB client.
     public func checkConnection() async throws {
         guard let mongoRequest = app.mongoRequest else {
-            throw HealthCheckError.serviceNotSetup
+            throw HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue)
         }
         return try await mongoRequest.checkConnection()
     }
@@ -105,7 +105,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     ///   - Any error thrown by the underlying MongoDB client.
     public func getActiveConnections() async throws -> Int {
         guard let mongoRequest = app.mongoRequest else {
-            throw HealthCheckError.serviceNotSetup
+            throw HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue)
         }
         return try await mongoRequest.getActiveConnections()
     }
@@ -117,7 +117,7 @@ public struct MongoHealthChecks: MongoHealthChecksProtocol {
     ///   - Any error thrown by the underlying MongoDB client.
     public func getVersion() async throws -> String {
         guard let mongoRequest = app.mongoRequest else {
-            throw HealthCheckError.serviceNotSetup
+            throw HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue)
         }
         return try await mongoRequest.getVersion()
     }

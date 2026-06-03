@@ -91,7 +91,7 @@ public struct PostgresHealthChecks: PostgresHealthChecksProtocol {
     /// - Throws: `HealthCheckError`
     @discardableResult public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
         guard let postgresRequest = app.postgresRequest else {
-            throw HealthCheckError.serviceNotSetup
+            throw HealthCheckError.serviceNotSetup(name: ComponentName.postgresql.rawValue)
         }
         return try await postgresRequest.getDatabaseHealthMetrics()
     }

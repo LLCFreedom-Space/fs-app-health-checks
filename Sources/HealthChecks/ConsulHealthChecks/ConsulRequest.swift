@@ -24,7 +24,7 @@
 
 import Vapor
 
-/// Concrete implementation of `ConsulRequestSendable` for interacting with MongoDB.
+/// Concrete implementation of `ConsulRequestSendable` for interacting with Consul.
 public struct ConsulRequest: ConsulRequestSendable {
     /// Instance of app as `Application`
     public let app: Application

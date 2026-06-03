@@ -40,15 +40,4 @@ public enum HealthChecks {
         }
         return components.first
     }
-
-    /// Generates a `HealthCheck` object representing the application's health status.
-    /// - Parameter app: The `Application` instance.
-    /// - Returns: `HealthCheck`
-    public static func getHealth(from app: Application) -> HealthCheck {
-        return HealthCheck(
-            version: getPublicVersion(from: app.releaseId),
-            releaseId: app.releaseId,
-            serviceId: app.serviceId
-        )
-    }
 }

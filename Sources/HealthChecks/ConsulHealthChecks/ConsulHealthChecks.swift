@@ -78,7 +78,7 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// Checks the connection for the Consul database.
     public func checkConnection() async throws {
         guard let consulRequest = app.consulRequest else {
-            throw HealthCheckError.serviceNotSetup
+            throw HealthCheckError.serviceNotSetup(name: ComponentName.consul.rawValue)
         }
         return try await consulRequest.checkConnection()
     }

@@ -43,7 +43,7 @@ public struct PostgresRequest: PostgresRequestSendable {
     /// - Throws: `HealthCheckError`
     public func getDatabaseHealthMetrics() async throws -> (activeConnections: Int, version: String) {
         guard let db = app.db(.psql) as? (any PostgresDatabase) else {
-            throw HealthCheckError.databaseNotSetup
+            throw HealthCheckError.databaseNotSetup(name: ComponentName.postgresql.rawValue)
         }
 
         let query = """

@@ -71,7 +71,7 @@ struct RedisHealthChecksTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.serviceNotSetup(name: ComponentName.redis.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -106,7 +106,7 @@ struct RedisHealthChecksTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.serviceNotSetup(name: ComponentName.redis.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -168,7 +168,9 @@ struct RedisHealthChecksTests {
     func getDatabaseHealthMetricsWithError() async throws {
         try await withApp { app in
             let checks = RedisHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup.self) { try await checks.getDatabaseHealthMetrics() }
+            await #expect(throws: HealthCheckError.serviceNotSetup(name: ComponentName.redis.rawValue).self) {
+                try await checks.getDatabaseHealthMetrics()
+            }
         }
     }
 }

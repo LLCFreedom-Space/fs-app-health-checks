@@ -53,18 +53,4 @@ struct HealthChecksTests {
             #expect(versionWithLettersAndDots == nil)
         }
     }
-
-    @Test("Get health")
-    func getHealth() async throws {
-        try await withApp { app in
-            let serviceId = UUID()
-            let releaseId = "1.0.0"
-            app.serviceId = serviceId
-            app.releaseId = releaseId
-            let response = HealthChecks.getHealth(from: app)
-            #expect(response.version == "1")
-            #expect(response.releaseId == releaseId)
-            #expect(response.serviceId == serviceId)
-        }
-    }
 }
