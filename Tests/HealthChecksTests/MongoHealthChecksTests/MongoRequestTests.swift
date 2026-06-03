@@ -60,7 +60,9 @@ struct MongoRequestTests {
     func checkConnectionWithError() async throws {
         try await withApp { app in
             let request = MongoRequest(app: app)
-            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.checkConnection() }
+            await #expect(throws: HealthCheckError.databaseNotSetup(name: ComponentName.mongo.rawValue).self) {
+                try await request.checkConnection()
+            }
         }
     }
 
@@ -78,7 +80,9 @@ struct MongoRequestTests {
     func getActiveConnectionsWithError() async throws {
         try await withApp { app in
             let request = MongoRequest(app: app)
-            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.getActiveConnections() }
+            await #expect(throws: HealthCheckError.databaseNotSetup(name: ComponentName.mongo.rawValue).self) {
+                try await request.getActiveConnections()
+            }
         }
     }
 
@@ -96,7 +100,9 @@ struct MongoRequestTests {
     func getVersionWithError() async throws {
         try await withApp { app in
             let request = MongoRequest(app: app)
-            await #expect(throws: HealthCheckError.databaseNotSetup.self) { try await request.getVersion() }
+            await #expect(throws: HealthCheckError.databaseNotSetup(name: ComponentName.mongo.rawValue).self) {
+                try await request.getVersion()
+            }
         }
     }
 }
