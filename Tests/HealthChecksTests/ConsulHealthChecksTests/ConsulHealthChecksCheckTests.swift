@@ -67,10 +67,7 @@ struct ConsulHealthChecksCheckTests {
             app.consulHealthChecks = ConsulHealthChecks(app: app)
             var result = await app.consulHealthChecks?.check(for: [MeasurementType.connections])
             #expect(result?.count == 1)
-            guard let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"] else {
-                Issue.record("No have key for connections")
-                return
-            }
+            var connections = try #require(result?["\(ComponentName.consul):\(MeasurementType.connections)"])
             #expect(connections.componentId == nil)
             #expect(connections.componentType == .component)
             #expect(connections.status == .fail)
@@ -84,10 +81,7 @@ struct ConsulHealthChecksCheckTests {
             }
             result = await app.consulHealthChecks?.check(for: [MeasurementType.connections])
             #expect(result?.count == 1)
-            guard let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"] else {
-                Issue.record("No have key for connections")
-                return
-            }
+            connections = try #require(result?["\(ComponentName.consul):\(MeasurementType.connections)"])
             #expect(connections.componentId == consulConfig.id)
             #expect(connections.componentType == .component)
             #expect(connections.status == .fail)
@@ -102,10 +96,7 @@ struct ConsulHealthChecksCheckTests {
             let healthChecks = ConsulHealthChecks(app: app)
             let result = await healthChecks.check(for: [.connections, .uptime])
             #expect(result.count == 1)
-            guard let connections = result["\(ComponentName.consul):\(MeasurementType.connections)"] else {
-                Issue.record("No have key for connections")
-                return
-            }
+            let connections = try #require(result["\(ComponentName.consul):\(MeasurementType.connections)"])
             #expect(connections.componentType == .component)
             #expect(connections.status == .pass)
             let observedValue = try #require(connections.observedValue)
