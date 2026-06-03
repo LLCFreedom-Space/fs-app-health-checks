@@ -59,6 +59,41 @@ struct ConsulHealthChecksCheckTests {
             #expect(result?["\(ComponentName.consul):\(MeasurementType.uptime)"] == nil)
         }
     }
+    
+    @Test("Health check with errors")
+    func healthCheckWithErrors() async throws {
+        try await withApp { app in
+            app.consulRequest = ConsulRequest(app: app)
+            app.consulHealthChecks = ConsulHealthChecks(app: app)
+            var result = await app.consulHealthChecks?.check(for: [MeasurementType.connections])
+            #expect(result?.count == 1)
+            guard let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"] else {
+                Issue.record("No have key for connections")
+                return
+            }
+            #expect(connections.componentId == nil)
+            #expect(connections.componentType == .component)
+            #expect(connections.status == .fail)
+            #expect(connections.output == HealthCheckError.urlNotConfigured.errorDescription)
+            
+            let consulConfig = ConsulConfig(id: UUID().uuidString, url: Constants.consulUrl)
+            app.consulConfig = consulConfig
+            let clientResponse = ClientResponse(status: .notFound)
+            app.clients.use { app in
+                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
+            }
+            result = await app.consulHealthChecks?.check(for: [MeasurementType.connections])
+            #expect(result?.count == 1)
+            guard let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"] else {
+                Issue.record("No have key for connections")
+                return
+            }
+            #expect(connections.componentId == consulConfig.id)
+            #expect(connections.componentType == .component)
+            #expect(connections.status == .fail)
+            #expect(connections.output == HealthCheckError.unexpectedStatusCode.errorDescription)
+        }
+    }
 
     @Test("Connections")
     func connections() async throws {

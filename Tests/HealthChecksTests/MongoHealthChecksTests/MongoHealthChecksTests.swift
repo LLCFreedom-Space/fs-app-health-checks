@@ -97,16 +97,26 @@ struct MongoHealthChecksTests {
         }
     }
     
-    @Test("Response time with error")
-    func responseTimeWithError() async throws {
+    @Test("Response time with errors")
+    func responseTimeWithErrors() async throws {
         try await withApp { app in
             app.mongoHealthChecks = MongoHealthChecks(app: app)
-            let result = await app.mongoHealthChecks?.responseTime()
+            var result = await app.mongoHealthChecks?.responseTime()
             #expect(result?.componentType == .datastore)
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
             #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+            
+            app.mongoRequest = MongoRequest(app: app)
+            result = await app.mongoHealthChecks?.responseTime()
+            #expect(result?.componentType == .datastore)
+            #expect(result?.observedValue == nil)
+            #expect(result?.observedUnit == nil)
+            #expect(result?.status == .fail)
+            #expect(result?.output == HealthCheckError.databaseNotSetup.errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
