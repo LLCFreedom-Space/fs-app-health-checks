@@ -21,7 +21,7 @@ let package = Package(
         // 🐘 Swift ORM (queries, models, relations, etc) built on PostgreSQL.
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.4.0"),
         // 🐈 MongoDB driver based on Swift NIO.
-        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.16.0"),
+        .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.16.3"),
         //  Vapor provider for RedisKit + RedisNIO
         .package(url: "https://github.com/vapor/redis.git", from: "4.14.0"),
         // 📄 Swift-DocC plugin for generating documentation.

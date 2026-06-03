@@ -122,7 +122,7 @@ struct ConsulHealthChecksCheckTests {
     func checkConnectionNotSetup() async throws {
         try await withApp { app in
             let checks = ConsulHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) {
+            await #expect(throws: HealthCheckError.serviceNotSetup(name: ComponentName.consul.rawValue)) {
                 try await checks.checkConnection()
             }
         }
@@ -163,7 +163,7 @@ struct ConsulHealthChecksCheckTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.serviceNotSetup(name: ComponentName.consul.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }

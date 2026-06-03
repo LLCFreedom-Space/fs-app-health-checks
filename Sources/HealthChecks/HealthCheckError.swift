@@ -24,15 +24,15 @@
 
 import Vapor
 
-public enum HealthCheckError: Error {
+public enum HealthCheckError: Error, Equatable {
     /// The service URL is absent or empty in the application configuration.
     case urlNotConfigured
     /// The service responded with an HTTP status code outside the expected range.
     case unexpectedStatusCode
     /// The service instance is not registered in the application container.
-    case serviceNotSetup
+    case serviceNotSetup(name: String)
     /// The database instance is not registered in the application container.
-    case databaseNotSetup
+    case databaseNotSetup(name: String)
     /// Failed to decode the response payload into the expected model.
     case responseDecodingFailed
 }
@@ -45,10 +45,10 @@ extension HealthCheckError: LocalizedError {
             return "The service URL is not set in the application configuration."
         case .unexpectedStatusCode:
             return "The service returned an unexpected HTTP status code, indicating it may be unavailable or unhealthy."
-        case .serviceNotSetup:
-            return "The service is not registered in the application container."
-        case .databaseNotSetup:
-            return "The database is not registered in the application container."
+        case .serviceNotSetup(let name):
+            return "The service `\(name)` is not registered in the application container."
+        case .databaseNotSetup(let name):
+            return "The database `\(name)` is not registered in the application container."
         case .responseDecodingFailed:
             return "Failed to decode the service response into the expected format."
         }

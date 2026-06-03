@@ -39,7 +39,7 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Throws: `HealthCheckError`
     public func checkConnection() async throws {
         guard let db = app.healthCheckMongoDatabase else {
-            throw HealthCheckError.databaseNotSetup
+            throw HealthCheckError.databaseNotSetup(name: ComponentName.mongo.rawValue)
         }
         try await db.checkConnection()
     }
@@ -49,7 +49,7 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Throws: `HealthCheckError` if the stats cannot be retrieved.
     public func getActiveConnections() async throws -> Int {
         guard let db = app.healthCheckMongoDatabase else {
-            throw HealthCheckError.databaseNotSetup
+            throw HealthCheckError.databaseNotSetup(name: ComponentName.mongo.rawValue)
         }
         let connectionStats = try await db.getConnectionStats()
         return connectionStats.active
@@ -60,7 +60,7 @@ public struct MongoRequest: MongoRequestSendable {
     /// - Throws: `HealthCheckError` if build info is missing or request fails.
     public func getVersion() async throws -> String {
         guard let db = app.healthCheckMongoDatabase else {
-            throw HealthCheckError.databaseNotSetup
+            throw HealthCheckError.databaseNotSetup(name: ComponentName.mongo.rawValue)
         }
         let buildInfo = try await db.buildInfo()
         return buildInfo.version

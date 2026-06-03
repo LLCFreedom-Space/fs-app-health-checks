@@ -71,7 +71,7 @@ struct MongoHealthChecksTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -106,7 +106,7 @@ struct MongoHealthChecksTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
             
@@ -116,7 +116,7 @@ struct MongoHealthChecksTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.databaseNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.databaseNotSetup(name: ComponentName.mongo.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -174,7 +174,7 @@ struct MongoHealthChecksTests {
     func checkConnectionNotSetup() async throws {
         try await withApp { app in
             let checks = MongoHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) {
+            await #expect(throws: HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue)) {
                 try await checks.checkConnection()
             }
         }
@@ -194,7 +194,9 @@ struct MongoHealthChecksTests {
     func getActiveConnectionsNotSetup() async throws {
         try await withApp { app in
             let checks = MongoHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) { try await checks.getActiveConnections() }
+            await #expect(throws: HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue)) {
+                try await checks.getActiveConnections()
+            }
             
             app.mongoHealthChecks = MongoHealthChecksMock()
             let mockResult = try await app.mongoHealthChecks?.getActiveConnections()
@@ -220,7 +222,7 @@ struct MongoHealthChecksTests {
     func getVersionNotSetup() async throws {
         try await withApp { app in
             let checks = MongoHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup) {
+            await #expect(throws: HealthCheckError.serviceNotSetup(name: ComponentName.mongo.rawValue)) {
                 try await checks.getVersion()
             }
         }

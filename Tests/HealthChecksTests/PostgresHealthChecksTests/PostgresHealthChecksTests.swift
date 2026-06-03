@@ -70,7 +70,7 @@ struct PostgresHealthChecksTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.serviceNotSetup(name: ComponentName.postgresql.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -105,7 +105,7 @@ struct PostgresHealthChecksTests {
             #expect(result?.observedValue == nil)
             #expect(result?.observedUnit == nil)
             #expect(result?.status == .fail)
-            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.output == HealthCheckError.serviceNotSetup(name: ComponentName.postgresql.rawValue).errorDescription)
             #expect(result?.links == nil)
             #expect(result?.node == nil)
         }
@@ -167,7 +167,9 @@ struct PostgresHealthChecksTests {
     func getDatabaseHealthMetricsWithError() async throws {
         try await withApp { app in
             let checks = PostgresHealthChecks(app: app)
-            await #expect(throws: HealthCheckError.serviceNotSetup.self) { try await checks.getDatabaseHealthMetrics() }
+            await #expect(throws: HealthCheckError.serviceNotSetup(name: ComponentName.postgresql.rawValue).self) {
+                try await checks.getDatabaseHealthMetrics()
+            }
         }
     }
 }
