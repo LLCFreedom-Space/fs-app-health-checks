@@ -16,13 +16,16 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulHealthChecksProtocol.swift
+//  ConsulRequestSendable.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 07.02.2024.
+//  Created by Mykola Buhaiov on 29.05.2026.
 //
 
 import Vapor
 
-/// A protocol defining health check capabilities for a Consul service.
-public protocol ConsulHealthChecksProtocol: ConsulChecksProtocol, ChecksProtocol, Sendable {}
+/// Protocol defining a sendable Consul request handler.
+public protocol ConsulRequestSendable: Sendable {
+    /// Retrieves the connection description for a given MongoDB.
+    func checkConnection() async throws
+}

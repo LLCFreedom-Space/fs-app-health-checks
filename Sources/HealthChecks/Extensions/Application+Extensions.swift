@@ -23,17 +23,17 @@
 //
 
 import Vapor
-import MongoClient
+import MongoKitten
 
 extension Application {
     /// Storage key for PostgreSQL request context.
-    private struct PsqlRequestKey: StorageKey {
-        typealias Value = PsqlRequestSendable
+    private struct PostgresRequestKey: StorageKey {
+        typealias Value = PostgresRequestSendable
     }
     /// PostgreSQL request context associated with the current request.
-    public var psqlRequest: PsqlRequestSendable? {
-        get { storage[PsqlRequestKey.self] }
-        set { storage[PsqlRequestKey.self] = newValue }
+    public var postgresRequest: PostgresRequestSendable? {
+        get { storage[PostgresRequestKey.self] }
+        set { storage[PostgresRequestKey.self] = newValue }
     }
 
     /// Storage key for Redis request context.
@@ -54,6 +54,16 @@ extension Application {
     public var mongoRequest: MongoRequestSendable? {
         get { storage[MongoRequestKey.self] }
         set { storage[MongoRequestKey.self] = newValue }
+    }
+    
+    /// Storage key for Consul request context.
+    private struct ConsulRequestKey: StorageKey {
+        typealias Value = ConsulRequestSendable
+    }
+    /// Consul request context associated with the current request.
+    public var consulRequest: ConsulRequestSendable? {
+        get { storage[ConsulRequestKey.self] }
+        set { storage[ConsulRequestKey.self] = newValue }
     }
 }
 
@@ -79,13 +89,13 @@ extension Application {
     }
 
     /// Storage key for PostgreSQL identifier.
-    private struct PsqlIdKey: StorageKey {
+    private struct PostgresIdKey: StorageKey {
         typealias Value = String
     }
     /// Unique identifier for the PostgreSQL instance.
-    public var psqlId: String? {
-        get { storage[PsqlIdKey.self] }
-        set { storage[PsqlIdKey.self] = newValue }
+    public var postgresId: String? {
+        get { storage[PostgresIdKey.self] }
+        set { storage[PostgresIdKey.self] = newValue }
     }
 
     /// Storage key for Redis identifier.
@@ -115,7 +125,7 @@ extension Application {
         typealias Value = PostgresHealthChecksProtocol
     }
     /// PostgreSQL health checks handler.
-    public var psqlHealthChecks: PostgresHealthChecksProtocol? {
+    public var postgresHealthChecks: PostgresHealthChecksProtocol? {
         get { storage[PostgresHealthChecksKey.self] }
         set { storage[PostgresHealthChecksKey.self] = newValue }
     }
@@ -174,35 +184,31 @@ extension Application {
 }
 
 extension Application {
-    /// Storage key for MongoDB cluster.
-    private struct MongoClusterKey: StorageKey {
-        typealias Value = MongoCluster
+    /// Storage key for Mongo database.
+    private struct MongoDatabaseKey: StorageKey {
+        typealias Value = MongoDatabase
     }
-    /// Shared MongoDB cluster instance.
+    /// Shared Mongo database instance.
     /// - Important: Should be initialized once during application bootstrap.
-    public var healthCheckMongoCluster: MongoCluster? {
-        get { storage[MongoClusterKey.self] }
-        set { storage[MongoClusterKey.self] = newValue }
+    public var healthCheckMongoDatabase: MongoDatabase? {
+        get { storage[MongoDatabaseKey.self] }
+        set { storage[MongoDatabaseKey.self] = newValue }
     }
 
-    /// Initializes MongoDB cluster with eager connection.
+    /// Initializes Mongo database with eager connection.
     /// - Parameter connectionString: MongoDB connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
-    public func initializeMongoCluster(connectionString: String) async throws {
-        self.healthCheckMongoCluster = try await MongoCluster(
-            connectingTo: ConnectionSettings(connectionString)
-        )
+    public func initializeMongo(connectionString: String) async throws {
+        self.healthCheckMongoDatabase = try await MongoDatabase.connect(to: connectionString)
     }
 
-    /// Initializes MongoDB cluster with lazy connection.
-    /// - Parameter connectionString: MongoDB connection string.
+    /// Initializes Mongo database with lazy connection.
+    /// - Parameter connectionString: Mongo database connection string.
     /// - Note: See README for comparison of connection strategies:
     ///   <https://github.com/LLCFreedom-Space/fs-app-health-checks#mongodb-connection-strategies>
-    public func initializeLazyMongoCluster(connectionString: String) throws {
-        self.healthCheckMongoCluster = try MongoCluster(
-            lazyConnectingTo: ConnectionSettings(connectionString)
-        )
+    public func initializeLazyMongo(connectionString: String) throws {
+        self.healthCheckMongoDatabase = try MongoDatabase.lazyConnect(to: connectionString)
     }
 }
 

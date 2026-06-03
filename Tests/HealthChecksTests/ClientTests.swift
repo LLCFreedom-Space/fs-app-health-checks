@@ -16,13 +16,29 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulHealthChecksProtocol.swift
+//  ClientTests.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 07.02.2024.
+//  Created by Mykola Buhaiov on 02.06.2026.
 //
 
-import Vapor
+@testable import HealthChecksMocks
+@testable import HealthChecks
+import VaporTesting
+import Testing
 
-/// A protocol defining health check capabilities for a Consul service.
-public protocol ConsulHealthChecksProtocol: ConsulChecksProtocol, ChecksProtocol, Sendable {}
+@Suite("Client tests")
+struct ClientTests {
+    @Test("Delegating returns same instance")
+    func delegatingReturnsSameInstance() {
+        let firstLoop = EmbeddedEventLoop()
+        let secondLoop = EmbeddedEventLoop()
+        
+        let client = MockClient(
+            eventLoop: firstLoop,
+            clientResponse: ClientResponse(status: .ok)
+        )
+        let delegated = client.delegating(to: secondLoop) as? MockClient
+        #expect(delegated?.eventLoop === secondLoop)
+    }
+}

@@ -29,46 +29,34 @@ import Testing
 
 @Suite("Health check item tests")
 struct HealthCheckItemTests {
-    private func withApp(_ test: (Application) async throws -> ()) async throws {
-        let app = try await Application.make(.testing)
-        do {
-            try await test(app)
-        } catch {
-            throw error
-        }
-        try await app.asyncShutdown()
-    }
-
     @Test("Health check item equatable")
     func healthCheckItemEquatable() async throws {
-        try await withApp { _ in
-            let firstHealthCheckItem = HealthCheckItem(
-                componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
-                componentType: .datastore,
-                observedValue: 1,
-                observedUnit: "s",
-                status: .pass,
-                affectedEndpoints: nil,
-                time: "2024-02-01T11:11:59.364",
-                output: "Ok",
-                links: nil,
-                node: nil
-            )
-            var secondHealthCheckItem = HealthCheckItem(
-                componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
-                componentType: .datastore,
-                observedValue: 1,
-                observedUnit: "s",
-                status: .pass,
-                affectedEndpoints: nil,
-                time: "2024-02-01T11:11:59.364",
-                output: "Ok",
-                links: nil,
-                node: nil
-            )
-            #expect(firstHealthCheckItem == secondHealthCheckItem)
-            secondHealthCheckItem.observedValue = 4
-            #expect(firstHealthCheckItem != secondHealthCheckItem)
-        }
+        let firstHealthCheckItem = HealthCheckItem(
+            componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
+            componentType: .datastore,
+            observedValue: 1,
+            observedUnit: "s",
+            status: .pass,
+            affectedEndpoints: nil,
+            time: "2024-02-01T11:11:59.364",
+            output: "Ok",
+            links: nil,
+            node: nil
+        )
+        var secondHealthCheckItem = HealthCheckItem(
+            componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
+            componentType: .datastore,
+            observedValue: 1,
+            observedUnit: "s",
+            status: .pass,
+            affectedEndpoints: nil,
+            time: "2024-02-01T11:11:59.364",
+            output: "Ok",
+            links: nil,
+            node: nil
+        )
+        #expect(firstHealthCheckItem == secondHealthCheckItem)
+        secondHealthCheckItem.observedValue = 4
+        #expect(firstHealthCheckItem != secondHealthCheckItem)
     }
 }

@@ -26,31 +26,29 @@ import Vapor
 @testable import HealthChecks
 
 public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
-    private var healthCheckItem: HealthCheckItem
-    
-    public init(healthCheckItem: HealthCheckItem = healthCheckItem) {
-        self.healthCheckItem = healthCheckItem
-    }
-
-    public static let consulId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     public static let healthCheckItem = HealthCheckItem(
-        componentId: consulId,
+        componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
         componentType: .component,
         observedValue: 1,
         observedUnit: "s",
         status: .pass,
         affectedEndpoints: nil,
         time: "2024-02-01T11:11:59.364",
-        output: "Ok",
+        output: nil,
         links: nil,
         node: nil
     )
-
+    
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.consul):\(MeasurementType.responseTime)": ConsulHealthChecksMock.healthCheckItem,
             "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
         ]
         return result
     }
+    
+    public func connection() async -> HealthCheckItem {
+        ConsulHealthChecksMock.healthCheckItem
+    }
+    
+    public func checkConnection() async throws { }
 }

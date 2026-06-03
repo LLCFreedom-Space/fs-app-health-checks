@@ -33,6 +33,9 @@ public struct MockClient: Client {
     }
     
     public func delegating(to eventLoop: EventLoop) -> Client {
-        self
+        MockClient(
+            eventLoop: eventLoop,
+            clientResponse: clientResponse
+        )
     }
 }

@@ -31,12 +31,12 @@ import Testing
 struct ApplicationHealthChecksCheckTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
-        do {
-            try await test(app)
-        } catch {
-            throw error
+        defer {
+            Task {
+                try? await app.asyncShutdown()
+            }
         }
-        try await app.asyncShutdown()
+        try await test(app)
     }
 
     @Test("Check")
@@ -61,33 +61,21 @@ struct ApplicationHealthChecksCheckTests {
             let checks = await healthChecks.check(for: [.uptime, .utilization])
             #expect(checks.count == 3)
             #expect(checks.keys.contains(MeasurementType.uptime.rawValue))
-            guard let uptimeItem = checks[MeasurementType.uptime.rawValue] else {
-                Issue.record("No have uptime")
-                return
-            }
+            let uptimeItem = try #require(checks[MeasurementType.uptime.rawValue])
             #expect(uptimeItem.componentType == .system)
             #expect(uptimeItem.observedUnit == "s")
             #expect(uptimeItem.status == .pass)
             #expect(uptimeItem.version != nil)
-            guard let observedValue = uptimeItem.observedValue else {
-                Issue.record("No have observed value")
-                return
-            }
+            let observedValue = try #require(uptimeItem.observedValue)
             let expectedUptime = processInfo.systemUptime
             #expect(abs(observedValue - expectedUptime) < 1.0)
             let cpuKey = "\(ComponentName.cpu):\(MeasurementType.utilization)"
-            guard let cpuItem = checks[cpuKey] else {
-                Issue.record("No have cpu")
-                return
-            }
+            let cpuItem = try #require(checks[cpuKey])
             #expect(cpuItem.componentType == .system)
             #expect(cpuItem.observedUnit == "cores")
             #expect(cpuItem.status == .pass)
             let memoryKey = "\(ComponentName.memory):\(MeasurementType.utilization)"
-            guard let memoryItem = checks[memoryKey] else {
-                Issue.record("No have memory")
-                return
-            }
+            let memoryItem = try #require(checks[memoryKey])
             #expect(memoryItem.componentType == .system)
             #expect(memoryItem.observedUnit == "GiB")
             #expect(memoryItem.status == .pass)
@@ -125,10 +113,7 @@ struct ApplicationHealthChecksCheckTests {
 
             // Assert time is within a reasonable range of actual uptime
             let expectedUptime = processInfo.systemUptime
-            guard let value = item.observedValue else {
-                Issue.record("No observed value")
-                return
-            }
+            let value = try #require(item.observedValue)
             #expect(abs(value - expectedUptime) < 1.0)
         }
     }

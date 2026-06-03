@@ -82,18 +82,14 @@ public struct ApplicationHealthChecks: ApplicationHealthChecksProtocol {
     ///   - Key: `String` representation of the `MeasurementType`
     ///   - Value: Corresponding `HealthCheckItem` result
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
+        let types = Set(options)
         var results: [String: HealthCheckItem] = [:]
-        let measurementTypes = Array(Set(options))
-        for type in measurementTypes {
-            switch type {
-            case .uptime:
-                results[MeasurementType.uptime.rawValue] = uptime()
-            case .utilization:
-                results["\(ComponentName.memory.rawValue):\(MeasurementType.utilization.rawValue)"] = memory()
-                results["\(ComponentName.cpu.rawValue):\(MeasurementType.utilization.rawValue)"] = cpu()
-            default:
-                break
-            }
+        if types.contains(.uptime) {
+            results[MeasurementType.uptime.rawValue] = uptime()
+        }
+        if types.contains(.utilization) {
+            results["\(ComponentName.memory.rawValue):\(MeasurementType.utilization.rawValue)"] = memory()
+            results["\(ComponentName.cpu.rawValue):\(MeasurementType.utilization.rawValue)"] = cpu()
         }
         return results
     }

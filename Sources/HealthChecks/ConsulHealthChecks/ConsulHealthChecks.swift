@@ -38,64 +38,14 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     /// - Parameter options: An array of `MeasurementType` values specifying.
     /// - Returns: `[String: HealthCheckItem]`
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
-        var result = ["": HealthCheckItem()]
-        let measurementTypes = Array(Set(options))
-        let dateNow = Date().timeIntervalSince1970
-        let response = await getStatus()
-        for type in measurementTypes {
-            switch type {
-            case .responseTime:
-                result["\(ComponentName.consul):\(MeasurementType.responseTime)"] = responseTime(from: response, dateNow)
-            case .connections:
-                result["\(ComponentName.consul):\(MeasurementType.connections)"] = status(response)
-            default:
-                break
-            }
+        let types = Set(options)
+        async let responseTimeResult: HealthCheckItem? =
+        types.contains(.connections) ? connection() : nil
+        var results: [String: HealthCheckItem] = [:]
+        if let item = await responseTimeResult {
+            results["\(ComponentName.consul):\(MeasurementType.connections)"] = item
         }
-        result[""] = nil
-        return result
-    }
-
-    /// Retrieves the current status of the Consul service.
-    /// - Returns: `ClientResponse`
-    func getStatus() async -> ClientResponse {
-        guard let url = app.consulConfig?.url, !url.isEmpty else {
-            app.logger.error("Consul URL is not configured.")
-            return ClientResponse()
-        }
-        let path = Constants.consulStatusPath
-        let uri = URI(string: url + path)
-        var headers = HTTPHeaders()
-        if let token = app.consulConfig?.token {
-            headers.bearerAuthorization = BearerAuthorization(token: token)
-        }
-        if let username = app.consulConfig?.username,
-           !username.isEmpty,
-           let password = app.consulConfig?.password,
-           !password.isEmpty {
-            headers.basicAuthorization = BasicAuthorization(username: username, password: password)
-        }
-        do {
-            return try await app.client.get(uri, headers: headers)
-        } catch {
-            app.logger.error("Send request by uri - \(uri) and method get fail with error - \(error).")
-            return ClientResponse()
-        }
-    }
-
-    /// Generates a `HealthCheckItem` based on the connection status of the Consul service.
-    /// - Parameter response: The `ClientResponse` from the Consul status request.
-    /// - Returns: `HealthCheckItem`
-    func status(_ response: ClientResponse) -> HealthCheckItem {
-        return HealthCheckItem(
-            componentId: app.consulConfig?.id,
-            componentType: .component,
-            status: response.status == .ok ? .pass : .fail,
-            time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,
-            output: response.status != .ok ? "Error response from consul, with http status - \(response.status)" : nil,
-            links: nil,
-            node: nil
-        )
+        return results
     }
 
     /// Generates a `HealthCheckItem` representing the response time of the Consul service.
@@ -103,17 +53,33 @@ public struct ConsulHealthChecks: ConsulHealthChecksProtocol {
     ///   - response: The `ClientResponse` from the Consul status request.
     ///   - start: The start time used to calculate response duration.
     /// - Returns: `HealthCheckItem`
-    func responseTime(from response: ClientResponse, _ start: TimeInterval) -> HealthCheckItem {
-        return HealthCheckItem(
+    public func connection() async -> HealthCheckItem {
+        let startTime: Date = .now
+        var healthCheckItem = HealthCheckItem(
             componentId: app.consulConfig?.id,
             componentType: .component,
-            observedValue: response.status == .ok ? (Date().timeIntervalSince1970 - start) * 1000 : 0,
-            observedUnit: "ms",
-            status: response.status == .ok ? .pass : .fail,
-            time: response.status == .ok ? app.dateTimeISOFormat.string(from: Date()) : nil,
-            output: response.status != .ok ? "Error response from consul, with http status - \(response.status)" : nil,
+            status: .pass,
             links: nil,
             node: nil
         )
+        do {
+            try await checkConnection()
+            healthCheckItem.observedValue = Date().timeIntervalSince(startTime)
+            healthCheckItem.observedUnit = "s"
+            healthCheckItem.time = app.dateTimeISOFormat.string(from: .now)
+            return healthCheckItem
+        } catch {
+            healthCheckItem.status = .fail
+            healthCheckItem.output = error.localizedDescription
+            return healthCheckItem
+        }
+    }
+    
+    /// Checks the connection for the Consul database.
+    public func checkConnection() async throws {
+        guard let consulRequest = app.consulRequest else {
+            throw HealthCheckError.serviceNotSetup
+        }
+        return try await consulRequest.checkConnection()
     }
 }

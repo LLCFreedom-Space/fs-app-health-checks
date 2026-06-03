@@ -16,13 +16,20 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  ConsulHealthChecksProtocol.swift
+//  ConsulChecksProtocol.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 07.02.2024.
+//  Created by Mykola Buhaiov on 02.06.2026.
 //
 
 import Vapor
 
-/// A protocol defining health check capabilities for a Consul service.
-public protocol ConsulHealthChecksProtocol: ConsulChecksProtocol, ChecksProtocol, Sendable {}
+/// Protocol defining a sendable Consul request handler.
+public protocol ConsulChecksProtocol: Sendable {
+    /// Retrieves the Consul connection status.
+    /// - Returns: A `HealthCheckItem` representing the connection state.
+    func connection() async -> HealthCheckItem
+    /// Checks whether Consul is reachable and responding.
+    /// - Throws: `HealthCheckError`
+    func checkConnection() async throws
+}

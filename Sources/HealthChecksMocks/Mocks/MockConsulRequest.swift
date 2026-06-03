@@ -16,21 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //
-//  PsqlRequestSendable.swift
+//  MockConsulRequest.swift
+//  fs-app-health-checks
 //
-//
-//  Created by Mykola Buhaiov on 14.03.2024.
+//  Created by Mykola Buhaiov on 29.05.2026.
 //
 
 import Vapor
+@testable import HealthChecks
 
-/// Protocol defining PostgreSQL request operations.
-public protocol PsqlRequestSendable: Sendable {
-    /// Retrieves the PostgreSQL version description.
-    /// - Returns: A `String` containing the PostgreSQL version.
-    func getVersionDescription() async throws -> String
-    /// Checks the connection state for a specific PostgreSQL database.
-    /// - Parameter databaseName: The name of the PostgreSQL database to check.
-    /// - Returns: A `String` describing the connection status, e.g., `"active"` or an error message.
-    func checkConnection() async throws -> String
+public struct MockConsulRequest: ConsulRequestSendable {
+    public func checkConnection() async throws { }
 }

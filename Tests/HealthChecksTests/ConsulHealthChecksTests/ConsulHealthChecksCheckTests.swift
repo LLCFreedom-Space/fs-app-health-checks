@@ -31,85 +31,141 @@ import Testing
 struct ConsulHealthChecksCheckTests {
     private func withApp(_ test: (Application) async throws -> ()) async throws {
         let app = try await Application.make(.testing)
-        do {
-            try await test(app)
-        } catch {
-            throw error
+        defer {
+            Task {
+                try? await app.asyncShutdown()
+            }
         }
-        try await app.asyncShutdown()
+        try await test(app)
     }
 
     @Test("Health check")
     func healthCheck() async throws {
         try await withApp { app in
-            let consulUrl = "http://127.0.0.1:8500"
             app.consulHealthChecks = ConsulHealthChecksMock()
             let consulConfig = ConsulConfig(
                 id: UUID().uuidString,
-                url: consulUrl
+                url: Constants.consulUrl
             )
             app.consulConfig = consulConfig
-            let result = await app.consulHealthChecks?.check(for: [MeasurementType.responseTime, MeasurementType.connections])
-            let responseTimes = result?["\(ComponentName.consul):\(MeasurementType.responseTime)"]
-            #expect(responseTimes == ConsulHealthChecksMock.healthCheckItem)
+            let result = await app.consulHealthChecks?.check(
+                for: [MeasurementType.responseTime, MeasurementType.connections]
+            )
+            let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
+            #expect(connections == ConsulHealthChecksMock.healthCheckItem)
             #expect(app.consulConfig?.id == consulConfig.id)
             #expect(app.consulConfig?.url == consulConfig.url)
-            #expect(app.consulConfig?.username == consulConfig.username)
-            #expect(app.consulConfig?.password == consulConfig.password)
+            
+            #expect(result?["\(ComponentName.consul):\(MeasurementType.uptime)"] == nil)
         }
     }
-
-    @Test("Check for both success")
-    func checkForBothSuccess() async throws {
+    
+    @Test("Health check with errors")
+    func healthCheckWithErrors() async throws {
         try await withApp { app in
-            app.consulConfig = ConsulConfig(
-                id: String(UUID()),
-                url: "consul-url"
-            )
-            let clientResponse = ClientResponse(status: .ok)
+            app.consulRequest = ConsulRequest(app: app)
+            app.consulHealthChecks = ConsulHealthChecks(app: app)
+            var result = await app.consulHealthChecks?.check(for: [MeasurementType.connections])
+            #expect(result?.count == 1)
+            var connections = try #require(result?["\(ComponentName.consul):\(MeasurementType.connections)"])
+            #expect(connections.componentId == nil)
+            #expect(connections.componentType == .component)
+            #expect(connections.status == .fail)
+            #expect(connections.output == HealthCheckError.urlNotConfigured.errorDescription)
+            
+            let consulConfig = ConsulConfig(id: UUID().uuidString, url: Constants.consulUrl)
+            app.consulConfig = consulConfig
+            let clientResponse = ClientResponse(status: .notFound)
             app.clients.use { app in
                 MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
             }
-            let healthChecks = ConsulHealthChecks(app: app)
-            let check = await healthChecks.check(for: [.responseTime, .connections])
-            #expect(check.count == 2)
-            guard let responseTimeCheck = check["\(ComponentName.consul):\(MeasurementType.responseTime)"] else {
-                Issue.record("No have key for response time")
-                return
-            }
-            #expect(responseTimeCheck.status == .pass)
-            guard let observedValue = responseTimeCheck.observedValue else {
-                Issue.record("No have observed value")
-                return
-            }
-            #expect(observedValue > .zero)
-            #expect(responseTimeCheck.output == nil)
-            guard let connectionsCheck = check["\(ComponentName.consul):\(MeasurementType.connections)"] else {
-                Issue.record("No have key for connections")
-                return
-            }
-            #expect(connectionsCheck.status == .pass)
-            #expect(connectionsCheck.observedValue == nil)
-            #expect(connectionsCheck.output == nil)
+            result = await app.consulHealthChecks?.check(for: [MeasurementType.connections])
+            #expect(result?.count == 1)
+            connections = try #require(result?["\(ComponentName.consul):\(MeasurementType.connections)"])
+            #expect(connections.componentId == consulConfig.id)
+            #expect(connections.componentType == .component)
+            #expect(connections.status == .fail)
+            #expect(connections.output == HealthCheckError.unexpectedStatusCode.errorDescription)
         }
     }
 
-    @Test("Check handles unsupported types")
-    func checkHandlesUnsupportedTypes() async throws {
+    @Test("Connections")
+    func connections() async throws {
         try await withApp { app in
-            let consulUrl = "http://127.0.0.1:8500"
+            app.consulRequest = MockConsulRequest()
+            let healthChecks = ConsulHealthChecks(app: app)
+            let result = await healthChecks.check(for: [.connections, .uptime])
+            #expect(result.count == 1)
+            let connections = try #require(result["\(ComponentName.consul):\(MeasurementType.connections)"])
+            #expect(connections.componentType == .component)
+            #expect(connections.status == .pass)
+            let observedValue = try #require(connections.observedValue)
+            #expect(observedValue < 1.0)
+            #expect(connections.observedUnit == "s")
+            #expect(connections.output == nil)
+        }
+    }
+    
+    @Test("Check connection")
+    func checkConnection() async throws {
+        try await withApp { app in
+            app.consulRequest = MockConsulRequest()
+            let checks = ConsulHealthChecks(app: app)
+            try await checks.checkConnection()
+            
+            app.consulHealthChecks = ConsulHealthChecksMock()
+            await #expect(throws: Never.self) { try await app.consulHealthChecks?.checkConnection() }
+        }
+    }
+
+    @Test("Check connection - service not setup")
+    func checkConnectionNotSetup() async throws {
+        try await withApp { app in
+            let checks = ConsulHealthChecks(app: app)
+            await #expect(throws: HealthCheckError.serviceNotSetup) {
+                try await checks.checkConnection()
+            }
+        }
+    }
+    
+    @Test("Connection")
+    func connection() async throws {
+        try await withApp { app in
             let consulConfig = ConsulConfig(
                 id: UUID().uuidString,
-                url: consulUrl
+                url: Constants.consulUrl
             )
             app.consulConfig = consulConfig
-            let healthChecks = ConsulHealthChecks(app: app)
-            let clientResponse = ClientResponse(status: .ok)
-            app.clients.use { app in
-                MockClient(eventLoop: app.eventLoopGroup.next(), clientResponse: clientResponse)
-            }
-            let checks = await healthChecks.check(for: [.uptime])
-            #expect(checks.count == .zero)  // Expect empty result, as .memory is not supported
+            app.consulHealthChecks = ConsulHealthChecksMock()
+            let mockResult = await app.consulHealthChecks?.connection()
+            #expect(mockResult == ConsulHealthChecksMock.healthCheckItem)
+            #expect(app.consulConfig?.id == consulConfig.id)
+
+            app.consulRequest = MockConsulRequest()
+            app.consulHealthChecks = ConsulHealthChecks(app: app)
+            let result = await app.consulHealthChecks?.connection()
+            #expect(result?.componentType == .component)
+            #expect(result?.observedValue != nil)
+            #expect(result?.observedUnit == "s")
+            #expect(result?.status == .pass)
+            #expect(result?.output == nil)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
+        }
+    }
+    
+    @Test("Connection with error")
+    func connectionWithError() async throws {
+        try await withApp { app in
+            app.consulHealthChecks = ConsulHealthChecks(app: app)
+            let result = await app.consulHealthChecks?.connection()
+            #expect(result?.componentType == .component)
+            #expect(result?.observedValue == nil)
+            #expect(result?.observedUnit == nil)
+            #expect(result?.status == .fail)
+            #expect(result?.output == HealthCheckError.serviceNotSetup.errorDescription)
+            #expect(result?.links == nil)
+            #expect(result?.node == nil)
         }
     }
 }

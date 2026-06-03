@@ -26,7 +26,7 @@ import Vapor
 @testable import HealthChecks
 
 public struct RedisRequestMock: RedisRequestSendable {
-    public func getPong() async throws -> String {
-        "PONG"
+    public func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) {
+        (2, "7.0.8")
     }
 }

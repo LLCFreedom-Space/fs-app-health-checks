@@ -26,12 +26,8 @@ import Vapor
 @testable import HealthChecks
 
 public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
-    private var healthCheckItem: HealthCheckItem
-    
-    public init(healthCheckItem: HealthCheckItem = healthCheckItem) {
-        self.healthCheckItem = healthCheckItem
-    }
-    
+    public static let connectedClients = 2
+    public static let version = "7.0.1"
     public static let redisId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
     public static let healthCheckItem = HealthCheckItem(
         componentId: redisId,
@@ -45,19 +41,19 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
         links: nil,
         node: nil
     )
-
+    
     public func connection() async -> HealthCheckItem {
         RedisHealthChecksMock.healthCheckItem
     }
-
+    
     public func responseTime() async -> HealthCheckItem {
         RedisHealthChecksMock.healthCheckItem
     }
-
-    public func ping() async -> String {
-        "PONG"
+    
+    public func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) {
+        return (RedisHealthChecksMock.connectedClients, RedisHealthChecksMock.version)
     }
-
+    
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
             "\(ComponentName.redis):\(MeasurementType.responseTime)": RedisHealthChecksMock.healthCheckItem,
