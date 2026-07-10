@@ -28,64 +28,27 @@ import Vapor
 public struct HealthCheckProvider: @unchecked Sendable {
     /// The Vapor application instance.
     public let app: Application
-
     /// Creates a new health check provider.
     /// - Parameter app: The Vapor application instance.
     public init(app: Application) {
         self.app = app
     }
-
-    /// Performs health checks for PostgreSQL.
-    /// - Returns: A `CheckResult` containing the PostgreSQL health status.
-    public func checkPostgres() async -> CheckResult {
-        let serviceChecks = await app.postgresHealthChecks?.check(for: [.connections, .responseTime])
-        return buildResult(name: ComponentName.postgresql.rawValue, serviceChecks: serviceChecks)
-    }
-
-    /// Performs health checks for Redis.
-    /// - Returns: A `CheckResult` containing the Redis health status.
-    public func checkRedis() async -> CheckResult {
-        let serviceChecks = await app.redisHealthChecks?.check(for: [.connections, .responseTime])
-        return buildResult(name: ComponentName.redis.rawValue, serviceChecks: serviceChecks)
-    }
-
-    /// Performs health checks for Consul.
-    /// - Returns: A `CheckResult` containing the Consul health status.
-    public func checkConsul() async -> CheckResult {
-        let serviceChecks = await app.consulHealthChecks?.check(for: [.connections])
-        return buildResult(name: ComponentName.consul.rawValue, serviceChecks: serviceChecks)
-    }
-
-    /// Performs health checks for MongoDB.
-    /// - Returns: A `CheckResult` containing the MongoDB health status.
-    public func checkMongo() async -> CheckResult {
-        let serviceChecks = await app.mongoHealthChecks?.check(for: [.connections, .responseTime])
-        return buildResult(name: ComponentName.mongo.rawValue, serviceChecks: serviceChecks)
-    }
-
-    /// Performs health checks for the application itself.
-    /// - Returns: A `CheckResult` containing the application health status.
-    public func checkApplication() async -> CheckResult {
-        let serviceChecks = await app.applicationHealthChecks?.check(for: [.uptime, .utilization])
-        return buildResult(name: "application", serviceChecks: serviceChecks)
-    }
-
-    /// Builds a unified health check result.
+    /// Performs a health check and returns a normalized result.
     /// - Parameters:
-    ///   - name: The name of the component being checked.
-    ///   - serviceChecks: The raw health check results.
+    ///   - name: The component name.
+    ///   - perform: Closure that executes the health check.
     /// - Returns: A normalized `CheckResult`.
-    func buildResult(
+    public func check(
         name: String,
-        serviceChecks: [String: HealthCheckItem]?
-    ) -> CheckResult {
-        guard let serviceChecks else {
-            app.logger.error("Health check failed. No connection to \(name).")
+        perform: () async -> [String: HealthCheckItem]?
+    ) async -> CheckResult {
+        guard let serviceChecks = await perform() else {
+            app.logger.error("Health check failed. No connection.", metadata: [ "name": .string(name) ])
             return .unavailable()
         }
         let hasFailed = serviceChecks.values.contains { $0.status == .fail }
         if hasFailed {
-            app.logger.error("Health check failed: \(name) reported failure.")
+            app.logger.error("Health check failed.", metadata: ["name": .string(name) ])
         }
         let items = serviceChecks.reduce(into: [String: [HealthCheckItem]]()) { dict, pair in
             guard !pair.key.isEmpty else {
