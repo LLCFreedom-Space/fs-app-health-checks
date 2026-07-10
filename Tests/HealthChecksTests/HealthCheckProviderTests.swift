@@ -120,7 +120,7 @@ struct HealthCheckProviderTests {
             
             #expect(result.status == .ok)
             #expect(!result.isUnavailable)
-            #expect(result.items.count == 2)
+            #expect(result.items.count == 1)
             
             let connections = result.items["\(ComponentName.consul):\(MeasurementType.connections)"]
             #expect(connections?.count == 1)
