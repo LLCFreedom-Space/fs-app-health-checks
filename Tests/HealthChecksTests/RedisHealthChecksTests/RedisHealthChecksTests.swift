@@ -46,7 +46,8 @@ struct RedisHealthChecksTests {
             app.redisId = redisId
             app.redisHealthChecks = RedisHealthChecksMock()
             let mockResult = await app.redisHealthChecks?.connection()
-            #expect(mockResult == RedisHealthChecksMock.healthCheckItem)
+            let redisHealthChecksMock = RedisHealthChecksMock()
+            #expect(mockResult == redisHealthChecksMock.healthCheckItem)
             #expect(app.redisId == redisId)
 
             app.redisRequest = RedisRequestMock()
@@ -81,8 +82,9 @@ struct RedisHealthChecksTests {
     func responseTime() async throws {
         try await withApp { app in
             app.redisHealthChecks = RedisHealthChecksMock()
-            let resultMock = await app.redisHealthChecks?.responseTime()
-            #expect(resultMock == RedisHealthChecksMock.healthCheckItem)
+            let mockResult = await app.redisHealthChecks?.responseTime()
+            let redisHealthChecksMock = RedisHealthChecksMock()
+            #expect(mockResult == redisHealthChecksMock.healthCheckItem)
 
             app.redisRequest = RedisRequestMock()
             app.redisHealthChecks = RedisHealthChecks(app: app)
@@ -120,8 +122,9 @@ struct RedisHealthChecksTests {
             let mock = await app.redisHealthChecks?.check(
                 for: [.responseTime, .connections, .utilization]
             )
-            #expect(mock?["\(ComponentName.redis):\(MeasurementType.connections)"] == RedisHealthChecksMock.healthCheckItem)
-            #expect(mock?["\(ComponentName.redis):\(MeasurementType.responseTime)"] == RedisHealthChecksMock.healthCheckItem)
+            let redisHealthChecksMock = RedisHealthChecksMock()
+            #expect(mock?["\(ComponentName.redis):\(MeasurementType.connections)"] == redisHealthChecksMock.healthCheckItem)
+            #expect(mock?["\(ComponentName.redis):\(MeasurementType.responseTime)"] == redisHealthChecksMock.healthCheckItem)
 
             app.redisRequest = RedisRequestMock()
             app.redisHealthChecks = RedisHealthChecks(app: app)

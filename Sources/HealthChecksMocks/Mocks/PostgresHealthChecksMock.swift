@@ -32,7 +32,7 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
             """
     public static let activeConnections = 2
     public static let postgresId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-    public static let healthCheckItem = HealthCheckItem(
+    public let healthCheckItem = HealthCheckItem(
         componentId: postgresId,
         componentType: .datastore,
         observedValue: 1,
@@ -46,17 +46,17 @@ public struct PostgresHealthChecksMock: PostgresHealthChecksProtocol {
     )
     
     public func connection() async -> HealthCheckItem {
-        PostgresHealthChecksMock.healthCheckItem
+        healthCheckItem
     }
     
     public func responseTime() async -> HealthCheckItem {
-        PostgresHealthChecksMock.healthCheckItem
+        healthCheckItem
     }
     
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.postgresql):\(MeasurementType.responseTime)": PostgresHealthChecksMock.healthCheckItem,
-            "\(ComponentName.postgresql):\(MeasurementType.connections)": PostgresHealthChecksMock.healthCheckItem
+            "\(ComponentName.postgresql):\(MeasurementType.responseTime)": healthCheckItem,
+            "\(ComponentName.postgresql):\(MeasurementType.connections)": healthCheckItem
         ]
         return result
     }

@@ -52,7 +52,8 @@ struct ConsulHealthChecksCheckTests {
                 for: [MeasurementType.responseTime, MeasurementType.connections]
             )
             let connections = result?["\(ComponentName.consul):\(MeasurementType.connections)"]
-            #expect(connections == ConsulHealthChecksMock.healthCheckItem)
+            let consulHealthChecksMock = ConsulHealthChecksMock()
+            #expect(connections == consulHealthChecksMock.healthCheckItem)
             #expect(app.consulConfig?.id == consulConfig.id)
             #expect(app.consulConfig?.url == consulConfig.url)
             
@@ -138,7 +139,8 @@ struct ConsulHealthChecksCheckTests {
             app.consulConfig = consulConfig
             app.consulHealthChecks = ConsulHealthChecksMock()
             let mockResult = await app.consulHealthChecks?.connection()
-            #expect(mockResult == ConsulHealthChecksMock.healthCheckItem)
+            let consulHealthChecksMock = ConsulHealthChecksMock()
+            #expect(mockResult == consulHealthChecksMock.healthCheckItem)
             #expect(app.consulConfig?.id == consulConfig.id)
 
             app.consulRequest = MockConsulRequest()

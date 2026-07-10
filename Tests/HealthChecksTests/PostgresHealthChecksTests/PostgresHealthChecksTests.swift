@@ -45,7 +45,8 @@ struct PostgresHealthChecksTests {
             app.postgresId = postgresId
             app.postgresHealthChecks = PostgresHealthChecksMock()
             let mockResult = await app.postgresHealthChecks?.connection()
-            #expect(mockResult == PostgresHealthChecksMock.healthCheckItem)
+            let postgresHealthChecksMock = PostgresHealthChecksMock()
+            #expect(mockResult == postgresHealthChecksMock.healthCheckItem)
             #expect(app.postgresId == postgresId)
 
             app.postgresRequest = PostgresRequestMock()
@@ -80,8 +81,9 @@ struct PostgresHealthChecksTests {
     func responseTime() async throws {
         try await withApp { app in
             app.postgresHealthChecks = PostgresHealthChecksMock()
-            let resultMock = await app.postgresHealthChecks?.responseTime()
-            #expect(resultMock == PostgresHealthChecksMock.healthCheckItem)
+            let mockResult = await app.postgresHealthChecks?.responseTime()
+            let postgresHealthChecksMock = PostgresHealthChecksMock()
+            #expect(mockResult == postgresHealthChecksMock.healthCheckItem)
 
             app.postgresRequest = PostgresRequestMock()
             app.postgresHealthChecks = PostgresHealthChecks(app: app)
@@ -119,8 +121,10 @@ struct PostgresHealthChecksTests {
             let mock = await app.postgresHealthChecks?.check(
                 for: [.responseTime, .connections, .utilization]
             )
-            #expect(mock?["\(ComponentName.postgresql):\(MeasurementType.connections)"] == PostgresHealthChecksMock.healthCheckItem)
-            #expect(mock?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] == PostgresHealthChecksMock.healthCheckItem)
+            let postgresHealthChecksMock = PostgresHealthChecksMock()
+
+            #expect(mock?["\(ComponentName.postgresql):\(MeasurementType.connections)"] == postgresHealthChecksMock.healthCheckItem)
+            #expect(mock?["\(ComponentName.postgresql):\(MeasurementType.responseTime)"] == postgresHealthChecksMock.healthCheckItem)
 
             app.postgresRequest = PostgresRequestMock()
             app.postgresHealthChecks = PostgresHealthChecks(app: app)

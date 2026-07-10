@@ -29,7 +29,7 @@ public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
     public static let version = "7.0.1"
     public static let activeConnections = 2
     public static let mongoId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-    public static let healthCheckItem = HealthCheckItem(
+    public let healthCheckItem = HealthCheckItem(
         componentId: mongoId,
         componentType: .datastore,
         observedValue: 1,
@@ -43,17 +43,17 @@ public struct MongoHealthChecksMock: MongoHealthChecksProtocol {
     )
     
     public func connection() async -> HealthCheckItem {
-        MongoHealthChecksMock.healthCheckItem
+        healthCheckItem
     }
     
     public func responseTime() async -> HealthCheckItem {
-        MongoHealthChecksMock.healthCheckItem
+        healthCheckItem
     }
     
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.mongo):\(MeasurementType.responseTime)": MongoHealthChecksMock.healthCheckItem,
-            "\(ComponentName.mongo):\(MeasurementType.connections)": MongoHealthChecksMock.healthCheckItem
+            "\(ComponentName.mongo):\(MeasurementType.responseTime)": healthCheckItem,
+            "\(ComponentName.mongo):\(MeasurementType.connections)": healthCheckItem
         ]
         return result
     }
