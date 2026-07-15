@@ -29,7 +29,7 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
     public static let connectedClients = 2
     public static let version = "7.0.1"
     public static let redisId = "adca7c3d-55f4-4ab3-a842-18b35f50cb0f"
-    public static let healthCheckItem = HealthCheckItem(
+    public let healthCheckItem = HealthCheckItem(
         componentId: redisId,
         componentType: .datastore,
         observedValue: 1,
@@ -43,11 +43,11 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
     )
     
     public func connection() async -> HealthCheckItem {
-        RedisHealthChecksMock.healthCheckItem
+        healthCheckItem
     }
     
     public func responseTime() async -> HealthCheckItem {
-        RedisHealthChecksMock.healthCheckItem
+        healthCheckItem
     }
     
     public func getDatabaseHealthMetrics() async throws -> (connectedClients: Int, version: String) {
@@ -56,8 +56,8 @@ public struct RedisHealthChecksMock: RedisHealthChecksProtocol {
     
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.redis):\(MeasurementType.responseTime)": RedisHealthChecksMock.healthCheckItem,
-            "\(ComponentName.redis):\(MeasurementType.connections)": RedisHealthChecksMock.healthCheckItem
+            "\(ComponentName.redis):\(MeasurementType.responseTime)": healthCheckItem,
+            "\(ComponentName.redis):\(MeasurementType.connections)": healthCheckItem
         ]
         return result
     }

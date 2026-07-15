@@ -26,7 +26,7 @@ import Vapor
 @testable import HealthChecks
 
 public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
-    public static let healthCheckItem = HealthCheckItem(
+    public let healthCheckItem = HealthCheckItem(
         componentId: "adca7c3d-55f4-4ab3-a842-18b35f50cb0f",
         componentType: .component,
         observedValue: 1,
@@ -41,13 +41,13 @@ public struct ConsulHealthChecksMock: ConsulHealthChecksProtocol {
     
     public func check(for options: [MeasurementType]) async -> [String: HealthCheckItem] {
         let result = [
-            "\(ComponentName.consul):\(MeasurementType.connections)": ConsulHealthChecksMock.healthCheckItem
+            "\(ComponentName.consul):\(MeasurementType.connections)": healthCheckItem
         ]
         return result
     }
     
     public func connection() async -> HealthCheckItem {
-        ConsulHealthChecksMock.healthCheckItem
+        healthCheckItem
     }
     
     public func checkConnection() async throws { }

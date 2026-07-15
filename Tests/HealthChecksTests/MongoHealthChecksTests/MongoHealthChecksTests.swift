@@ -46,7 +46,8 @@ struct MongoHealthChecksTests {
             app.mongoId = mongoId
             app.mongoHealthChecks = MongoHealthChecksMock()
             let mockResult = await app.mongoHealthChecks?.connection()
-            #expect(mockResult == MongoHealthChecksMock.healthCheckItem)
+            let mongoHealthChecksMock = MongoHealthChecksMock()
+            #expect(mockResult == mongoHealthChecksMock.healthCheckItem)
             #expect(app.mongoId == mongoId)
 
             app.mongoRequest = MongoRequestMock()
@@ -81,8 +82,9 @@ struct MongoHealthChecksTests {
     func responseTime() async throws {
         try await withApp { app in
             app.mongoHealthChecks = MongoHealthChecksMock()
-            let resultMock = await app.mongoHealthChecks?.responseTime()
-            #expect(resultMock == MongoHealthChecksMock.healthCheckItem)
+            let mockResult = await app.mongoHealthChecks?.responseTime()
+            let mongoHealthChecksMock = MongoHealthChecksMock()
+            #expect(mockResult == mongoHealthChecksMock.healthCheckItem)
 
             app.mongoRequest = MongoRequestMock()
             app.mongoHealthChecks = MongoHealthChecks(app: app)
@@ -130,8 +132,10 @@ struct MongoHealthChecksTests {
             let mock = await app.mongoHealthChecks?.check(
                 for: [.responseTime, .connections, .utilization]
             )
-            #expect(mock?["\(ComponentName.mongo):\(MeasurementType.connections)"] == MongoHealthChecksMock.healthCheckItem)
-            #expect(mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"] == MongoHealthChecksMock.healthCheckItem)
+            let mongoHealthChecksMock = MongoHealthChecksMock()
+
+            #expect(mock?["\(ComponentName.mongo):\(MeasurementType.connections)"] == mongoHealthChecksMock.healthCheckItem)
+            #expect(mock?["\(ComponentName.mongo):\(MeasurementType.responseTime)"] == mongoHealthChecksMock.healthCheckItem)
 
             app.mongoRequest = MongoRequestMock()
             app.mongoHealthChecks = MongoHealthChecks(app: app)
